@@ -25,12 +25,13 @@ function buildHero() {
     def,
     status: [],
     raged: false,
-    visualState: 'normal'
+    visualState: 'normal' // normal | panic | rage | flee | dead
   };
 }
 
 function getHeroIcon(hero) {
   if (!hero) return '⚔';
+  if (hero.visualState === 'dead') return '💀';
   if (hero.visualState === 'rage') return '🔥';
   if (hero.visualState === 'flee') return '💨';
   if (hero.visualState === 'panic') return '😰';
@@ -39,6 +40,8 @@ function getHeroIcon(hero) {
 
 function applyHeroVisualState(hero, nextState) {
   if (!hero) return;
+  // once dead, don't override with panic/rage
+  if (hero.visualState === 'dead' && nextState !== 'dead') return;
   hero.visualState = nextState;
   if (typeof updateHeroCardVisual === 'function') {
     updateHeroCardVisual(hero);
@@ -46,7 +49,10 @@ function applyHeroVisualState(hero, nextState) {
 }
 
 function checkPanic(hero) {
-  if (!hero || hero.visualState === 'rage' || hero.visualState === 'flee') return;
+  if (!hero) return;
+  // no panic if already dead, raging, or fleeing
+  if (hero.hp <= 0) return;
+  if (hero.visualState === 'rage' || hero.visualState === 'flee' || hero.visualState === 'dead') return;
   if (hero.hp / hero.maxHp <= 0.3) {
     applyHeroVisualState(hero, 'panic');
     if (typeof setReaction === 'function') setReaction('PANIK...');
@@ -55,6 +61,7 @@ function checkPanic(hero) {
 
 function tryTriggerRage(hero) {
   if (!hero || !hero.canRage || hero.raged) return false;
+  if (hero.hp <= 0) return false;
   if (hero.hp / hero.maxHp > hero.rageHpThreshold) return false;
 
   hero.raged = true;
@@ -69,7 +76,14 @@ function tryTriggerRage(hero) {
 }
 
 function triggerFlee(hero) {
-  if (!hero) return;
+  if (!hero || hero.hp <= 0) return;
   applyHeroVisualState(hero, 'flee');
   if (typeof setReaction === 'function') setReaction('KABUR!');
+}
+
+function triggerDeath(hero) {
+  if (!hero) return;
+  applyHeroVisualState(hero, 'dead');
+  if (typeof setReaction === 'function') setReaction('GUGUR');
+  if (typeof updateHeroCard === 'function') updateHeroCard(hero);
 }
