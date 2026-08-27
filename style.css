@@ -30,7 +30,14 @@
   --radius: 3px;
 }
 
-* {
+
+/* ============================================
+   RESET / BASE
+   ============================================ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -40,8 +47,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
-  background-image:
+  min-height: 100vh;
+
+  background:
     radial-gradient(
       ellipse at 20% 0%,
       rgba(192, 71, 43, 0.08),
@@ -51,11 +59,13 @@ body {
       ellipse at 85% 100%,
       rgba(122, 149, 86, 0.06),
       transparent 55%
-    );
+    ),
+    var(--bg);
+
   background-attachment: fixed;
+
   color: var(--bone);
   font-family: var(--font-body);
-  min-height: 100vh;
 
   animation: page-enter 0.7s ease-out both;
 }
@@ -63,14 +73,16 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
   margin: 0;
+
+  font-family: var(--font-display);
   letter-spacing: 0.02em;
 }
 
 button {
   font-family: var(--font-body);
 }
+
 
 /* ============================================
    KEYFRAMES
@@ -161,11 +173,11 @@ button {
 }
 
 @keyframes hp-flash {
-  0% {
+  from {
     opacity: 0.65;
   }
 
-  100% {
+  to {
     opacity: 1;
   }
 }
@@ -208,15 +220,19 @@ button {
   }
 }
 
+
 /* ============================================
    APP
    ============================================ */
 
 .app {
+  width: 100%;
   max-width: 1400px;
+
   margin: 0 auto;
   padding: 20px 24px 48px;
 }
+
 
 /* ============================================
    TOPBAR
@@ -227,7 +243,11 @@ button {
   align-items: center;
   justify-content: space-between;
 
+  width: 100%;
+  min-width: 0;
+
   padding: 14px 20px;
+  margin-bottom: 20px;
 
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -239,42 +259,52 @@ button {
       rgba(27, 22, 16, 0.96)
     );
 
-  margin-bottom: 20px;
-
   animation: panel-enter 0.55s ease-out both;
 }
 
 .brand {
   display: flex;
   align-items: center;
+
+  min-width: 0;
+
   gap: 10px;
 }
 
 .brand-mark {
+  flex-shrink: 0;
+
   color: var(--ember);
   font-size: 20px;
+
+  text-shadow: 0 0 12px rgba(192, 71, 43, 0.6);
 
   animation:
     flicker 3.2s ease-in-out infinite,
     ember-glow 3.2s ease-in-out infinite;
-
-  text-shadow: 0 0 12px rgba(192, 71, 43, 0.6);
 }
 
 .topbar h1 {
+  min-width: 0;
+
+  color: var(--bone);
   font-size: 18px;
   font-weight: 700;
-  color: var(--bone);
 }
 
 .currencies {
   display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+
   gap: 20px;
 }
 
 .currency {
   display: flex;
   align-items: center;
+
   gap: 8px;
 
   font-family: var(--font-mono);
@@ -292,10 +322,14 @@ button {
 }
 
 .currency-icon {
+  display: inline-block;
+
   width: 14px;
   height: 14px;
+
+  flex-shrink: 0;
+
   border-radius: 50%;
-  display: inline-block;
 
   transition:
     transform 0.25s ease,
@@ -316,14 +350,24 @@ button {
   box-shadow: 0 0 8px rgba(127, 163, 196, 0.6);
 }
 
+
 /* ============================================
-   LAYOUT
+   MAIN LAYOUT
    ============================================ */
 
 .layout {
   display: grid;
-  grid-template-columns: 260px 1fr 280px;
+
+  width: 100%;
+  min-width: 0;
+
+  grid-template-columns:
+    260px
+    minmax(0, 1fr)
+    280px;
+
   gap: 16px;
+
   align-items: start;
 }
 
@@ -339,13 +383,17 @@ button {
   animation: panel-enter 0.55s 0.24s ease-out both;
 }
 
-@media (max-width: 980px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-}
+
+/* ============================================
+   PANEL
+   ============================================ */
 
 .panel {
+  width: 100%;
+  min-width: 0;
+
+  padding: 18px;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
 
@@ -355,8 +403,6 @@ button {
       rgba(27, 22, 16, 0.98),
       rgba(25, 20, 15, 0.98)
     );
-
-  padding: 18px;
 
   transition:
     border-color 0.25s ease,
@@ -368,15 +414,16 @@ button {
 }
 
 .panel-title {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--muted);
+
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--muted);
-
-  padding-bottom: 10px;
-  margin-bottom: 14px;
-
-  border-bottom: 1px solid var(--border);
 }
 
 .panel-title--spaced {
@@ -384,11 +431,14 @@ button {
 }
 
 .panel-hint {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
   margin: -6px 0 16px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+  line-height: 1.5;
 }
+
 
 /* ============================================
    PALETTE
@@ -399,24 +449,32 @@ button {
 }
 
 .palette-group-title {
+  margin-bottom: 8px;
+
+  color: var(--muted-dim);
+
+  font-family: var(--font-body);
   font-size: 11px;
+  font-weight: 600;
+
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--muted-dim);
-  margin-bottom: 8px;
-  font-family: var(--font-body);
-  font-weight: 600;
 }
 
 .palette-list {
   display: flex;
   flex-direction: column;
+
   gap: 6px;
 }
 
 .palette-item {
   display: flex;
   align-items: center;
+
+  width: 100%;
+  min-width: 0;
+
   gap: 10px;
 
   padding: 8px 10px;
@@ -437,8 +495,11 @@ button {
 
 .palette-item:hover {
   border-color: var(--border-bright);
-  transform: translateX(3px);
+
   background: #2a2118;
+
+  transform: translateX(3px);
+
   box-shadow: -3px 0 0 rgba(192, 71, 43, 0.25);
 }
 
@@ -462,9 +523,12 @@ button {
 }
 
 .palette-icon {
-  font-size: 16px;
   width: 20px;
+
+  flex-shrink: 0;
+
   text-align: center;
+  font-size: 16px;
 
   transition:
     transform 0.2s ease,
@@ -477,25 +541,32 @@ button {
 }
 
 .palette-info {
+  min-width: 0;
   flex: 1;
 }
 
 .palette-item-name {
-  font-weight: 600;
   color: var(--bone);
+  font-weight: 600;
 }
 
 .palette-item-desc {
-  font-size: 11px;
-  color: var(--muted);
   margin-top: 1px;
+
+  color: var(--muted);
+
+  font-size: 11px;
 }
 
 .palette-item-level {
+  flex-shrink: 0;
+
+  color: var(--poison-bright);
+
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--poison-bright);
 }
+
 
 /* ============================================
    DUNGEON SLOTS
@@ -503,35 +574,46 @@ button {
 
 .dungeon-slots {
   display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+
   gap: 10px;
 
   padding: 20px 10px 26px;
 
   overflow-x: auto;
-  align-items: center;
+  overflow-y: hidden;
 
   scrollbar-width: thin;
   scrollbar-color: var(--border-bright) transparent;
+
+  -webkit-overflow-scrolling: touch;
 }
 
 .dungeon-slot {
-  min-width: 92px;
-  height: 108px;
-
-  border: 1px dashed var(--border-bright);
-  border-radius: var(--radius);
-
-  background: var(--panel-raised);
+  position: relative;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
+  width: 92px;
+  min-width: 92px;
+  height: 108px;
+
+  flex: 0 0 92px;
+
   gap: 6px;
 
+  border: 1px dashed var(--border-bright);
+  border-radius: var(--radius);
+
+  background: var(--panel-raised);
+
   cursor: pointer;
-  position: relative;
 
   transition:
     border-color 0.2s ease,
@@ -568,15 +650,17 @@ button {
 
 .dungeon-slot.entrance,
 .dungeon-slot.locked-slot {
-  cursor: default;
   opacity: 0.5;
+  cursor: default;
 }
 
 .dungeon-slot.entrance:hover,
 .dungeon-slot.locked-slot:hover {
-  transform: none;
-  box-shadow: none;
   border-color: var(--border-bright);
+
+  transform: none;
+
+  box-shadow: none;
 }
 
 .slot-icon {
@@ -593,31 +677,33 @@ button {
 }
 
 .slot-label {
-  font-size: 10px;
   color: var(--muted);
+
+  font-size: 10px;
+  text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-
-  text-align: center;
 }
 
 .slot-index {
   position: absolute;
+
   top: 4px;
   left: 6px;
 
+  color: var(--muted-dim);
+
   font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--muted-dim);
 }
 
 .slot-connector {
   width: 16px;
   height: 1px;
 
-  background: var(--border-bright);
+  flex: 0 0 16px;
 
-  flex-shrink: 0;
+  background: var(--border-bright);
 
   transition:
     background 0.2s ease,
@@ -636,12 +722,14 @@ button {
 
 .dungeon-slot.raid-cleared {
   border-color: var(--poison);
+
   opacity: 0.55;
 
   transition:
     opacity 0.4s ease,
     border-color 0.4s ease;
 }
+
 
 /* ============================================
    STAGE CONTROLS
@@ -650,25 +738,28 @@ button {
 .stage-controls {
   display: flex;
   align-items: center;
+
   gap: 14px;
+
   margin-bottom: 18px;
 }
 
 .btn {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 13px;
-
   padding: 10px 22px;
 
-  border-radius: var(--radius);
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
 
   background: var(--panel-raised);
   color: var(--bone);
 
-  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+
   letter-spacing: 0.03em;
+
+  cursor: pointer;
 
   transition:
     transform 0.12s ease,
@@ -696,6 +787,8 @@ button {
 }
 
 .btn-primary {
+  border-color: var(--ember);
+
   background:
     linear-gradient(
       180deg,
@@ -703,7 +796,6 @@ button {
       var(--ember)
     );
 
-  border-color: var(--ember);
   color: #17100C;
 
   box-shadow:
@@ -723,32 +815,35 @@ button {
 }
 
 .raid-status {
-  font-size: 12px;
   color: var(--muted);
+
   font-family: var(--font-mono);
+  font-size: 12px;
 
   animation: page-enter 0.3s ease-out;
 }
+
 
 /* ============================================
    RAID STAGE
    ============================================ */
 
 .raid-stage {
-  border-top: 1px solid var(--border);
   padding-top: 16px;
+
+  border-top: 1px solid var(--border);
 }
 
 .hero-card {
-  border: 1px solid var(--border-bright);
-  border-radius: var(--radius);
-
-  background: var(--panel-raised);
+  position: relative;
 
   padding: 14px 16px;
   margin-bottom: 14px;
 
-  position: relative;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+
+  background: var(--panel-raised);
 
   transition:
     opacity 0.2s,
@@ -769,28 +864,36 @@ button {
 
 .hero-card-top {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
+
+  gap: 10px;
+
   margin-bottom: 8px;
 }
 
 .hero-name {
+  min-width: 0;
+
+  color: var(--bone);
+
   font-family: var(--font-display);
   font-size: 16px;
-  color: var(--bone);
 }
 
 .hero-class-tag {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  flex-shrink: 0;
+
+  padding: 2px 8px;
+
+  border: 1px solid var(--soul);
+  border-radius: 12px;
 
   color: var(--soul);
 
-  border: 1px solid var(--soul);
-
-  padding: 2px 8px;
-  border-radius: 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 
   transition:
     background 0.2s ease,
@@ -799,23 +902,25 @@ button {
 
 .hero-class-tag:hover {
   background: rgba(127, 163, 196, 0.08);
-  box-shadow: 0 0 10px rgba(127, 163, 196, 0.12);
+
+  box-shadow:
+    0 0 10px rgba(127, 163, 196, 0.12);
 }
 
 .hero-hp-bar {
   height: 8px;
 
-  background: #0F0B08;
-
-  border-radius: 4px;
   overflow: hidden;
 
   border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: #0F0B08;
 }
 
 .hero-hp-fill {
-  height: 100%;
   width: 100%;
+  height: 100%;
 
   background:
     linear-gradient(
@@ -844,23 +949,28 @@ button {
   display: flex;
   justify-content: space-between;
 
+  gap: 10px;
+
   margin-top: 6px;
+
+  color: var(--muted);
 
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--muted);
 }
 
 .hero-reaction {
-  margin-top: 10px;
   min-height: 20px;
+
+  margin-top: 10px;
+
+  color: var(--ember-bright);
 
   font-family: var(--font-display);
   font-size: 13px;
 
-  color: var(--ember-bright);
-
   opacity: 0;
+
   transform: translateY(4px);
 
   transition:
@@ -875,6 +985,7 @@ button {
 
 .hero-reaction.rage {
   color: var(--ember-bright);
+
   font-size: 16px;
 
   text-shadow:
@@ -883,17 +994,24 @@ button {
   animation: rage-pulse 0.5s ease-in-out 2;
 }
 
+
+/* ============================================
+   RAID LOG
+   ============================================ */
+
 .raid-log {
   height: 220px;
 
   overflow-y: auto;
 
-  background: #0F0B08;
+  padding: 12px 14px;
 
   border: 1px solid var(--border);
   border-radius: var(--radius);
 
-  padding: 12px 14px;
+  background: #0F0B08;
+
+  color: var(--muted);
 
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -910,6 +1028,7 @@ button {
 
 .log-line {
   margin: 0 0 2px;
+
   color: var(--muted);
 
   animation: log-enter 0.22s ease-out both;
@@ -939,6 +1058,7 @@ button {
   font-weight: 600;
 }
 
+
 /* ============================================
    UPGRADES
    ============================================ */
@@ -946,16 +1066,17 @@ button {
 .upgrade-list {
   display: flex;
   flex-direction: column;
+
   gap: 10px;
 }
 
 .upgrade-item {
+  padding: 10px 12px;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
 
   background: var(--panel-raised);
-
-  padding: 10px 12px;
 
   transition:
     transform 0.18s ease,
@@ -964,8 +1085,9 @@ button {
 }
 
 .upgrade-item:hover {
-  transform: translateY(-2px);
   border-color: var(--border-bright);
+
+  transform: translateY(-2px);
 
   box-shadow:
     0 5px 15px rgba(0, 0, 0, 0.18);
@@ -973,45 +1095,61 @@ button {
 
 .upgrade-item-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
   margin-bottom: 4px;
 }
 
 .upgrade-item-name {
+  min-width: 0;
+
+  color: var(--bone);
+
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--bone);
 }
 
 .upgrade-item-level {
+  flex-shrink: 0;
+
+  color: var(--muted);
+
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--muted);
 }
 
 .upgrade-item-cost {
+  color: var(--muted);
+
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--muted);
 }
 
 .upgrade-btn-row {
   display: flex;
   justify-content: flex-end;
+
   margin-top: 6px;
 }
 
 .stats-list {
   display: flex;
   flex-direction: column;
+
   gap: 8px;
+
   font-size: 12.5px;
 }
 
 .stat-row {
   display: flex;
   justify-content: space-between;
+
+  gap: 10px;
+
   color: var(--muted);
 
   transition:
@@ -1025,9 +1163,13 @@ button {
 }
 
 .stat-row span:last-child {
-  font-family: var(--font-mono);
+  flex-shrink: 0;
+
   color: var(--bone);
+
+  font-family: var(--font-mono);
 }
+
 
 /* ============================================
    MODAL
@@ -1037,13 +1179,15 @@ button {
   position: fixed;
   inset: 0;
 
-  background: rgba(8, 6, 4, 0.78);
+  z-index: 50;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  z-index: 50;
+  padding: 20px;
+
+  background: rgba(8, 6, 4, 0.78);
 
   backdrop-filter: blur(3px);
 }
@@ -1057,14 +1201,14 @@ button {
 }
 
 .modal {
-  width: min(420px, 90vw);
+  width: min(420px, 100%);
 
-  background: var(--panel-raised);
+  padding: 26px;
 
   border: 1px solid var(--border-bright);
   border-radius: var(--radius);
 
-  padding: 26px;
+  background: var(--panel-raised);
 
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.5),
@@ -1072,120 +1216,30 @@ button {
 }
 
 .modal-title {
-  font-size: 20px;
-  color: var(--ember-bright);
   margin-bottom: 14px;
+
+  color: var(--ember-bright);
+
+  font-size: 20px;
 }
 
 .modal-body {
-  font-size: 13.5px;
-  line-height: 1.7;
+  margin-bottom: 20px;
 
   color: var(--bone);
 
-  margin-bottom: 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
 }
 
 .modal-body strong {
   color: var(--gold);
 }
 
-/* ============================================
-   MOBILE
-   ============================================ */
-
-@media (max-width: 600px) {
-  .app {
-    padding: 12px 12px 32px;
-  }
-
-  .topbar {
-    padding: 12px 14px;
-  }
-
-  .topbar h1 {
-    font-size: 15px;
-  }
-
-  .brand {
-    gap: 7px;
-  }
-
-  .brand-mark {
-    font-size: 16px;
-  }
-
-  .currencies {
-    gap: 12px;
-  }
-
-  .currency {
-    font-size: 12px;
-    gap: 5px;
-  }
-
-  .currency-icon {
-    width: 11px;
-    height: 11px;
-  }
-
-  .panel {
-    padding: 14px;
-  }
-
-  .dungeon-slots {
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-
-  .dungeon-slot {
-    min-width: 82px;
-    height: 96px;
-  }
-
-  .stage-controls {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .btn-primary {
-    width: 100%;
-  }
-
-  .raid-status {
-    min-height: 16px;
-  }
-
-  .raid-log {
-    height: 200px;
-    font-size: 11.5px;
-  }
-
-  .modal {
-    padding: 20px;
-  }
-}
 
 /* ============================================
-   REDUCE MOTION
+   RESPONSIVE — SMALL DESKTOP
    ============================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-/* ============================================
-   RESPONSIVE PATCH
-   ============================================ */
-
-/* ---------- TABLET / SMALL LAPTOP ---------- */
 
 @media (max-width: 1100px) {
   .app {
@@ -1194,7 +1248,11 @@ button {
   }
 
   .layout {
-    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    grid-template-columns:
+      220px
+      minmax(0, 1fr)
+      220px;
+
     gap: 12px;
   }
 
@@ -1203,42 +1261,49 @@ button {
   }
 
   .dungeon-slot {
+    width: 82px;
     min-width: 82px;
+    flex-basis: 82px;
   }
 
   .slot-connector {
     width: 10px;
+    flex-basis: 10px;
   }
 }
 
 
-/* ---------- TABLET ---------- */
+/* ============================================
+   RESPONSIVE — TABLET
+   ============================================ */
 
 @media (max-width: 900px) {
   .layout {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+    gap: 12px;
   }
 
   .palette-panel {
     grid-column: 1;
+    grid-row: 1;
   }
 
   .upgrades-panel {
     grid-column: 2;
+    grid-row: 1;
   }
 
   .stage-panel {
     grid-column: 1 / -1;
     grid-row: 2;
   }
-
-  .dungeon-slots {
-    justify-content: flex-start;
-  }
 }
 
 
-/* ---------- LARGE PHONE / SMALL TABLET ---------- */
+/* ============================================
+   RESPONSIVE — LARGE PHONE
+   ============================================ */
 
 @media (max-width: 700px) {
   .app {
@@ -1252,6 +1317,7 @@ button {
   .layout {
     display: flex;
     flex-direction: column;
+
     gap: 12px;
   }
 
@@ -1259,10 +1325,6 @@ button {
     width: 100%;
   }
 
-  /*
-   * Dungeon stage comes first on smaller screens.
-   * Makes the actual gameplay area visible immediately.
-   */
   .stage-panel {
     order: 1;
   }
@@ -1277,34 +1339,47 @@ button {
 
   .dungeon-slots {
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
 
     padding-top: 16px;
     padding-bottom: 20px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
 
     -webkit-overflow-scrolling: touch;
   }
 
   .dungeon-slot {
-    flex: 0 0 82px;
+    width: 82px;
+    min-width: 82px;
+    flex-basis: 82px;
   }
 
   .slot-connector {
-    flex: 0 0 10px;
+    width: 10px;
+    flex-basis: 10px;
   }
 
-  .palette-list {
-    gap: 5px;
-  }
+  .stage-controls {
+    align-items: stretch;
+    flex-direction: column;
 
-  .upgrade-list {
     gap: 8px;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+  .raid-status {
+    min-height: 16px;
   }
 }
 
 
-/* ---------- PHONE ---------- */
+/* ============================================
+   RESPONSIVE — PHONE
+   ============================================ */
 
 @media (max-width: 480px) {
   .app {
@@ -1318,10 +1393,11 @@ button {
 
   .brand {
     min-width: 0;
+    gap: 7px;
   }
 
   .brand-mark {
-    flex-shrink: 0;
+    font-size: 16px;
   }
 
   .topbar h1 {
@@ -1330,11 +1406,12 @@ button {
   }
 
   .currencies {
-    flex-shrink: 0;
     gap: 9px;
   }
 
   .currency {
+    gap: 5px;
+
     font-size: 10px;
   }
 
@@ -1355,24 +1432,19 @@ button {
     font-size: 11px;
   }
 
-  /*
-   * Keep dungeon horizontal instead of
-   * squeezing 5 rooms into the screen.
-   */
   .dungeon-slots {
-    justify-content: flex-start;
     gap: 7px;
 
-    margin-right: -4px;
     padding-left: 2px;
     padding-right: 2px;
   }
 
   .dungeon-slot {
-    min-width: 76px;
     width: 76px;
+    min-width: 76px;
     height: 90px;
-    flex: 0 0 76px;
+
+    flex-basis: 76px;
   }
 
   .slot-icon {
@@ -1385,7 +1457,7 @@ button {
 
   .slot-connector {
     width: 8px;
-    flex: 0 0 8px;
+    flex-basis: 8px;
   }
 
   .stage-controls {
@@ -1410,7 +1482,9 @@ button {
 
   .raid-log {
     height: 190px;
+
     padding: 10px 11px;
+
     font-size: 10.5px;
   }
 
@@ -1433,10 +1507,16 @@ button {
   .upgrade-item-name {
     font-size: 12px;
   }
+
+  .modal {
+    padding: 20px;
+  }
 }
 
 
-/* ---------- VERY SMALL PHONE ---------- */
+/* ============================================
+   RESPONSIVE — VERY SMALL PHONE
+   ============================================ */
 
 @media (max-width: 360px) {
   .topbar {
@@ -1449,18 +1529,38 @@ button {
 
   .currencies {
     flex-direction: column;
-    gap: 3px;
     align-items: flex-end;
+
+    gap: 3px;
   }
 
   .dungeon-slot {
-    min-width: 70px;
     width: 70px;
+    min-width: 70px;
+
     flex-basis: 70px;
   }
 
   .slot-connector {
     width: 6px;
     flex-basis: 6px;
+  }
+}
+
+
+/* ============================================
+   REDUCE MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    scroll-behavior: auto !important;
+
+    transition-duration: 0.01ms !important;
   }
 }
