@@ -932,3 +932,99 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ========== HERO VISUAL REACTIONS ========== */
+
+.hero-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.hero-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-card-top .hero-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-card--panic {
+  border-color: var(--ember);
+  animation: panic-shake 0.45s ease-in-out infinite;
+}
+
+.hero-card--rage {
+  border-color: var(--ember-bright);
+  box-shadow: 0 0 18px rgba(230, 122, 74, 0.4);
+  transform: scale(1.03);
+  animation: rage-pulse 0.75s ease-in-out infinite;
+}
+
+.hero-card--flee {
+  animation: flee-out 0.75s ease-in forwards;
+}
+
+@keyframes panic-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@keyframes flee-out {
+  to {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+}
+
+.hero-reaction.is-rage {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: var(--ember-bright);
+  text-shadow: 0 0 12px rgba(230, 122, 74, 0.55);
+  animation: rage-pulse 0.6s ease-in-out infinite;
+}
+
+.hero-reaction.is-panic {
+  color: var(--ember);
+  animation: panic-shake 0.5s ease-in-out infinite;
+}
+
+.hero-reaction.is-flee {
+  color: var(--gold);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+/* Slot flash feedback */
+
+.dungeon-slot.slot-triggered {
+  animation: slot-flash 0.35s ease-out;
+}
+
+.dungeon-slot.slot-kill {
+  animation: slot-kill-flash 0.5s ease-out;
+}
+
+.dungeon-slot.slot-cleared-flash {
+  animation: slot-clear-flash 0.4s ease-out;
+}
+
+@keyframes slot-flash {
+  0% { background: rgba(230, 122, 74, 0.4); }
+  100% { background: var(--panel-raised); }
+}
+
+@keyframes slot-kill-flash {
+  0% { background: rgba(192, 71, 43, 0.5); box-shadow: 0 0 14px rgba(192, 71, 43, 0.4); }
+  100% { background: var(--panel-raised); box-shadow: none; }
+}
+
+@keyframes slot-clear-flash {
+  0% { background: rgba(122, 149, 86, 0.35); }
+  100% { background: var(--panel-raised); }
+}
