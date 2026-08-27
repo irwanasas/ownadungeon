@@ -52,6 +52,7 @@
       <div class="raid-stage">
         <div id="hero-card" class="hero-card hero-card--hidden">
           <div class="hero-card-top">
+            <span id="hero-icon" class="hero-icon">⚔</span>
             <span id="hero-name" class="hero-name">—</span>
             <span id="hero-class" class="hero-class-tag">—</span>
           </div>
@@ -75,7 +76,6 @@
     </section>
   </main>
 
-  <!-- OVERLAY: Gudang Dungeon (kiri) -->
   <div id="palette-overlay" class="side-overlay side-overlay-left side-overlay--hidden" aria-hidden="true">
     <div class="side-overlay-backdrop" data-close-overlay="palette"></div>
     <aside class="side-panel" role="dialog" aria-modal="true" aria-label="Gudang Dungeon" tabindex="-1">
@@ -86,7 +86,6 @@
         </div>
         <button id="btn-close-palette" class="overlay-close" type="button" aria-label="Tutup">×</button>
       </div>
-
       <div class="palette-group">
         <h3 class="palette-group-title">Trap</h3>
         <div id="palette-traps" class="palette-list"></div>
@@ -102,32 +101,24 @@
     </aside>
   </div>
 
-  <!-- OVERLAY: Peningkatan (kanan) -->
   <div id="upgrades-overlay" class="side-overlay side-overlay-right side-overlay--hidden" aria-hidden="true">
     <div class="side-overlay-backdrop" data-close-overlay="upgrades"></div>
     <aside class="side-panel" role="dialog" aria-modal="true" aria-label="Peningkatan" tabindex="-1">
       <div class="side-panel-header">
-        <div>
-          <h2 class="panel-title">Peningkatan</h2>
-        </div>
+        <div><h2 class="panel-title">Peningkatan</h2></div>
         <button id="btn-close-upgrades" class="overlay-close" type="button" aria-label="Tutup">×</button>
       </div>
-
       <div id="upgrade-list" class="upgrade-list"></div>
     </aside>
   </div>
 
-  <!-- OVERLAY: Statistik (kanan) -->
   <div id="stats-overlay" class="side-overlay side-overlay-right side-overlay--hidden" aria-hidden="true">
     <div class="side-overlay-backdrop" data-close-overlay="stats"></div>
     <aside class="side-panel" role="dialog" aria-modal="true" aria-label="Statistik" tabindex="-1">
       <div class="side-panel-header">
-        <div>
-          <h2 class="panel-title">Statistik</h2>
-        </div>
+        <div><h2 class="panel-title">Statistik</h2></div>
         <button id="btn-close-stats" class="overlay-close" type="button" aria-label="Tutup">×</button>
       </div>
-
       <div id="stats-list" class="stats-list"></div>
     </aside>
   </div>
@@ -140,11 +131,13 @@
     </div>
   </div>
 
-  <!-- Toast container -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
 </div>
 
+<script src="data.js"></script>
+<script src="characters.js"></script>
 <script src="game.js"></script>
+<script src="ui.js"></script>
 </body>
 </html>
