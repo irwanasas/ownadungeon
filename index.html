@@ -6,7 +6,10 @@
 <title>MVP - Own a Dungeon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/raid.css">
 </head>
 <body>
 
@@ -42,7 +45,10 @@
         <h2 class="panel-title">Rancangan Dungeon</h2>
       </div>
 
-      <div id="dungeon-slots" class="dungeon-slots"></div>
+      <div class="dungeon-runway" id="dungeon-runway">
+        <div id="hero-token" class="hero-token" aria-hidden="true">⚔</div>
+        <div id="dungeon-slots" class="dungeon-slots"></div>
+      </div>
 
       <div class="stage-controls">
         <button id="btn-start-raid" class="btn btn-primary">Mulai Raid</button>
@@ -138,6 +144,7 @@
 <script src="data.js"></script>
 <script src="characters.js"></script>
 <script src="game.js"></script>
+<script src="stage.js"></script>
 <script src="ui.js"></script>
 </body>
 </html>
