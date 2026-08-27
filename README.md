@@ -1,4 +1,4 @@
-# Idle Dungeon Management — MVP
+# MVP - Own a Dungeon
 
 https://irwanasas.github.io/ownadungeon/
 
