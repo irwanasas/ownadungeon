@@ -69,6 +69,8 @@ function updateHeroCardVisual(hero) {
 
   var iconEl = document.getElementById('hero-icon');
   if (iconEl) iconEl.textContent = getHeroIcon(hero);
+
+  if (typeof syncHeroTokenVisual === 'function') syncHeroTokenVisual(hero);
 }
 
 function updateHeroCard(hero) {
