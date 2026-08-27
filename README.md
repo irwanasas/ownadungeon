@@ -1,5 +1,7 @@
 # Idle Dungeon Management — MVP
 
+https://irwanasas.github.io/ownadungeon/
+
 Prototype web-based untuk memvalidasi pertanyaan inti:
 
 > Apakah genuinely satisfying mendesain dungeon, menekan Start, dan menonton hero mencoba menaklukkannya?
