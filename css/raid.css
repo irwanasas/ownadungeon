@@ -1,0 +1,179 @@
+/* ========== HERO VISUAL REACTIONS ========== */
+
+.hero-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.hero-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-card-top .hero-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-card--panic {
+  border-color: var(--ember);
+  animation: panic-shake 0.45s ease-in-out infinite;
+}
+
+.hero-card--rage {
+  border-color: var(--ember-bright);
+  box-shadow: 0 0 18px rgba(230, 122, 74, 0.4);
+  transform: scale(1.03);
+  animation: rage-pulse 0.75s ease-in-out infinite;
+}
+
+.hero-card--flee {
+  animation: flee-out 0.75s ease-in forwards;
+}
+
+.hero-card--dead {
+  border-color: var(--muted-dim);
+  opacity: 0.72;
+  filter: grayscale(0.35);
+  animation: none;
+  transform: none;
+}
+
+.hero-card--dead .hero-reaction {
+  color: var(--muted);
+  animation: none;
+}
+
+@keyframes panic-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@keyframes flee-out {
+  to {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+}
+
+.hero-reaction.is-rage {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: var(--ember-bright);
+  text-shadow: 0 0 12px rgba(230, 122, 74, 0.55);
+  animation: rage-pulse 0.6s ease-in-out infinite;
+}
+
+.hero-reaction.is-panic {
+  color: var(--ember);
+  animation: panic-shake 0.5s ease-in-out infinite;
+}
+
+.hero-reaction.is-flee {
+  color: var(--gold);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+.dungeon-slot.slot-triggered {
+  animation: slot-flash 0.35s ease-out;
+}
+
+.dungeon-slot.slot-kill {
+  animation: slot-kill-flash 0.5s ease-out;
+}
+
+.dungeon-slot.slot-cleared-flash {
+  animation: slot-clear-flash 0.4s ease-out;
+}
+
+@keyframes slot-flash {
+  0% { background: rgba(230, 122, 74, 0.4); }
+  100% { background: var(--panel-raised); }
+}
+
+@keyframes slot-kill-flash {
+  0% { background: rgba(192, 71, 43, 0.5); box-shadow: 0 0 14px rgba(192, 71, 43, 0.4); }
+  100% { background: var(--panel-raised); box-shadow: none; }
+}
+
+@keyframes slot-clear-flash {
+  0% { background: rgba(122, 149, 86, 0.35); }
+  100% { background: var(--panel-raised); }
+}
+
+/* ========== STAGE B: dungeon runway / hero walk ========== */
+
+.dungeon-runway {
+  position: relative;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.hero-token {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  margin-left: -18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--ember-bright);
+  background: var(--panel-raised);
+  box-shadow: 0 0 12px rgba(230, 122, 74, 0.35);
+  font-size: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(0) scale(0.9);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+}
+
+.hero-token.is-visible {
+  opacity: 1;
+  transform: translateX(var(--hero-x, 0px)) scale(1);
+}
+
+.hero-token.is-panic {
+  border-color: var(--ember);
+  animation: panic-shake 0.45s ease-in-out infinite;
+}
+
+.hero-token.is-rage {
+  border-color: var(--ember-bright);
+  box-shadow: 0 0 16px rgba(230, 122, 74, 0.55);
+  animation: rage-pulse 0.75s ease-in-out infinite;
+}
+
+.hero-token.is-flee {
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateX(calc(var(--hero-x, 0px) + 40px)) scale(0.85);
+}
+
+.hero-token.is-dead {
+  border-color: var(--muted-dim);
+  filter: grayscale(0.4);
+  opacity: 0.75;
+  animation: none;
+}
+
+.dungeon-runway.is-raiding .dungeon-slot:not(.raid-active) {
+  opacity: 0.55;
+}
+
+.dungeon-runway.is-raiding .dungeon-slot.raid-active {
+  opacity: 1;
+}
+
+.dungeon-runway .dungeon-slots {
+  padding-top: 32px;
+}
