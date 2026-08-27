@@ -136,6 +136,7 @@ async function runRaid() {
       if (hero.hp <= 0) {
         if (typeof logLine === 'function') logLine(hero.name + ' gugur di trap.', 'danger');
         if (typeof flashSlot === 'function') flashSlot(slotEl, 'kill');
+        if (typeof triggerDeath === 'function') triggerDeath(hero);
         dungeonWin = true;
         break;
       }
@@ -210,6 +211,7 @@ async function runRaid() {
           logLine(hero.name + ' gugur dalam pertarungan.', 'danger');
         }
         if (typeof flashSlot === 'function') flashSlot(slotEl, 'kill');
+        if (typeof triggerDeath === 'function') triggerDeath(hero);
         dungeonWin = true;
         break;
       }
