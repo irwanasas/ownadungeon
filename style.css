@@ -1181,3 +1181,286 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+/* ============================================
+   RESPONSIVE PATCH
+   ============================================ */
+
+/* ---------- TABLET / SMALL LAPTOP ---------- */
+
+@media (max-width: 1100px) {
+  .app {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .layout {
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    gap: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .dungeon-slot {
+    min-width: 82px;
+  }
+
+  .slot-connector {
+    width: 10px;
+  }
+}
+
+
+/* ---------- TABLET ---------- */
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .palette-panel {
+    grid-column: 1;
+  }
+
+  .upgrades-panel {
+    grid-column: 2;
+  }
+
+  .stage-panel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .dungeon-slots {
+    justify-content: flex-start;
+  }
+}
+
+
+/* ---------- LARGE PHONE / SMALL TABLET ---------- */
+
+@media (max-width: 700px) {
+  .app {
+    padding: 10px;
+  }
+
+  .topbar {
+    gap: 12px;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel {
+    width: 100%;
+  }
+
+  /*
+   * Dungeon stage comes first on smaller screens.
+   * Makes the actual gameplay area visible immediately.
+   */
+  .stage-panel {
+    order: 1;
+  }
+
+  .palette-panel {
+    order: 2;
+  }
+
+  .upgrades-panel {
+    order: 3;
+  }
+
+  .dungeon-slots {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-top: 16px;
+    padding-bottom: 20px;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dungeon-slot {
+    flex: 0 0 82px;
+  }
+
+  .slot-connector {
+    flex: 0 0 10px;
+  }
+
+  .palette-list {
+    gap: 5px;
+  }
+
+  .upgrade-list {
+    gap: 8px;
+  }
+}
+
+
+/* ---------- PHONE ---------- */
+
+@media (max-width: 480px) {
+  .app {
+    padding: 8px;
+  }
+
+  .topbar {
+    padding: 11px 12px;
+    margin-bottom: 12px;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .brand-mark {
+    flex-shrink: 0;
+  }
+
+  .topbar h1 {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .currencies {
+    flex-shrink: 0;
+    gap: 9px;
+  }
+
+  .currency {
+    font-size: 10px;
+  }
+
+  .currency-icon {
+    width: 9px;
+    height: 9px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .panel-title {
+    font-size: 12px;
+  }
+
+  .panel-hint {
+    font-size: 11px;
+  }
+
+  /*
+   * Keep dungeon horizontal instead of
+   * squeezing 5 rooms into the screen.
+   */
+  .dungeon-slots {
+    justify-content: flex-start;
+    gap: 7px;
+
+    margin-right: -4px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .dungeon-slot {
+    min-width: 76px;
+    width: 76px;
+    height: 90px;
+    flex: 0 0 76px;
+  }
+
+  .slot-icon {
+    font-size: 22px;
+  }
+
+  .slot-label {
+    font-size: 9px;
+  }
+
+  .slot-connector {
+    width: 8px;
+    flex: 0 0 8px;
+  }
+
+  .stage-controls {
+    margin-bottom: 12px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+  }
+
+  .hero-card {
+    padding: 12px;
+  }
+
+  .hero-name {
+    font-size: 14px;
+  }
+
+  .hero-reaction {
+    font-size: 12px;
+  }
+
+  .raid-log {
+    height: 190px;
+    padding: 10px 11px;
+    font-size: 10.5px;
+  }
+
+  .palette-item {
+    padding: 8px;
+  }
+
+  .palette-item-name {
+    font-size: 12px;
+  }
+
+  .palette-item-desc {
+    font-size: 10px;
+  }
+
+  .upgrade-item {
+    padding: 9px 10px;
+  }
+
+  .upgrade-item-name {
+    font-size: 12px;
+  }
+}
+
+
+/* ---------- VERY SMALL PHONE ---------- */
+
+@media (max-width: 360px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar h1 {
+    font-size: 12px;
+  }
+
+  .currencies {
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-end;
+  }
+
+  .dungeon-slot {
+    min-width: 70px;
+    width: 70px;
+    flex-basis: 70px;
+  }
+
+  .slot-connector {
+    width: 6px;
+    flex-basis: 6px;
+  }
+}
