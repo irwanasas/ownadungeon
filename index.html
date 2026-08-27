@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Idle Dungeon Management — MVP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -36,7 +36,6 @@
   </header>
 
   <main class="layout">
-
     <section class="panel stage-panel">
       <div class="stage-header">
         <h2 class="panel-title">Rancangan Dungeon</h2>
@@ -73,13 +72,12 @@
         </div>
       </div>
     </section>
-
   </main>
 
-  <div id="palette-overlay" class="side-overlay side-overlay-left side-overlay--hidden">
+  <!-- OVERLAY: Gudang Dungeon (kiri) -->
+  <div id="palette-overlay" class="side-overlay side-overlay-left side-overlay--hidden" aria-hidden="true">
     <div class="side-overlay-backdrop" data-close-overlay="palette"></div>
-
-    <aside class="side-panel">
+    <aside class="side-panel" role="dialog" aria-label="Gudang Dungeon">
       <div class="side-panel-header">
         <div>
           <h2 class="panel-title">Gudang Dungeon</h2>
@@ -92,12 +90,10 @@
         <h3 class="palette-group-title">Trap</h3>
         <div id="palette-traps" class="palette-list"></div>
       </div>
-
       <div class="palette-group">
         <h3 class="palette-group-title">Monster</h3>
         <div id="palette-monsters" class="palette-list"></div>
       </div>
-
       <div class="palette-group">
         <h3 class="palette-group-title">Ruang Spesial</h3>
         <div id="palette-special" class="palette-list"></div>
@@ -105,10 +101,10 @@
     </aside>
   </div>
 
-  <div id="upgrades-overlay" class="side-overlay side-overlay-right side-overlay--hidden">
+  <!-- OVERLAY: Peningkatan + Statistik (kanan) -->
+  <div id="upgrades-overlay" class="side-overlay side-overlay-right side-overlay--hidden" aria-hidden="true">
     <div class="side-overlay-backdrop" data-close-overlay="upgrades"></div>
-
-    <aside class="side-panel">
+    <aside class="side-panel" role="dialog" aria-label="Peningkatan">
       <div class="side-panel-header">
         <div>
           <h2 class="panel-title">Peningkatan</h2>
