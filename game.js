@@ -71,9 +71,11 @@ async function runRaid() {
 
   var hero = buildHero();
   if (typeof updateHeroCard === 'function') updateHeroCard(hero);
+  if (typeof showHeroToken === 'function') showHeroToken(hero);
   if (typeof logLine === 'function') {
     logLine(hero.name + ' the ' + hero.className + ' memasuki dungeon...', 'info');
   }
+  await sleep(400);
 
   var goldReward = 0;
   var soulsReward = 0;
@@ -91,6 +93,7 @@ async function runRaid() {
         s.classList.remove('raid-active');
       });
       slotEl.classList.add('raid-active');
+      if (typeof moveHeroToSlot === 'function') moveHeroToSlot(i);
     }
 
     await sleep(600);
@@ -269,6 +272,10 @@ async function runRaid() {
   raidInProgress = false;
   saveState();
   if (typeof renderAll === 'function') renderAll();
+  // keep token visible briefly on death/flee, then clear after short delay
+  setTimeout(function () {
+    if (typeof hideHeroToken === 'function') hideHeroToken();
+  }, 1200);
 }
 
 function simulateOfflineProgress() {
