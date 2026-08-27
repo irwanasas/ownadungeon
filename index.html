@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idle Dungeon Management — MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <h1>Idle Dungeon Management</h1>
+    </div>
+    <div class="currencies">
+      <div class="currency" title="Gold — hasil raid berhasil">
+        <span class="currency-icon gold-icon"></span>
+        <span id="gold-value">0</span>
+      </div>
+      <div class="currency" title="Souls — mata uang progres permanen">
+        <span class="currency-icon soul-icon"></span>
+        <span id="souls-value">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- LEFT: Palette / inventory -->
+    <section class="panel palette-panel">
+      <h2 class="panel-title">Gudang Dungeon</h2>
+      <p class="panel-hint">Pilih item, lalu klik ruang kosong di layout dungeon untuk memasangnya.</p>
+
+      <div class="palette-group">
+        <h3 class="palette-group-title">Trap</h3>
+        <div id="palette-traps" class="palette-list"></div>
+      </div>
+
+      <div class="palette-group">
+        <h3 class="palette-group-title">Monster</h3>
+        <div id="palette-monsters" class="palette-list"></div>
+      </div>
+
+      <div class="palette-group">
+        <h3 class="palette-group-title">Ruang Spesial</h3>
+        <div id="palette-special" class="palette-list"></div>
+      </div>
+    </section>
+
+    <!-- CENTER: Dungeon layout + raid stage -->
+    <section class="panel stage-panel">
+      <h2 class="panel-title">Rancangan Dungeon</h2>
+      <div id="dungeon-slots" class="dungeon-slots"></div>
+
+      <div class="stage-controls">
+        <button id="btn-start-raid" class="btn btn-primary">Mulai Raid</button>
+        <span id="raid-status" class="raid-status"></span>
+      </div>
+
+      <div class="raid-stage">
+        <div id="hero-card" class="hero-card hero-card--hidden">
+          <div class="hero-card-top">
+            <span id="hero-name" class="hero-name">—</span>
+            <span id="hero-class" class="hero-class-tag">—</span>
+          </div>
+          <div class="hero-hp-bar">
+            <div id="hero-hp-fill" class="hero-hp-fill"></div>
+          </div>
+          <div class="hero-stats">
+            <span id="hero-level">Lv. —</span>
+            <span id="hero-hp-text">HP —/—</span>
+          </div>
+          <div id="hero-reaction" class="hero-reaction"></div>
+        </div>
+
+        <div id="raid-log" class="raid-log">
+          <p class="raid-log-placeholder">Susun dungeon-mu, lalu tekan "Mulai Raid" untuk melihat hero mencoba menaklukkannya.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Upgrades & stats -->
+    <section class="panel upgrades-panel">
+      <h2 class="panel-title">Peningkatan</h2>
+      <div id="upgrade-list" class="upgrade-list"></div>
+
+      <h2 class="panel-title panel-title--spaced">Statistik</h2>
+      <div id="stats-list" class="stats-list"></div>
+    </section>
+
+  </main>
+
+  <div id="offline-modal" class="modal-overlay modal-overlay--hidden">
+    <div class="modal">
+      <h2 class="modal-title">Selagi Kau Pergi...</h2>
+      <div id="offline-summary" class="modal-body"></div>
+      <button id="btn-close-offline" class="btn btn-primary">Kembali ke Dungeon</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

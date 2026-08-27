@@ -1,0 +1,423 @@
+/* ============================================
+   DESIGN TOKENS
+   Subject: dungeon-keeper strategy game.
+   Palette: torch-lit stone, ember/blood accent,
+   sickly poison-green secondary, ghost-soul blue.
+   ============================================ */
+:root {
+  --bg: #120E0B;
+  --panel: #1B1610;
+  --panel-raised: #241D15;
+  --border: #3C3122;
+  --border-bright: #55432E;
+
+  --bone: #E9DFC8;
+  --muted: #93876E;
+  --muted-dim: #665A45;
+
+  --ember: #C0472B;
+  --ember-bright: #E67A4A;
+  --poison: #7A9556;
+  --poison-bright: #9CBB6E;
+  --gold: #D8AA4D;
+  --soul: #7FA3C4;
+
+  --danger: #C0472B;
+  --success: #7A9556;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(192,71,43,0.06), transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(122,149,86,0.05), transparent 55%);
+  color: var(--bone);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: 0.02em; }
+
+button { font-family: var(--font-body); }
+
+.app { max-width: 1400px; margin: 0 auto; padding: 20px 24px 48px; }
+
+/* ============ TOPBAR ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--panel-raised), var(--panel));
+  margin-bottom: 20px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+
+.brand-mark {
+  color: var(--ember);
+  font-size: 20px;
+  animation: flicker 3.2s ease-in-out infinite;
+  text-shadow: 0 0 12px rgba(192,71,43,0.6);
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.75; }
+  50% { opacity: 1; }
+  70% { opacity: 0.85; }
+}
+
+.topbar h1 { font-size: 18px; font-weight: 700; color: var(--bone); }
+
+.currencies { display: flex; gap: 20px; }
+
+.currency {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.currency-icon { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.gold-icon { background: var(--gold); box-shadow: 0 0 8px rgba(216,170,77,0.6); }
+.soul-icon { background: var(--soul); box-shadow: 0 0 8px rgba(127,163,196,0.6); }
+
+/* ============ LAYOUT ============ */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 18px;
+}
+
+.panel-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-title--spaced { margin-top: 24px; }
+
+.panel-hint { font-size: 12px; color: var(--muted); line-height: 1.5; margin: -6px 0 16px; }
+
+/* ============ PALETTE ============ */
+.palette-group { margin-bottom: 20px; }
+.palette-group-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-dim);
+  margin-bottom: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.palette-list { display: flex; flex-direction: column; gap: 6px; }
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  font-size: 13px;
+}
+
+.palette-item:hover { border-color: var(--border-bright); }
+.palette-item.selected { border-color: var(--ember); box-shadow: 0 0 0 1px var(--ember) inset; }
+.palette-item.locked { opacity: 0.4; cursor: not-allowed; }
+
+.palette-icon { font-size: 16px; width: 20px; text-align: center; }
+.palette-info { flex: 1; }
+.palette-item-name { font-weight: 600; color: var(--bone); }
+.palette-item-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.palette-item-level {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--poison-bright);
+}
+
+/* ============ DUNGEON SLOTS ============ */
+.dungeon-slots {
+  display: flex;
+  gap: 10px;
+  padding: 20px 10px 26px;
+  overflow-x: auto;
+  align-items: center;
+}
+
+.dungeon-slot {
+  min-width: 92px;
+  height: 108px;
+  border: 1px dashed var(--border-bright);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.dungeon-slot:hover { border-color: var(--ember); }
+
+.dungeon-slot.filled {
+  border-style: solid;
+  border-color: var(--border);
+}
+
+.dungeon-slot.entrance,
+.dungeon-slot.locked-slot {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.slot-icon { font-size: 26px; }
+.slot-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.slot-index {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted-dim);
+}
+
+.slot-connector {
+  width: 16px;
+  height: 1px;
+  background: var(--border-bright);
+  flex-shrink: 0;
+}
+
+.dungeon-slot.raid-active {
+  border-color: var(--ember-bright);
+  box-shadow: 0 0 0 1px var(--ember-bright), 0 0 16px rgba(230,122,74,0.35);
+}
+
+.dungeon-slot.raid-cleared { border-color: var(--poison); opacity: 0.55; }
+
+/* ============ STAGE CONTROLS ============ */
+.stage-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-bright);
+  background: var(--panel-raised);
+  color: var(--bone);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: transform 0.08s, border-color 0.15s;
+}
+
+.btn:hover:not(:disabled) { border-color: var(--ember-bright); }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--ember-bright), var(--ember));
+  border-color: var(--ember);
+  color: #17100C;
+}
+
+.btn-small { padding: 6px 12px; font-size: 12px; }
+
+.raid-status { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+/* ============ RAID STAGE ============ */
+.raid-stage {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.hero-card {
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  position: relative;
+  transition: opacity 0.2s;
+}
+
+.hero-card--hidden { display: none; }
+
+.hero-card-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.hero-name { font-family: var(--font-display); font-size: 16px; color: var(--bone); }
+.hero-class-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--soul);
+  border: 1px solid var(--soul);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.hero-hp-bar {
+  height: 8px;
+  background: #0F0B08;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.hero-hp-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--poison), var(--poison-bright));
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.hero-hp-fill.low { background: linear-gradient(90deg, var(--ember), var(--ember-bright)); }
+
+.hero-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.hero-reaction {
+  margin-top: 10px;
+  min-height: 20px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--ember-bright);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.hero-reaction.show { opacity: 1; transform: translateY(0); }
+.hero-reaction.rage {
+  color: var(--ember-bright);
+  font-size: 16px;
+  text-shadow: 0 0 10px rgba(230,122,74,0.7);
+  animation: rage-pulse 0.5s ease-in-out 2;
+}
+
+@keyframes rage-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.raid-log {
+  height: 220px;
+  overflow-y: auto;
+  background: #0F0B08;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.raid-log-placeholder { color: var(--muted-dim); font-style: italic; }
+
+.log-line { margin: 0 0 2px; color: var(--muted); }
+.log-line.hit { color: var(--bone); }
+.log-line.reaction { color: var(--ember-bright); font-weight: 600; }
+.log-line.victory { color: var(--poison-bright); font-weight: 600; }
+.log-line.defeat { color: var(--ember); font-weight: 600; }
+.log-line.loot { color: var(--gold); }
+
+/* ============ UPGRADES ============ */
+.upgrade-list { display: flex; flex-direction: column; gap: 10px; }
+
+.upgrade-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  padding: 10px 12px;
+}
+
+.upgrade-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.upgrade-item-name { font-size: 12.5px; font-weight: 600; color: var(--bone); }
+.upgrade-item-level { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+.upgrade-item-cost {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.upgrade-btn-row { display: flex; justify-content: flex-end; margin-top: 6px; }
+
+.stats-list { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+.stat-row { display: flex; justify-content: space-between; color: var(--muted); }
+.stat-row span:last-child { font-family: var(--font-mono); color: var(--bone); }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,6,4,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-overlay--hidden { display: none; }
+
+.modal {
+  width: min(420px, 90vw);
+  background: var(--panel-raised);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 26px;
+}
+
+.modal-title { font-size: 20px; color: var(--ember-bright); margin-bottom: 14px; }
+.modal-body { font-size: 13.5px; line-height: 1.7; color: var(--bone); margin-bottom: 20px; }
+.modal-body strong { color: var(--gold); }
