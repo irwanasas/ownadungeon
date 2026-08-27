@@ -58,12 +58,14 @@ function updateHeroCardVisual(hero) {
   card.classList.remove(
     'hero-card--panic',
     'hero-card--rage',
-    'hero-card--flee'
+    'hero-card--flee',
+    'hero-card--dead'
   );
 
   if (hero.visualState === 'panic') card.classList.add('hero-card--panic');
   if (hero.visualState === 'rage') card.classList.add('hero-card--rage');
   if (hero.visualState === 'flee') card.classList.add('hero-card--flee');
+  if (hero.visualState === 'dead') card.classList.add('hero-card--dead');
 
   var iconEl = document.getElementById('hero-icon');
   if (iconEl) iconEl.textContent = getHeroIcon(hero);
