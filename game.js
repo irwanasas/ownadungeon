@@ -333,10 +333,8 @@ function spend(cost) {
 
 function costLabel(cost) {
   const parts = [];
-
   if (cost.gold) parts.push(`${cost.gold}g`);
   if (cost.souls) parts.push(`${cost.souls}s`);
-
   return parts.length ? parts.join(' + ') : 'Gratis';
 }
 
@@ -373,7 +371,6 @@ function renderUpgrades() {
 
     div.querySelector('button').addEventListener('click', () => {
       if (!affordable(cost)) return;
-
       spend(cost);
       state.levels[def.id] = level + 1;
       saveState();
@@ -385,7 +382,6 @@ function renderUpgrades() {
 
   UNLOCK_DEFS.forEach(def => {
     if (state.unlocked[def.id]) return;
-
     if (def.id === 'slot4' && state.slotCount !== 3) return;
     if (def.id === 'slot5' && state.slotCount !== 4) return;
 
@@ -406,13 +402,10 @@ function renderUpgrades() {
 
     div.querySelector('button').addEventListener('click', () => {
       if (!affordable(def.cost)) return;
-
       spend(def.cost);
       state.unlocked[def.id] = true;
-
       if (def.id === 'slot4') state.slotCount = 4;
       if (def.id === 'slot5') state.slotCount = 5;
-
       saveState();
       renderAll();
     });
@@ -426,7 +419,6 @@ function renderStats() {
   if (!wrap) return;
 
   const s = state.stats;
-
   const rows = [
     ['Total Raid', s.raidsTotal],
     ['Dungeon Menang', s.dungeonWins],
@@ -444,7 +436,6 @@ function renderStats() {
 function renderCurrencies() {
   const gold = document.getElementById('gold-value');
   const souls = document.getElementById('souls-value');
-
   if (gold) gold.textContent = Math.floor(state.gold);
   if (souls) souls.textContent = Math.floor(state.souls);
 }
@@ -457,90 +448,105 @@ function renderAll() {
   renderStats();
 
   const startButton = document.getElementById('btn-start-raid');
-
   if (startButton) {
-    startButton.disabled = raidInProgress || dungeonEmpty();
+    startButton.disabled = raidInProgress;
   }
 }
 
-function dungeonEmpty() {
-  return state.dungeon
-    .slice(0, state.slotCount)
-    .every(slot => !slot);
+/* ========== OVERLAY CONTROLS (baru) ========== */
+
+function openOverlay(which) {
+  const palette = document.getElementById('palette-overlay');
+  const upgrades = document.getElementById('upgrades-overlay');
+
+  closeAllOverlays();
+
+  if (which === 'palette' && palette) {
+    palette.classList.remove('side-overlay--hidden');
+    palette.setAttribute('aria-hidden', 'false');
+  } else if (which === 'upgrades' && upgrades) {
+    upgrades.classList.remove('side-overlay--hidden');
+    upgrades.setAttribute('aria-hidden', 'false');
+  }
+
+  document.body.classList.add('overlay-active');
 }
 
-function pickHeroLevel() {
-  const avgLevel = averageDungeonLevel();
-  const variance = Math.floor(Math.random() * 3) - 1;
-
-  return Math.max(1, avgLevel + variance);
+function closeAllOverlays() {
+  document.querySelectorAll('.side-overlay').forEach(el => {
+    el.classList.add('side-overlay--hidden');
+    el.setAttribute('aria-hidden', 'true');
+  });
+  document.body.classList.remove('overlay-active');
 }
 
-function averageDungeonLevel() {
-  const filled = state.dungeon
-    .slice(0, state.slotCount)
-    .filter(s => s && s.kind !== 'treasure');
+function initOverlayControls() {
+  const btnPalette = document.getElementById('btn-open-palette');
+  const btnUpgrades = document.getElementById('btn-open-upgrades');
+  const btnClosePalette = document.getElementById('btn-close-palette');
+  const btnCloseUpgrades = document.getElementById('btn-close-upgrades');
 
-  if (!filled.length) return 1;
+  if (btnPalette) btnPalette.addEventListener('click', () => openOverlay('palette'));
+  if (btnUpgrades) btnUpgrades.addEventListener('click', () => openOverlay('upgrades'));
+  if (btnClosePalette) btnClosePalette.addEventListener('click', closeAllOverlays);
+  if (btnCloseUpgrades) btnCloseUpgrades.addEventListener('click', closeAllOverlays);
 
-  const sum = filled.reduce(
-    (acc, s) => acc + (state.levels[s.catalogId] || 1),
-    0
+  document.querySelectorAll('[data-close-overlay]').forEach(el => {
+    el.addEventListener('click', closeAllOverlays);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAllOverlays();
+  });
+}
+
+/* ========== RAID LOGIC (dari repo asli) ========== */
+
+function getItemLevel(catalogId) {
+  return state.levels[catalogId] || 1;
+}
+
+function buildHero() {
+  const arch = HERO_ARCHETYPES[Math.floor(Math.random() * HERO_ARCHETYPES.length)];
+  const avgLevel = Math.max(
+    1,
+    Math.round(
+      Object.values(state.levels).reduce((a, b) => a + b, 0) /
+        Object.keys(state.levels).length
+    )
   );
 
-  return Math.round(sum / filled.length);
-}
-
-function generateHero() {
-  const archetype =
-    HERO_ARCHETYPES[
-      Math.floor(Math.random() * HERO_ARCHETYPES.length)
-    ];
-
-  const level = pickHeroLevel();
-
-  const name =
-    NAME_POOL[
-      Math.floor(Math.random() * NAME_POOL.length)
-    ];
-
-  const maxHp = archetype.baseHp + (level - 1) * 8;
+  const level = Math.max(1, avgLevel + Math.floor(Math.random() * 3) - 1);
+  const hp = Math.round(arch.baseHp + (level - 1) * 8);
+  const atk = Math.round(arch.baseAtk + (level - 1) * 1.5);
+  const def = Math.round(arch.baseDef + (level - 1) * 0.4);
 
   return {
-    ...archetype,
-    name,
+    ...arch,
+    name: NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)],
     level,
-    maxHp,
-    hp: maxHp,
-    atk: archetype.baseAtk + (level - 1) * 2,
-    def: archetype.baseDef + Math.floor((level - 1) / 2),
-    hasRaged: false,
-    panicked: false,
-    atkMultiplier: 1
+    maxHp: hp,
+    hp,
+    atk,
+    def,
+    status: [],
+    raged: false
   };
 }
 
-const logEl = () => document.getElementById('raid-log');
-
-function clearLog() {
-  const el = logEl();
-  if (el) el.innerHTML = '';
-}
-
-function log(text, cls) {
-  const el = logEl();
-  if (!el) return;
-
+function logLine(text, type = '') {
+  const log = document.getElementById('raid-log');
+  if (!log) return;
   const p = document.createElement('p');
-  p.className = 'log-line' + (cls ? ' ' + cls : '');
+  p.className = 'raid-log-line' + (type ? ` ${type}` : '');
   p.textContent = text;
-
-  el.appendChild(p);
-  el.scrollTop = el.scrollHeight;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function clearRaidLog() {
+  const log = document.getElementById('raid-log');
+  if (log) log.innerHTML = '';
 }
 
 function updateHeroCard(hero) {
@@ -548,750 +554,303 @@ function updateHeroCard(hero) {
   if (!card) return;
 
   card.classList.remove('hero-card--hidden');
-
   document.getElementById('hero-name').textContent = hero.name;
   document.getElementById('hero-class').textContent = hero.className;
   document.getElementById('hero-level').textContent = `Lv. ${hero.level}`;
-  document.getElementById('hero-hp-text').textContent =
-    `HP ${Math.max(0, Math.round(hero.hp))}/${hero.maxHp}`;
+  document.getElementById('hero-hp-text').textContent = `HP ${Math.max(0, Math.floor(hero.hp))}/${hero.maxHp}`;
 
-  const pct = Math.max(0, hero.hp / hero.maxHp * 100);
   const fill = document.getElementById('hero-hp-fill');
+  if (fill) {
+    const pct = Math.max(0, (hero.hp / hero.maxHp) * 100);
+    fill.style.width = pct + '%';
+    fill.classList.toggle('low', pct <= 30);
+  }
 
-  fill.style.width = pct + '%';
-  fill.classList.toggle('low', pct <= 30);
+  const reaction = document.getElementById('hero-reaction');
+  if (reaction) reaction.textContent = '';
 }
 
-function showReaction(text, isRage) {
+function setReaction(text) {
   const el = document.getElementById('hero-reaction');
-  if (!el) return;
-
-  el.textContent = text;
-  el.classList.remove('show', 'rage');
-
-  void el.offsetWidth;
-
-  el.classList.add('show');
-
-  if (isRage) {
-    el.classList.add('rage');
-  }
+  if (el) el.textContent = text;
 }
 
-function clearSlotHighlights() {
-  document.querySelectorAll('.dungeon-slot').forEach(el => {
-    el.classList.remove('raid-active', 'raid-cleared');
-  });
-}
-
-function highlightSlot(index, cls) {
-  const slotEl =
-    document.querySelector(`.dungeon-slot[data-index="${index}"]`);
-
-  if (slotEl) slotEl.classList.add(cls);
-}
-
-async function resolveMonsterEncounter(hero, monsterDef, monsterLevel) {
-  const monster = {
-    name: monsterDef.name,
-    hp: monsterDef.baseHp + (monsterLevel - 1) * monsterDef.hpPerLevel,
-    atk: monsterDef.baseAtk + (monsterLevel - 1) * monsterDef.atkPerLevel,
-    def: monsterDef.baseDef,
-    level: monsterLevel
-  };
-
-  monster.maxHp = monster.hp;
-
-  log(
-    `${monster.name} (Lv.${monster.level}) menghadang di lorong.`,
-    'hit'
-  );
-
-  await sleep(500);
-
-  const levelGap = monster.level - hero.level;
-
-  if (!hero.fearImmune && levelGap >= hero.fleeThreshold) {
-    const fleeChance = Math.min(
-      0.85,
-      0.25 + (levelGap - hero.fleeThreshold) * 0.15
-    );
-
-    if (Math.random() < fleeChance) {
-      showReaction(`${hero.name} mundur ketakutan!`, false);
-
-      log(
-        `${hero.name} melihat ${monster.name} terlalu kuat dan kabur dari dungeon.`,
-        'reaction'
-      );
-
-      await sleep(700);
-
-      return { result: 'flee' };
-    }
-
-    showReaction(
-      `${hero.name} gemetar, tapi memutuskan bertarung.`,
-      false
-    );
-
-    log(
-      `${hero.name} ragu-ragu, tapi memilih melawan.`,
-      'reaction'
-    );
-
-    await sleep(500);
-  }
-
-  let round = 0;
-
-  while (
-    hero.hp > 0 &&
-    monster.hp > 0 &&
-    round < 20
-  ) {
-    round++;
-
-    const heroDmg = Math.max(
-      1,
-      Math.round(
-        hero.atk * hero.atkMultiplier - monster.def
-      )
-    );
-
-    monster.hp -= heroDmg;
-
-    log(
-      `${hero.name} menyerang ${monster.name} (-${heroDmg} HP).`,
-      'hit'
-    );
-
-    await sleep(320);
-
-    if (monster.hp <= 0) {
-      log(`${monster.name} tumbang.`, 'hit');
-      break;
-    }
-
-    const monsterDmg = Math.max(
-      1,
-      monster.atk - hero.def
-    );
-
-    hero.hp -= monsterDmg;
-
-    updateHeroCard(hero);
-
-    log(
-      `${monster.name} membalas menyerang ${hero.name} (-${monsterDmg} HP).`,
-      'hit'
-    );
-
-    await sleep(320);
-
-    const hpFrac = hero.hp / hero.maxHp;
-
-    if (
-      hpFrac > 0 &&
-      hpFrac <= 0.3 &&
-      !hero.panicked &&
-      !(hero.canRage && !hero.hasRaged)
-    ) {
-      hero.panicked = true;
-
-      showReaction(
-        `${hero.name} panik, HP kritis!`,
-        false
-      );
-
-      log(
-        `${hero.name} mulai panik melihat HP-nya menipis.`,
-        'reaction'
-      );
-
-      await sleep(500);
-    }
-
-    if (
-      hero.canRage &&
-      !hero.hasRaged &&
-      hpFrac > 0 &&
-      hpFrac <= hero.rageHpThreshold
-    ) {
-      hero.hasRaged = true;
-      hero.atkMultiplier = hero.rageAtkMultiplier;
-
-      const healAmount =
-        Math.round(hero.maxHp * hero.rageHealFraction);
-
-      hero.hp = Math.min(
-        hero.maxHp,
-        hero.hp + healAmount
-      );
-
-      updateHeroCard(hero);
-
-      showReaction(
-        `"RAAAAGH!!" — ${hero.name} MENGAMUK!`,
-        true
-      );
-
-      log(
-        `★ ${hero.name} berteriak kencang dan memasuki mode RAGE! ATK meningkat drastis.`,
-        'reaction'
-      );
-
-      await sleep(900);
-    }
-
-    if (hero.hp <= 0) {
-      log(
-        `${hero.name} tumbang di hadapan ${monster.name}.`,
-        'defeat'
-      );
-
-      break;
-    }
-  }
-
-  if (hero.hp <= 0) {
-    return { result: 'hero_dead' };
-  }
-
-  if (monster.hp <= 0) {
-    return { result: 'monster_dead' };
-  }
-
-  return { result: 'timeout' };
-}
-
-async function resolveTrap(hero, trapDef, trapLevel) {
-  log(
-    `${hero.name} menginjak ${trapDef.name}!`,
-    'hit'
-  );
-
-  await sleep(400);
-
-  if (
-    hero.trapEvasion &&
-    Math.random() < hero.trapEvasion
-  ) {
-    showReaction(
-      `${hero.name} lincah menghindar!`,
-      false
-    );
-
-    log(
-      `${hero.name} berhasil menghindari efek trap.`,
-      'reaction'
-    );
-
-    await sleep(500);
-    return;
-  }
-
-  const dmg =
-    trapDef.baseDamage +
-    (trapLevel - 1) * trapDef.dmgPerLevel;
-
-  hero.hp -= dmg;
-
-  updateHeroCard(hero);
-
-  log(
-    `Trap mengenai ${hero.name} (-${dmg} HP).`,
-    'hit'
-  );
-
-  if (trapDef.atkReduction) {
-    hero.atkMultiplier *=
-      1 - trapDef.atkReduction;
-
-    log(
-      `${hero.name} terjerat, ATK menurun untuk sisa raid.`,
-      'reaction'
-    );
-  }
-
-  if (trapDef.dotRounds) {
-    log(
-      `${hero.name} teracuni, akan melemah di pertarungan berikutnya.`,
-      'reaction'
-    );
-
-    hero.poisonRounds =
-      (hero.poisonRounds || 0) + trapDef.dotRounds;
-
-    hero.poisonDmg = Math.round(dmg * 0.4);
-  }
-
-  await sleep(400);
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
 }
 
 async function runRaid() {
-  if (raidInProgress || dungeonEmpty()) return;
-
+  if (raidInProgress) return;
   raidInProgress = true;
+  renderAll();
 
-  clearLog();
-  clearSlotHighlights();
+  clearRaidLog();
+  const status = document.getElementById('raid-status');
+  if (status) status.textContent = 'Raid berlangsung...';
 
-  const startButton =
-    document.getElementById('btn-start-raid');
-
-  if (startButton) {
-    startButton.disabled = true;
-  }
-
-  const raidStatus =
-    document.getElementById('raid-status');
-
-  if (raidStatus) {
-    raidStatus.textContent = 'Raid berlangsung...';
-  }
-
-  const hero = generateHero();
-
+  const hero = buildHero();
   updateHeroCard(hero);
+  logLine(`${hero.name} the ${hero.className} memasuki dungeon...`, 'info');
 
-  const reaction =
-    document.getElementById('hero-reaction');
+  let goldReward = 0;
+  let soulsReward = 0;
+  let dungeonWin = false;
+  let heroVictory = false;
+  let heroEscape = false;
 
-  if (reaction) {
-    reaction.classList.remove('show', 'rage');
-  }
+  const slots = state.dungeon.slice(0, state.slotCount);
 
-  log(
-    `${hero.name} sang ${hero.className} (Lv.${hero.level}) memasuki dungeon.`,
-    'hit'
-  );
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i];
+    const slotEl = document.querySelector(`.dungeon-slot[data-index="${i}"]`);
+    if (slotEl) {
+      document.querySelectorAll('.dungeon-slot').forEach(s => s.classList.remove('raid-active'));
+      slotEl.classList.add('raid-active');
+    }
 
-  await sleep(600);
+    await sleep(600);
 
-  let outcome = null;
-  let treasureStolen = false;
-
-  for (let i = 0; i < state.slotCount; i++) {
-    const slotData = state.dungeon[i];
-
-    highlightSlot(i, 'raid-active');
-
-    if (!slotData) {
-      await sleep(300);
-      highlightSlot(i, 'raid-cleared');
+    if (!slot) {
+      logLine(`Ruang ${i + 1} kosong. Hero melanjutkan.`);
       continue;
     }
 
-    if (slotData.kind === 'trap') {
-      await applyPoisonIfAny(hero);
+    const cat = catalogFor(slot.catalogId, slot.kind);
+    const level = getItemLevel(slot.catalogId);
 
-      const def = TRAPS[slotData.catalogId];
+    if (slot.kind === 'trap') {
+      logLine(`Hero menginjak ${cat.name} (Lv.${level})!`);
 
-      await resolveTrap(
-        hero,
-        def,
-        state.levels[slotData.catalogId] || 1
-      );
+      let dmg = cat.baseDamage + (level - 1) * cat.dmgPerLevel;
+      if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
+        logLine(`${hero.name} berhasil menghindar!`, 'success');
+        dmg = 0;
+      }
+
+      if (dmg > 0) {
+        hero.hp -= dmg;
+        logLine(`Terkena ${dmg} damage.`, 'danger');
+        updateHeroCard(hero);
+      }
+
+      if (cat.id === 'poison' && dmg > 0) {
+        hero.status.push({ type: 'poison', rounds: cat.dotRounds, dmg: Math.round(dmg * 0.4) });
+        logLine('Racun mengalir di tubuhnya...', 'danger');
+      }
+      if (cat.id === 'net' && dmg > 0) {
+        hero.atk = Math.round(hero.atk * (1 - cat.atkReduction));
+        logLine('Hero terjerat! ATK menurun.', 'danger');
+      }
 
       if (hero.hp <= 0) {
-        outcome = 'hero_dead';
-        highlightSlot(i, 'raid-cleared');
+        logLine(`${hero.name} gugur di trap.`, 'danger');
+        dungeonWin = true;
         break;
       }
-    } else if (slotData.kind === 'monster') {
-      await applyPoisonIfAny(hero);
-
-      if (hero.hp <= 0) {
-        outcome = 'hero_dead';
-        highlightSlot(i, 'raid-cleared');
-        break;
-      }
-
-      const def = MONSTERS[slotData.catalogId];
-
-      const res = await resolveMonsterEncounter(
-        hero,
-        def,
-        state.levels[slotData.catalogId] || 1
-      );
-
-      if (res.result === 'flee') {
-        outcome = 'flee';
-        highlightSlot(i, 'raid-cleared');
-        break;
-      }
-
-      if (res.result === 'hero_dead') {
-        outcome = 'hero_dead';
-        highlightSlot(i, 'raid-cleared');
-        break;
-      }
-    } else if (slotData.kind === 'treasure') {
-      log(
-        `${hero.name} menemukan Treasure Vault dan menjarahnya!`,
-        'loot'
-      );
-
-      treasureStolen = true;
-
-      await sleep(500);
     }
 
-    highlightSlot(i, 'raid-cleared');
-    await sleep(200);
+    if (slot.kind === 'monster') {
+      const monHp = cat.baseHp + (level - 1) * cat.hpPerLevel;
+      const monAtk = cat.baseAtk + (level - 1) * cat.atkPerLevel;
+      const monDef = cat.baseDef || 0;
+
+      logLine(`${cat.name} (Lv.${level}) muncul! HP ${monHp}`);
+
+      // Level gap flee check
+      const levelGap = level - hero.level;
+      if (!hero.fearImmune && levelGap >= hero.fleeThreshold) {
+        logLine(`${hero.name} merasa kewalahan dan memutuskan kabur!`, 'warning');
+        setReaction('KABUR!');
+        heroEscape = true;
+        break;
+      }
+
+      let mHp = monHp;
+      let round = 0;
+
+      while (mHp > 0 && hero.hp > 0) {
+        round++;
+        await sleep(450);
+
+        // poison tick
+        hero.status = hero.status.filter(s => {
+          if (s.type === 'poison' && s.rounds > 0) {
+            hero.hp -= s.dmg;
+            logLine(`Racun: -${s.dmg} HP`, 'danger');
+            s.rounds--;
+            return s.rounds > 0;
+          }
+          return true;
+        });
+        updateHeroCard(hero);
+        if (hero.hp <= 0) break;
+
+        // rage check
+        if (hero.canRage && !hero.raged && hero.hp / hero.maxHp <= hero.rageHpThreshold) {
+          hero.raged = true;
+          hero.atk = Math.round(hero.atk * hero.rageAtkMultiplier);
+          hero.hp = Math.min(hero.maxHp, hero.hp + Math.round(hero.maxHp * hero.rageHealFraction));
+          setReaction('RAGE!');
+          logLine(`${hero.name} mengamuk! ATK naik & heal sedikit.`, 'ember');
+          updateHeroCard(hero);
+        }
+
+        // panic visual
+        if (hero.hp / hero.maxHp <= 0.3) {
+          setReaction('PANIK...');
+        }
+
+        // hero attack
+        const hDmg = Math.max(1, hero.atk - monDef);
+        mHp -= hDmg;
+        logLine(`${hero.name} menyerang → ${hDmg} dmg (sisa monster ${Math.max(0, Math.floor(mHp))})`);
+
+        if (mHp <= 0) {
+          logLine(`${cat.name} dikalahkan!`, 'success');
+          goldReward += 8 + level * 3;
+          break;
+        }
+
+        // monster attack
+        const mDmg = Math.max(1, monAtk - hero.def);
+        hero.hp -= mDmg;
+        logLine(`${cat.name} memukul → ${mDmg} dmg`);
+        updateHeroCard(hero);
+      }
+
+      if (hero.hp <= 0) {
+        logLine(`${hero.name} gugur dalam pertarungan.`, 'danger');
+        dungeonWin = true;
+        break;
+      }
+    }
+
+    if (slot.kind === 'treasure') {
+      logLine(`Hero menemukan Treasure Vault!`);
+      if (hero.hp > 0) {
+        const stolen = Math.round(goldReward * 0.4 + 15);
+        goldReward = Math.max(0, goldReward - stolen);
+        logLine(`Hero mencuri sebagian harta (+${stolen} gold ke hero).`, 'warning');
+        heroVictory = true;
+      }
+    }
+
+    if (slotEl) slotEl.classList.add('raid-cleared');
   }
 
-  if (!outcome) {
-    outcome = 'hero_wins';
+  // akhir raid
+  await sleep(400);
+  document.querySelectorAll('.dungeon-slot').forEach(s => {
+    s.classList.remove('raid-active', 'raid-cleared');
+  });
+
+  if (hero.hp > 0 && !heroEscape && !heroVictory) {
+    logLine(`${hero.name} berhasil keluar hidup-hidup!`, 'warning');
+    heroVictory = true;
   }
 
-  await finishRaid(
-    hero,
-    outcome,
-    treasureStolen
-  );
-}
-
-async function applyPoisonIfAny(hero) {
-  if (hero.poisonRounds > 0) {
-    hero.hp -= hero.poisonDmg;
-    hero.poisonRounds -= 1;
-
-    updateHeroCard(hero);
-
-    log(
-      `Racun mengalir di tubuh ${hero.name} (-${hero.poisonDmg} HP).`,
-      'hit'
-    );
-
-    await sleep(350);
-  }
-}
-
-async function finishRaid(
-  hero,
-  outcome,
-  treasureStolen
-) {
-  state.stats.raidsTotal += 1;
-
-  const dungeonPower = averageDungeonLevel();
-
-  let goldReward = 0;
-  let soulReward = 0;
-
-  if (outcome === 'hero_dead') {
-    state.stats.dungeonWins += 1;
-
-    goldReward =
-      15 +
-      dungeonPower * 6 +
-      hero.level * 4;
-
-    soulReward =
-      2 +
-      Math.floor(dungeonPower / 2);
-
-    log(
-      `${hero.name} gugur. Dungeon-mu menang!`,
-      'victory'
-    );
-
-    log(
-      `+${goldReward} Gold, +${soulReward} Souls`,
-      'loot'
-    );
-  } else if (outcome === 'flee') {
-    state.stats.heroEscapes += 1;
-
-    goldReward =
-      6 +
-      dungeonPower * 2;
-
-    soulReward = 1;
-
-    log(
-      `${hero.name} berhasil kabur. Reward sebagian saja.`,
-      'defeat'
-    );
-
-    log(
-      `+${goldReward} Gold, +${soulReward} Souls`,
-      'loot'
-    );
-  } else {
-    state.stats.heroVictories += 1;
-
-    goldReward = treasureStolen ? 2 : 5;
-    soulReward = 1;
-
-    log(
-      `${hero.name} berhasil menaklukkan dungeon-mu!${treasureStolen ? ' Treasure dijarah.' : ''}`,
-      'defeat'
-    );
-
-    log(
-      `Hanya +${goldReward} Gold, +${soulReward} Souls. Waktunya redesign.`,
-      'loot'
-    );
+  if (dungeonWin) {
+    logLine('Dungeon menang! Hero dihentikan.', 'success');
+    goldReward += 25 + state.slotCount * 8;
+    soulsReward += 1;
+    state.stats.dungeonWins++;
+  } else if (heroEscape) {
+    state.stats.heroEscapes++;
+    goldReward = Math.round(goldReward * 0.3);
+  } else if (heroVictory) {
+    state.stats.heroVictories++;
+    goldReward = Math.round(goldReward * 0.5);
   }
 
   state.gold += goldReward;
-  state.souls += soulReward;
+  state.souls += soulsReward;
+  state.stats.raidsTotal++;
 
-  saveState();
+  logLine(`Reward: +${goldReward} Gold` + (soulsReward ? ` +${soulsReward} Souls` : ''), 'info');
+  if (status) status.textContent = 'Raid selesai';
 
   raidInProgress = false;
-
-  const raidStatus =
-    document.getElementById('raid-status');
-
-  if (raidStatus) {
-    raidStatus.textContent = '';
-  }
-
+  saveState();
   renderAll();
 }
 
-const OFFLINE_RAID_INTERVAL_MIN = 8;
-const OFFLINE_MAX_RAIDS = 15;
+/* ========== OFFLINE ========== */
 
 function simulateOfflineProgress() {
   const now = Date.now();
+  const elapsed = now - (state.lastActive || now);
+  const hours = elapsed / (1000 * 60 * 60);
 
-  const elapsedMs =
-    now - (state.lastActive || now);
+  if (hours < 0.25) return null;
 
-  const elapsedMin =
-    elapsedMs / 60000;
+  const raids = Math.min(12, Math.floor(hours * 1.8));
+  if (raids < 1) return null;
 
-  if (
-    elapsedMin < OFFLINE_RAID_INTERVAL_MIN ||
-    dungeonEmpty()
-  ) {
-    state.lastActive = now;
-    return null;
-  }
-
-  const raidCount = Math.min(
-    OFFLINE_MAX_RAIDS,
-    Math.floor(
-      elapsedMin / OFFLINE_RAID_INTERVAL_MIN
-    )
-  );
-
-  const dungeonPower =
-    averageDungeonLevel();
-
+  let gold = 0;
+  let souls = 0;
   let wins = 0;
-  let escapes = 0;
-  let losses = 0;
-  let goldEarned = 0;
-  let soulsEarned = 0;
 
-  for (let i = 0; i < raidCount; i++) {
-    const heroPower =
-      3 + Math.random() * 6;
-
-    const dungeonRoll =
-      dungeonPower + Math.random() * 3;
-
-    if (dungeonRoll >= heroPower) {
+  for (let i = 0; i < raids; i++) {
+    const success = Math.random() < 0.55;
+    if (success) {
       wins++;
-
-      goldEarned +=
-        15 + dungeonPower * 6;
-
-      soulsEarned +=
-        2 + Math.floor(dungeonPower / 2);
-    } else if (dungeonRoll >= heroPower - 2) {
-      escapes++;
-
-      goldEarned +=
-        6 + dungeonPower * 2;
-
-      soulsEarned += 1;
+      gold += 18 + state.slotCount * 5;
+      if (Math.random() < 0.25) souls += 1;
     } else {
-      losses++;
-
-      goldEarned += 4;
-      soulsEarned += 1;
+      gold += 6;
     }
   }
 
-  state.gold += goldEarned;
-  state.souls += soulsEarned;
-
-  state.stats.raidsTotal += raidCount;
+  state.gold += gold;
+  state.souls += souls;
+  state.stats.raidsTotal += raids;
   state.stats.dungeonWins += wins;
-  state.stats.heroEscapes += escapes;
-  state.stats.heroVictories += losses;
-
-  state.lastActive = now;
-
   saveState();
 
-  return {
-    raidCount,
-    wins,
-    escapes,
-    losses,
-    goldEarned,
-    soulsEarned
-  };
+  return { raids, gold, souls, wins, hours: hours.toFixed(1) };
 }
 
 function showOfflineModal(summary) {
-  const modal =
-    document.getElementById('offline-modal');
-
-  const body =
-    document.getElementById('offline-summary');
-
+  const modal = document.getElementById('offline-modal');
+  const body = document.getElementById('offline-summary');
   if (!modal || !body) return;
 
   body.innerHTML = `
-    <p>Dungeon-mu diraid <strong>${summary.raidCount}x</strong> selagi kau pergi.</p>
-    <p>🏆 Menang: <strong>${summary.wins}</strong> &nbsp; 🏃 Hero kabur: <strong>${summary.escapes}</strong> &nbsp; 💀 Hero menang: <strong>${summary.losses}</strong></p>
-    <p>Total didapat: <strong>+${summary.goldEarned} Gold</strong>, <strong>+${summary.soulsEarned} Souls</strong></p>
+    <p>Kamu pergi selama ~${summary.hours} jam.</p>
+    <p>Simulasi offline: <strong>${summary.raids}</strong> raid.</p>
+    <p>Dungeon menang: <strong>${summary.wins}</strong></p>
+    <p>Gold didapat: <strong>+${summary.gold}</strong></p>
+    <p>Souls didapat: <strong>+${summary.souls}</strong></p>
   `;
-
-  modal.classList.remove(
-    'modal-overlay--hidden'
-  );
+  modal.classList.remove('modal-overlay--hidden');
 }
 
-function initOverlayControls() {
-  const palettePanel =
-    document.querySelector('.palette-panel');
-
-  const upgradesPanel =
-    document.querySelector('.upgrades-panel');
-
-  const closeButtons =
-    document.querySelectorAll(
-      '[data-close-panel]'
-    );
-
-  document
-    .querySelectorAll('[data-open-panel]')
-    .forEach(button => {
-      button.addEventListener('click', () => {
-        const target =
-          button.dataset.openPanel;
-
-        const panel =
-          target === 'palette'
-            ? palettePanel
-            : target === 'upgrades'
-              ? upgradesPanel
-              : null;
-
-        if (!panel) return;
-
-        document
-          .querySelectorAll('.panel.is-overlay-open')
-          .forEach(openPanel => {
-            openPanel.classList.remove(
-              'is-overlay-open'
-            );
-          });
-
-        panel.classList.add(
-          'is-overlay-open'
-        );
-
-        document.body.classList.add(
-          'overlay-active'
-        );
-      });
-    });
-
-  closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      document
-        .querySelectorAll('.panel.is-overlay-open')
-        .forEach(panel => {
-          panel.classList.remove(
-            'is-overlay-open'
-          );
-        });
-
-      document.body.classList.remove(
-        'overlay-active'
-      );
-    });
-  });
-
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape') return;
-
-    document
-      .querySelectorAll('.panel.is-overlay-open')
-      .forEach(panel => {
-        panel.classList.remove(
-          'is-overlay-open'
-        );
-      });
-
-    document.body.classList.remove(
-      'overlay-active'
-    );
-  });
-}
+/* ========== INIT ========== */
 
 function init() {
-  const offlineSummary =
-    simulateOfflineProgress();
+  const offlineSummary = simulateOfflineProgress();
 
   renderAll();
   initOverlayControls();
 
-  const startButton =
-    document.getElementById('btn-start-raid');
-
+  const startButton = document.getElementById('btn-start-raid');
   if (startButton) {
-    startButton.addEventListener(
-      'click',
-      runRaid
-    );
+    startButton.addEventListener('click', runRaid);
   }
 
-  const closeOffline =
-    document.getElementById(
-      'btn-close-offline'
-    );
-
+  const closeOffline = document.getElementById('btn-close-offline');
   if (closeOffline) {
-    closeOffline.addEventListener(
-      'click',
-      () => {
-        document
-          .getElementById('offline-modal')
-          .classList.add(
-            'modal-overlay--hidden'
-          );
-      }
-    );
+    closeOffline.addEventListener('click', () => {
+      document.getElementById('offline-modal').classList.add('modal-overlay--hidden');
+    });
   }
 
   if (offlineSummary) {
     showOfflineModal(offlineSummary);
   }
 
-  window.addEventListener(
-    'beforeunload',
-    saveState
-  );
-
-  setInterval(
-    saveState,
-    30000
-  );
+  window.addEventListener('beforeunload', saveState);
+  setInterval(saveState, 30000);
 }
 
-document.addEventListener(
-  'DOMContentLoaded',
-  init
-);
+document.addEventListener('DOMContentLoaded', init);
