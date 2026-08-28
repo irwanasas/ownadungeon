@@ -10,6 +10,10 @@ function loadState() {
       next.king = structuredClone(DEFAULT_STATE.king);
     }
     if (!next.stats) next.stats = structuredClone(DEFAULT_STATE.stats);
+    if (!next.mode) next.mode = 'stage';
+    if (typeof next.stage !== 'number' || next.stage < 1) next.stage = 1;
+    if (next.stage > STAGE_MAX) next.stage = STAGE_MAX;
+    if (typeof next.maxStageCleared !== 'number') next.maxStageCleared = 0;
     return next;
   } catch {
     return structuredClone(DEFAULT_STATE);
@@ -117,11 +121,26 @@ async function runRaid() {
     return sleep(fallback[key] || 500);
   }
 
+  var stageDiff =
+    state.mode === 'stage' && typeof getStageDiff === 'function'
+      ? getStageDiff(state.stage)
+      : {
+          stage: 1,
+          heroLevelBonus: 0,
+          trapMult: 1,
+          monsterHpMult: 1,
+          monsterAtkMult: 1,
+          kingMult: 1
+        };
+
   var hero = buildHero();
   if (typeof updateHeroCard === 'function') updateHeroCard(hero);
   if (typeof showHeroToken === 'function') showHeroToken(hero);
 
   if (typeof logLine === 'function') {
+    if (state.mode === 'stage') {
+      logLine('Stage ' + stageDiff.stage + ' / ' + STAGE_MAX + ' — hero memasuki dungeon.', 'info');
+    }
     logLine(hero.name + ' the ' + hero.className + ' menatap mulut dungeon yang menganga.', 'info');
   }
   await waitBeat('enterDungeon');
@@ -174,7 +193,7 @@ async function runRaid() {
       if (typeof flashSlot === 'function') flashSlot(slotEl, 'triggered');
       await waitBeat('actionGap');
 
-      var dmg = cat.baseDamage + (level - 1) * cat.dmgPerLevel;
+      var dmg = Math.round((cat.baseDamage + (level - 1) * cat.dmgPerLevel) * stageDiff.trapMult);
       if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
         if (typeof logLine === 'function') {
           logLine(hero.name + ' meloncat di detik terakhir — lolos!', 'success');
@@ -218,8 +237,8 @@ async function runRaid() {
     }
 
     if (slot.kind === 'monster') {
-      var monHp = cat.baseHp + (level - 1) * cat.hpPerLevel;
-      var monAtk = cat.baseAtk + (level - 1) * cat.atkPerLevel;
+      var monHp = Math.round((cat.baseHp + (level - 1) * cat.hpPerLevel) * stageDiff.monsterHpMult);
+      var monAtk = Math.round((cat.baseAtk + (level - 1) * cat.atkPerLevel) * stageDiff.monsterAtkMult);
       var monDef = cat.baseDef || 0;
 
       if (typeof logLine === 'function') {
@@ -354,9 +373,9 @@ async function runRaid() {
     var king = typeof getKingStats === 'function'
       ? getKingStats(state.king && state.king.level)
       : { level: 1, maxHp: 40, atk: 8, def: 2 };
-    var kHp = king.maxHp;
-    var kAtk = king.atk;
-    var kDef = king.def;
+    var kHp = Math.round(king.maxHp * stageDiff.kingMult);
+    var kAtk = Math.round(king.atk * stageDiff.kingMult);
+    var kDef = Math.max(0, Math.round(king.def * stageDiff.kingMult));
 
     if (typeof logLine === 'function') {
       logLine(
@@ -460,6 +479,19 @@ async function runRaid() {
     goldReward += 25 + state.slotCount * 8;
     soulsReward += 1;
     state.stats.dungeonWins++;
+    if (state.mode === 'stage') {
+      if (state.stage > state.maxStageCleared) {
+        state.maxStageCleared = state.stage;
+      }
+      if (state.stage < STAGE_MAX) {
+        state.stage += 1;
+        if (typeof logLine === 'function') {
+          logLine('Stage naik → ' + state.stage + ' / ' + STAGE_MAX, 'info');
+        }
+      } else if (typeof logLine === 'function') {
+        logLine('Semua Stage (1–' + STAGE_MAX + ') sudah ditaklukkan.', 'success');
+      }
+    }
   } else if (heroEscape) {
     state.stats.heroEscapes++;
     goldReward = Math.round(goldReward * 0.3);
