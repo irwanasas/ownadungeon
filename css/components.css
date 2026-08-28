@@ -1,5 +1,3 @@
-/* ========== SIDE OVERLAY ========== */
-
 .side-overlay {
   position: fixed;
   inset: 0;
@@ -85,7 +83,6 @@
   background: rgba(192, 71, 43, 0.12);
 }
 
-/* Empty state */
 .empty-state {
   padding: 14px 12px;
   border: 1px dashed var(--border);
@@ -95,8 +92,6 @@
   line-height: 1.5;
   text-align: center;
 }
-
-/* Palette & Upgrade items */
 
 .palette-group {
   margin-bottom: 18px;
@@ -246,8 +241,6 @@
   color: var(--gold);
 }
 
-/* Toast */
-
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -298,8 +291,6 @@
   color: var(--gold);
 }
 
-/* Modal offline */
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -341,7 +332,24 @@
   color: var(--bone);
 }
 
-/* Responsive */
+.btn-danger {
+  border-color: var(--ember);
+  color: var(--ember-bright);
+  background: rgba(192, 71, 43, 0.12);
+}
+
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--ember-bright);
+  background: rgba(192, 71, 43, 0.22);
+  filter: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 @media (max-width: 640px) {
   .app {
@@ -406,4 +414,3 @@
     transition-duration: 0.01ms !important;
   }
 }
-
