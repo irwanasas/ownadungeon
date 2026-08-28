@@ -413,3 +413,21 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+
+.mode-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-btn.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(216, 170, 77, 0.35) inset;
+}
