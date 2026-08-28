@@ -281,6 +281,21 @@ function renderDungeonSlots() {
 
     wrap.appendChild(slotEl);
   }
+
+  var endConn = document.createElement('div');
+  endConn.className = 'slot-connector';
+  wrap.appendChild(endConn);
+
+  var throne = document.createElement('div');
+  throne.className = 'dungeon-slot throne-room filled';
+  throne.dataset.index = 'throne';
+  var kingLv = (state.king && state.king.level) || 1;
+  throne.innerHTML =
+    '<span class="slot-index">◆</span>' +
+    '<span class="slot-icon">👑</span>' +
+    '<span class="slot-label">Throne</span>' +
+    '<span class="slot-sub">Chest · King Lv.' + kingLv + '</span>';
+  wrap.appendChild(throne);
 }
 
 function renderUpgrades() {
