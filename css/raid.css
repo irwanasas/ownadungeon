@@ -1,5 +1,3 @@
-/* ========== HERO VISUAL REACTIONS ========== */
-
 .hero-icon {
   font-size: 18px;
   flex-shrink: 0;
@@ -105,8 +103,6 @@
   100% { background: var(--panel-raised); }
 }
 
-/* ========== STAGE B: token position via left; face anim only ========== */
-
 .dungeon-runway {
   position: relative;
   flex-shrink: 0;
@@ -188,4 +184,19 @@
 
 .dungeon-runway.is-raiding .dungeon-slot.raid-active {
   opacity: 1;
+}
+
+.dungeon-slot.throne-room {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(216, 170, 77, 0.35) inset;
+  min-width: 88px;
+}
+
+.dungeon-slot.throne-room .slot-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  color: var(--gold);
+  line-height: 1.2;
+  text-align: center;
 }

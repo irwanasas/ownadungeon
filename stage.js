@@ -1,5 +1,3 @@
-/* ========== STAGE B: hero token on runway + beat helpers ========== */
-
 var STAGE_BEAT = {
   enterDungeon: 850,
   arriveRoom: 750,
@@ -9,11 +7,9 @@ var STAGE_BEAT = {
   resolve: 850,
   betweenRooms: 650,
   ending: 1100,
-  /** ± fraction of base (0.3 = 70%–130%) */
   jitter: 0.3
 };
 
-/** Wait a named beat with random jitter so pacing feels less robotic. */
 function beatWait(key) {
   var base = (STAGE_BEAT && STAGE_BEAT[key]) || 500;
   var j = (STAGE_BEAT && STAGE_BEAT.jitter) || 0.25;
@@ -137,6 +133,12 @@ function moveHeroToEntrance(instant) {
 
 function moveHeroToSlot(index, instant) {
   var slotEl = document.querySelector('.dungeon-slot[data-index="' + index + '"]');
+  if (!slotEl) return;
+  repositionHeroOver(slotEl, !!instant);
+}
+
+function moveHeroToThrone(instant) {
+  var slotEl = document.querySelector('.dungeon-slot.throne-room');
   if (!slotEl) return;
   repositionHeroOver(slotEl, !!instant);
 }
