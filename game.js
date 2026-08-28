@@ -69,37 +69,50 @@ async function runRaid() {
   var status = document.getElementById('raid-status');
   if (status) status.textContent = 'Raid berlangsung...';
 
+  var beat = typeof STAGE_BEAT !== 'undefined' ? STAGE_BEAT : {
+    enterDungeon: 500, arriveRoom: 450, threat: 400, actionGap: 380,
+    combatRound: 420, resolve: 500, betweenRooms: 350, ending: 700
+  };
+
   var hero = buildHero();
   if (typeof updateHeroCard === 'function') updateHeroCard(hero);
   if (typeof showHeroToken === 'function') showHeroToken(hero);
+
   if (typeof logLine === 'function') {
-    logLine(hero.name + ' the ' + hero.className + ' memasuki dungeon...', 'info');
+    logLine(hero.name + ' the ' + hero.className + ' berdiri di pintu masuk...', 'info');
   }
-  await sleep(400);
+  await sleep(beat.enterDungeon);
+  if (typeof logLine === 'function') {
+    logLine(hero.name + ' melangkah masuk ke dungeon.', 'info');
+  }
+  await sleep(beat.betweenRooms);
 
   var goldReward = 0;
   var soulsReward = 0;
   var dungeonWin = false;
   var heroVictory = false;
   var heroEscape = false;
-
   var slots = state.dungeon.slice(0, state.slotCount);
 
   for (var i = 0; i < slots.length; i++) {
     var slot = slots[i];
     var slotEl = document.querySelector('.dungeon-slot[data-index="' + i + '"]');
+
+    document.querySelectorAll('.dungeon-slot').forEach(function (s) {
+      s.classList.remove('raid-active');
+    });
     if (slotEl) {
-      document.querySelectorAll('.dungeon-slot').forEach(function (s) {
-        s.classList.remove('raid-active');
-      });
       slotEl.classList.add('raid-active');
-      if (typeof moveHeroToSlot === 'function') moveHeroToSlot(i);
+      if (typeof moveHeroToSlot === 'function') moveHeroToSlot(i, false);
     }
 
-    await sleep(600);
+    await sleep(beat.arriveRoom);
 
     if (!slot) {
-      if (typeof logLine === 'function') logLine('Ruang ' + (i + 1) + ' kosong. Hero melanjutkan.');
+      if (typeof logLine === 'function') {
+        logLine('Ruang ' + (i + 1) + ' kosong. Hanya koridor gelap...', 'info');
+      }
+      await sleep(beat.resolve);
       continue;
     }
 
@@ -107,8 +120,16 @@ async function runRaid() {
     var level = getItemLevel(slot.catalogId);
 
     if (slot.kind === 'trap') {
-      if (typeof logLine === 'function') logLine('Hero menginjak ' + cat.name + ' (Lv.' + level + ')!');
+      if (typeof logLine === 'function') {
+        logLine('Sesuatu berkilau di lantai ruang ' + (i + 1) + '...', 'warning');
+      }
+      await sleep(beat.threat);
+
+      if (typeof logLine === 'function') {
+        logLine('Trap: ' + cat.name + ' (Lv.' + level + ')!', 'danger');
+      }
       if (typeof flashSlot === 'function') flashSlot(slotEl, 'triggered');
+      await sleep(beat.actionGap);
 
       var dmg = cat.baseDamage + (level - 1) * cat.dmgPerLevel;
       if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
@@ -124,17 +145,15 @@ async function runRaid() {
       }
 
       if (cat.id === 'poison' && dmg > 0) {
-        hero.status.push({
-          type: 'poison',
-          rounds: cat.dotRounds,
-          dmg: Math.round(dmg * 0.4)
-        });
+        hero.status.push({ type: 'poison', rounds: cat.dotRounds, dmg: Math.round(dmg * 0.4) });
         if (typeof logLine === 'function') logLine('Racun mengalir di tubuhnya...', 'danger');
       }
       if (cat.id === 'net' && dmg > 0) {
         hero.atk = Math.round(hero.atk * (1 - cat.atkReduction));
         if (typeof logLine === 'function') logLine('Hero terjerat! ATK menurun.', 'danger');
       }
+
+      await sleep(beat.resolve);
 
       if (hero.hp <= 0) {
         if (typeof logLine === 'function') logLine(hero.name + ' gugur di trap.', 'danger');
@@ -151,8 +170,14 @@ async function runRaid() {
       var monDef = cat.baseDef || 0;
 
       if (typeof logLine === 'function') {
-        logLine(cat.name + ' (Lv.' + level + ') muncul! HP ' + monHp);
+        logLine('Bayangan bergerak di ruang ' + (i + 1) + '...', 'warning');
       }
+      await sleep(beat.threat);
+
+      if (typeof logLine === 'function') {
+        logLine(cat.name + ' (Lv.' + level + ') muncul! HP ' + monHp, 'danger');
+      }
+      await sleep(beat.actionGap);
 
       var levelGap = level - hero.level;
       if (!hero.fearImmune && levelGap >= hero.fleeThreshold) {
@@ -161,13 +186,13 @@ async function runRaid() {
         }
         triggerFlee(hero);
         heroEscape = true;
+        await sleep(beat.resolve);
         break;
       }
 
       var mHp = monHp;
-
       while (mHp > 0 && hero.hp > 0) {
-        await sleep(450);
+        await sleep(beat.combatRound);
 
         hero.status = hero.status.filter(function (s) {
           if (s.type === 'poison' && s.rounds > 0) {
@@ -187,6 +212,7 @@ async function runRaid() {
             logLine(hero.name + ' mengamuk! ATK naik & heal sedikit.', 'ember');
           }
           if (typeof updateHeroCard === 'function') updateHeroCard(hero);
+          await sleep(beat.actionGap);
         }
 
         var hDmg = Math.max(1, hero.atk - monDef);
@@ -209,10 +235,10 @@ async function runRaid() {
         checkPanic(hero);
       }
 
+      await sleep(beat.resolve);
+
       if (hero.hp <= 0) {
-        if (typeof logLine === 'function') {
-          logLine(hero.name + ' gugur dalam pertarungan.', 'danger');
-        }
+        if (typeof logLine === 'function') logLine(hero.name + ' gugur dalam pertarungan.', 'danger');
         if (typeof flashSlot === 'function') flashSlot(slotEl, 'kill');
         if (typeof triggerDeath === 'function') triggerDeath(hero);
         dungeonWin = true;
@@ -221,7 +247,13 @@ async function runRaid() {
     }
 
     if (slot.kind === 'treasure') {
-      if (typeof logLine === 'function') logLine('Hero menemukan Treasure Vault!');
+      if (typeof logLine === 'function') {
+        logLine('Cahaya emas di ujung ruang ' + (i + 1) + '...', 'warning');
+      }
+      await sleep(beat.threat);
+      if (typeof logLine === 'function') logLine('Treasure Vault terbuka!');
+      await sleep(beat.actionGap);
+
       if (hero.hp > 0) {
         var stolen = Math.round(goldReward * 0.4 + 15);
         goldReward = Math.max(0, goldReward - stolen);
@@ -230,20 +262,20 @@ async function runRaid() {
         }
         heroVictory = true;
       }
+      await sleep(beat.resolve);
     }
 
     if (slotEl) slotEl.classList.add('raid-cleared');
+    await sleep(beat.betweenRooms);
   }
 
-  await sleep(400);
+  await sleep(beat.ending);
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
   });
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
-    if (typeof logLine === 'function') {
-      logLine(hero.name + ' berhasil keluar hidup-hidup!', 'warning');
-    }
+    if (typeof logLine === 'function') logLine(hero.name + ' berhasil keluar hidup-hidup!', 'warning');
     heroVictory = true;
   }
 
@@ -272,42 +304,30 @@ async function runRaid() {
   raidInProgress = false;
   saveState();
   if (typeof renderAll === 'function') renderAll();
-  // keep token visible briefly on death/flee, then clear after short delay
   setTimeout(function () {
     if (typeof hideHeroToken === 'function') hideHeroToken();
-  }, 1200);
+  }, 1400);
 }
 
 function simulateOfflineProgress() {
   var now = Date.now();
   var elapsed = now - (state.lastActive || now);
   var hours = elapsed / (1000 * 60 * 60);
-
   if (hours < 0.25) return null;
-
   var raids = Math.min(12, Math.floor(hours * 1.8));
   if (raids < 1) return null;
-
-  var gold = 0;
-  var souls = 0;
-  var wins = 0;
-
+  var gold = 0, souls = 0, wins = 0;
   for (var i = 0; i < raids; i++) {
-    var success = Math.random() < 0.55;
-    if (success) {
+    if (Math.random() < 0.55) {
       wins++;
       gold += 18 + state.slotCount * 5;
       if (Math.random() < 0.25) souls += 1;
-    } else {
-      gold += 6;
-    }
+    } else gold += 6;
   }
-
   state.gold += gold;
   state.souls += souls;
   state.stats.raidsTotal += raids;
   state.stats.dungeonWins += wins;
   saveState();
-
   return { raids: raids, gold: gold, souls: souls, wins: wins, hours: hours.toFixed(1) };
 }
