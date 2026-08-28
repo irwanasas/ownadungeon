@@ -129,6 +129,20 @@ function getKingStats(level) {
   };
 }
 
+const STAGE_MAX = 10;
+
+function getStageDiff(stage) {
+  stage = Math.min(STAGE_MAX, Math.max(1, Math.floor(stage || 1)));
+  return {
+    stage: stage,
+    heroLevelBonus: stage - 1,
+    trapMult: 1 + (stage - 1) * 0.12,
+    monsterHpMult: 1 + (stage - 1) * 0.14,
+    monsterAtkMult: 1 + (stage - 1) * 0.12,
+    kingMult: 1 + (stage - 1) * 0.1
+  };
+}
+
 const DEFAULT_STATE = {
   gold: 30,
   souls: 0,
@@ -162,6 +176,9 @@ const DEFAULT_STATE = {
   king: {
     level: 1
   },
+  mode: 'stage',
+  stage: 1,
+  maxStageCleared: 0,
   lastActive: Date.now()
 };
 
