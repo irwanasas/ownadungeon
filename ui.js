@@ -363,7 +363,14 @@ function renderStats() {
   var wrap = document.getElementById('stats-list');
   if (!wrap) return;
   var s = state.stats;
+  var king = typeof getKingStats === 'function'
+    ? getKingStats(state.king && state.king.level)
+    : { level: 1, maxHp: 40, atk: 8, def: 2 };
   var rows = [
+    ['King Level', king.level],
+    ['King HP', king.maxHp],
+    ['King ATK', king.atk],
+    ['King DEF', king.def],
     ['Total Raid', s.raidsTotal],
     ['Dungeon Menang', s.dungeonWins],
     ['Hero Kabur', s.heroEscapes],
