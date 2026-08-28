@@ -1,5 +1,3 @@
-/* ========== UI: render, overlay, toast, visual reactions ========== */
-
 let currentOverlay = null;
 let lastFocusedBeforeOverlay = null;
 
@@ -114,8 +112,6 @@ function flashSlot(slotEl, kind) {
     slotEl.classList.remove(cls);
   }, 400);
 }
-
-/* ---------- render ---------- */
 
 function renderPalette() {
   var trapWrap = document.getElementById('palette-traps');
@@ -403,8 +399,6 @@ function renderAll() {
   if (startButton) startButton.disabled = raidInProgress;
 }
 
-/* ---------- overlays ---------- */
-
 var OVERLAY_MAP = {
   palette: { id: 'palette-overlay', btn: 'btn-open-palette' },
   upgrades: { id: 'upgrades-overlay', btn: 'btn-open-upgrades' },
@@ -608,6 +602,37 @@ function init() {
 
   var startButton = document.getElementById('btn-start-raid');
   if (startButton) startButton.addEventListener('click', runRaid);
+
+  var btnReset = document.getElementById('btn-reset-game');
+  var resetModal = document.getElementById('reset-modal');
+  var btnResetCancel = document.getElementById('btn-reset-cancel');
+  var btnResetConfirm = document.getElementById('btn-reset-confirm');
+
+  function openResetModal() {
+    if (raidInProgress) {
+      showToast('Tunggu raid selesai dulu', 'warning');
+      return;
+    }
+    if (resetModal) resetModal.classList.remove('modal-overlay--hidden');
+  }
+
+  function closeResetModal() {
+    if (resetModal) resetModal.classList.add('modal-overlay--hidden');
+  }
+
+  if (btnReset) btnReset.addEventListener('click', openResetModal);
+  if (btnResetCancel) btnResetCancel.addEventListener('click', closeResetModal);
+  if (btnResetConfirm) {
+    btnResetConfirm.addEventListener('click', function () {
+      closeResetModal();
+      if (typeof resetGame === 'function') resetGame();
+    });
+  }
+  if (resetModal) {
+    resetModal.addEventListener('click', function (e) {
+      if (e.target === resetModal) closeResetModal();
+    });
+  }
 
   var closeOffline = document.getElementById('btn-close-offline');
   if (closeOffline) {
