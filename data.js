@@ -2,20 +2,20 @@ const TRAPS = {
   spike: {
     id: 'spike', name: 'Spike Trap', icon: '🗡', kind: 'trap',
     desc: 'Damage instan saat terinjak.',
-    baseDamage: 12, dmgPerLevel: 6,
+    baseDamage: 14, dmgPerLevel: 5,
     cost: { gold: 0, souls: 0 }
   },
   poison: {
     id: 'poison', name: 'Poison Trap', icon: '☠', kind: 'trap',
     desc: 'Racun berjalan, damage tiap giliran combat berikutnya.',
-    baseDamage: 5, dmgPerLevel: 2, dotRounds: 3,
-    cost: { gold: 40, souls: 0 }
+    baseDamage: 6, dmgPerLevel: 3, dotRounds: 3,
+    cost: { gold: 35, souls: 0 }
   },
   net: {
     id: 'net', name: 'Net Trap', icon: '🕸', kind: 'trap',
     desc: 'Hero terjerat, ATK menurun untuk sisa raid.',
-    baseDamage: 4, dmgPerLevel: 1, atkReduction: 0.25,
-    cost: { gold: 70, souls: 0 }
+    baseDamage: 5, dmgPerLevel: 2, atkReduction: 0.28,
+    cost: { gold: 55, souls: 0 }
   }
 };
 
@@ -23,23 +23,23 @@ const MONSTERS = {
   skeleton: {
     id: 'skeleton', name: 'Skeleton Archer', icon: '🏹', kind: 'monster',
     desc: 'Ranged, ATK rendah tapi konsisten.',
-    baseHp: 30, baseAtk: 7, baseDef: 1,
-    hpPerLevel: 10, atkPerLevel: 2,
+    baseHp: 32, baseAtk: 8, baseDef: 1,
+    hpPerLevel: 9, atkPerLevel: 2,
     cost: { gold: 0, souls: 0 }
   },
   goblin: {
     id: 'goblin', name: 'Goblin Brute', icon: '👹', kind: 'monster',
     desc: 'HP rendah, ATK tinggi. Cepat mati, cepat membunuh.',
-    baseHp: 22, baseAtk: 11, baseDef: 0,
-    hpPerLevel: 6, atkPerLevel: 3,
-    cost: { gold: 50, souls: 0 }
+    baseHp: 24, baseAtk: 12, baseDef: 0,
+    hpPerLevel: 7, atkPerLevel: 3,
+    cost: { gold: 45, souls: 0 }
   },
   ogre: {
     id: 'ogre', name: 'Bone Ogre', icon: '🦴', kind: 'monster',
     desc: 'HP tinggi, tahan lama. Baik untuk menguras hero.',
-    baseHp: 55, baseAtk: 6, baseDef: 3,
-    hpPerLevel: 14, atkPerLevel: 2,
-    cost: { gold: 90, souls: 5 }
+    baseHp: 60, baseAtk: 7, baseDef: 3,
+    hpPerLevel: 13, atkPerLevel: 2,
+    cost: { gold: 80, souls: 4 }
   }
 };
 
@@ -111,10 +111,10 @@ const NAME_POOL = [
 ];
 
 const KING_BASE = {
-  maxHp: 40,
-  atk: 8,
+  maxHp: 48,
+  atk: 9,
   def: 2,
-  hpPerLevel: 12,
+  hpPerLevel: 14,
   atkPerLevel: 2,
   defPerLevel: 1
 };
@@ -140,9 +140,9 @@ function getStageDiff(stage) {
     monsterHpMult: 1 + (stage - 1) * 0.14,
     monsterAtkMult: 1 + (stage - 1) * 0.12,
     kingMult: 1 + (stage - 1) * 0.1,
-    rewardMult: 1 + (stage - 1) * 0.15,
-    firstClearBonusGold: 20 + stage * 15,
-    firstClearBonusSouls: stage >= 5 ? 2 : 1
+    rewardMult: 1 + (stage - 1) * 0.12,
+    firstClearBonusGold: 25 + stage * 12,
+    firstClearBonusSouls: stage >= 4 ? 2 : 1
   };
 }
 
@@ -156,7 +156,7 @@ function getArcadeDiff(wave) {
     monsterHpMult: 1 + t * 0.1,
     monsterAtkMult: 1 + t * 0.09,
     kingMult: 1 + t * 0.07,
-    rewardMult: 1 + t * 0.12,
+    rewardMult: 1 + t * 0.1,
     firstClearBonusGold: 0,
     firstClearBonusSouls: 0
   };
@@ -170,7 +170,7 @@ function getRaidDiff() {
 }
 
 const DEFAULT_STATE = {
-  gold: 30,
+  gold: 45,
   souls: 0,
   slotCount: 3,
   maxSlotCount: 5,
@@ -211,9 +211,9 @@ const DEFAULT_STATE = {
 };
 
 const KING_UPGRADE = {
-  baseGold: 45,
-  goldGrowth: 1.55,
-  soulsEvery: 2,
+  baseGold: 35,
+  goldGrowth: 1.48,
+  soulsEvery: 3,
   soulsBase: 1
 };
 
@@ -228,19 +228,19 @@ function kingUpgradeCost(level) {
 }
 
 const UPGRADE_DEFS = [
-  { id: 'spike', label: 'Spike Trap — Damage', type: 'trap', baseCost: 20 },
-  { id: 'poison', label: 'Poison Trap — Damage', type: 'trap', baseCost: 30, requiresUnlock: 'poison' },
-  { id: 'net', label: 'Net Trap — Damage', type: 'trap', baseCost: 35, requiresUnlock: 'net' },
-  { id: 'skeleton', label: 'Skeleton Archer — Level', type: 'monster', baseCost: 25 },
-  { id: 'goblin', label: 'Goblin Brute — Level', type: 'monster', baseCost: 35, requiresUnlock: 'goblin' },
-  { id: 'ogre', label: 'Bone Ogre — Level', type: 'monster', baseCost: 45, requiresUnlock: 'ogre' }
+  { id: 'spike', label: 'Spike Trap — Damage', type: 'trap', baseCost: 15 },
+  { id: 'poison', label: 'Poison Trap — Damage', type: 'trap', baseCost: 22, requiresUnlock: 'poison' },
+  { id: 'net', label: 'Net Trap — Damage', type: 'trap', baseCost: 28, requiresUnlock: 'net' },
+  { id: 'skeleton', label: 'Skeleton Archer — Level', type: 'monster', baseCost: 18 },
+  { id: 'goblin', label: 'Goblin Brute — Level', type: 'monster', baseCost: 26, requiresUnlock: 'goblin' },
+  { id: 'ogre', label: 'Bone Ogre — Level', type: 'monster', baseCost: 36, requiresUnlock: 'ogre' }
 ];
 
 const UNLOCK_DEFS = [
-  { id: 'poison', label: 'Buka: Poison Trap', cost: { gold: 40, souls: 0 } },
-  { id: 'net', label: 'Buka: Net Trap', cost: { gold: 70, souls: 0 } },
-  { id: 'goblin', label: 'Buka: Goblin Brute', cost: { gold: 50, souls: 0 } },
-  { id: 'ogre', label: 'Buka: Bone Ogre', cost: { gold: 90, souls: 5 } },
-  { id: 'slot4', label: 'Gali Ruang ke-4', cost: { gold: 120, souls: 10 } },
-  { id: 'slot5', label: 'Gali Ruang ke-5', cost: { gold: 220, souls: 20 } }
+  { id: 'poison', label: 'Buka: Poison Trap', cost: { gold: 35, souls: 0 } },
+  { id: 'net', label: 'Buka: Net Trap', cost: { gold: 55, souls: 0 } },
+  { id: 'goblin', label: 'Buka: Goblin Brute', cost: { gold: 40, souls: 0 } },
+  { id: 'ogre', label: 'Buka: Bone Ogre', cost: { gold: 75, souls: 4 } },
+  { id: 'slot4', label: 'Gali Ruang ke-4', cost: { gold: 95, souls: 6 } },
+  { id: 'slot5', label: 'Gali Ruang ke-5', cost: { gold: 160, souls: 14 } }
 ];
