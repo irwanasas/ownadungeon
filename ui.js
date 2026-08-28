@@ -458,8 +458,24 @@ function renderCurrencies() {
   if (souls) souls.textContent = Math.floor(state.souls);
 }
 
+
+function renderModeStage() {
+  var el = document.getElementById('mode-stage-label');
+  if (!el) return;
+  var stage = state.stage || 1;
+  var max = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
+  if (state.mode === 'stage') {
+    el.textContent = 'Stage Mode · ' + stage + ' / ' + max;
+    el.classList.remove('is-hidden');
+  } else {
+    el.textContent = '';
+    el.classList.add('is-hidden');
+  }
+}
+
 function renderAll() {
   renderCurrencies();
+  renderModeStage();
   renderPalette();
   renderDungeonSlots();
   renderUpgrades();
