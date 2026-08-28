@@ -10,7 +10,9 @@ function buildHero() {
     )
   );
   var stageBonus = 0;
-  if (typeof state !== 'undefined' && state.mode === 'stage' && typeof getStageDiff === 'function') {
+  if (typeof state !== 'undefined' && typeof getRaidDiff === 'function') {
+    stageBonus = getRaidDiff().heroLevelBonus || 0;
+  } else if (typeof state !== 'undefined' && state.mode === 'stage' && typeof getStageDiff === 'function') {
     stageBonus = getStageDiff(state.stage).heroLevelBonus;
   }
   const level = Math.max(1, avgLevel + Math.floor(Math.random() * 3) - 1 + stageBonus);

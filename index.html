@@ -44,7 +44,13 @@
     <section class="panel stage-panel">
       <div class="stage-header">
         <h2 class="panel-title">Rancangan Dungeon</h2>
-        <div id="mode-stage-label" class="mode-stage-label">Stage 1 / 10</div>
+        <div class="mode-controls">
+          <div class="mode-toggle" role="group" aria-label="Mode permainan">
+            <button type="button" id="btn-mode-stage" class="btn btn-small mode-btn active">Stage</button>
+            <button type="button" id="btn-mode-arcade" class="btn btn-small mode-btn">Arcade</button>
+          </div>
+          <div id="mode-stage-label" class="mode-stage-label">Stage 1 / 10</div>
+        </div>
       </div>
 
       <div class="dungeon-runway" id="dungeon-runway">
