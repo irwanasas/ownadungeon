@@ -289,6 +289,53 @@ function renderUpgrades() {
   wrap.innerHTML = '';
   var hasAny = false;
 
+  var kingLevel = (state.king && state.king.level) || 1;
+  var kingStats = typeof getKingStats === 'function' ? getKingStats(kingLevel) : null;
+  var nextStats = typeof getKingStats === 'function' ? getKingStats(kingLevel + 1) : null;
+  var kingCost = typeof kingUpgradeCost === 'function' ? kingUpgradeCost(kingLevel) : { gold: 45, souls: 0 };
+  var canKing = affordable(kingCost);
+  var kingDiv = document.createElement('div');
+  kingDiv.className = 'upgrade-item upgrade-item--king';
+  var kingDesc =
+    'HP ' +
+    kingStats.maxHp +
+    ' · ATK ' +
+    kingStats.atk +
+    ' · DEF ' +
+    kingStats.def;
+  if (nextStats) {
+    kingDesc +=
+      ' → HP ' +
+      nextStats.maxHp +
+      ' · ATK ' +
+      nextStats.atk +
+      ' · DEF ' +
+      nextStats.def;
+  }
+  kingDiv.innerHTML =
+    '<div class="upgrade-item-top"><span class="upgrade-item-name">Raja (King)</span><span class="upgrade-item-level">Lv.' +
+    kingLevel +
+    '</span></div>' +
+    '<div class="upgrade-item-cost">' +
+    kingDesc +
+    '</div>' +
+    '<div class="upgrade-item-cost">Biaya: ' +
+    costLabel(kingCost) +
+    '</div>' +
+    '<div class="upgrade-btn-row"><button class="btn btn-small"' +
+    (canKing ? '' : ' disabled') +
+    '>Tingkatkan King</button></div>';
+  kingDiv.querySelector('button').addEventListener('click', function () {
+    if (typeof tryUpgradeKing !== 'function' || !tryUpgradeKing()) {
+      showToast('Resource tidak cukup', 'warning');
+      return;
+    }
+    renderAll();
+    showToast('King → Lv.' + state.king.level, 'success');
+  });
+  wrap.appendChild(kingDiv);
+  hasAny = true;
+
   UPGRADE_DEFS.forEach(function (def) {
     if (def.requiresUnlock && !isUnlocked(def.requiresUnlock)) return;
     hasAny = true;
