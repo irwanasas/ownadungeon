@@ -146,6 +146,29 @@ function getStageDiff(stage) {
   };
 }
 
+function getArcadeDiff(wave) {
+  wave = Math.max(1, Math.floor(wave || 1));
+  var t = wave - 1;
+  return {
+    wave: wave,
+    heroLevelBonus: Math.floor(t * 0.75),
+    trapMult: 1 + t * 0.08,
+    monsterHpMult: 1 + t * 0.1,
+    monsterAtkMult: 1 + t * 0.09,
+    kingMult: 1 + t * 0.07,
+    rewardMult: 1 + t * 0.12,
+    firstClearBonusGold: 0,
+    firstClearBonusSouls: 0
+  };
+}
+
+function getRaidDiff() {
+  if (typeof state !== 'undefined' && state.mode === 'arcade') {
+    return getArcadeDiff(state.arcadeWave || 1);
+  }
+  return getStageDiff(typeof state !== 'undefined' ? state.stage : 1);
+}
+
 const DEFAULT_STATE = {
   gold: 30,
   souls: 0,
@@ -182,6 +205,8 @@ const DEFAULT_STATE = {
   mode: 'stage',
   stage: 1,
   maxStageCleared: 0,
+  arcadeWave: 1,
+  arcadeBest: 0,
   lastActive: Date.now()
 };
 
