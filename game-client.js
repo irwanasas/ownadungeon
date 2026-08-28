@@ -1,7 +1,7 @@
-// Entry point / orchestrator: boots the game on DOMContentLoaded by
-// wiring together state, combat, and UI modules from src/. Game logic
-// itself lives in src/ — this file only sequences startup and top-level
-// event listeners.
+// Next.js client entry point: same boot sequence as the vanilla game.js
+// orchestrator, but exported as a function so a React effect can call it
+// once the DOM (rendered by GameApp.js) is mounted, instead of listening
+// for DOMContentLoaded (which React's mount effect already guarantees).
 import { saveState } from './src/state/gameState.js';
 import { runtime } from './src/state/runtimeState.js';
 import { simulateOfflineProgress } from './src/core/offlineProgress.js';
@@ -13,7 +13,7 @@ import { initOverlayControls } from './src/ui/overlays.js';
 import { showOfflineModal } from './src/ui/offlineModal.js';
 import { showToast } from './src/ui/toast.js';
 
-function init() {
+export function startGame() {
   var offlineSummary = simulateOfflineProgress();
   renderAll();
   initOverlayControls();
@@ -79,5 +79,3 @@ function init() {
   window.addEventListener('beforeunload', saveState);
   setInterval(saveState, 30000);
 }
-
-document.addEventListener('DOMContentLoaded', init);
