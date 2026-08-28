@@ -14,6 +14,9 @@ function loadState() {
     if (typeof next.stage !== 'number' || next.stage < 1) next.stage = 1;
     if (next.stage > STAGE_MAX) next.stage = STAGE_MAX;
     if (typeof next.maxStageCleared !== 'number') next.maxStageCleared = 0;
+    if (typeof next.arcadeWave !== 'number' || next.arcadeWave < 1) next.arcadeWave = 1;
+    if (typeof next.arcadeBest !== 'number') next.arcadeBest = 0;
+    if (next.mode !== 'stage' && next.mode !== 'arcade') next.mode = 'stage';
     return next;
   } catch {
     return structuredClone(DEFAULT_STATE);
@@ -122,27 +125,32 @@ async function runRaid() {
   }
 
   var stageDiff =
-    state.mode === 'stage' && typeof getStageDiff === 'function'
-      ? getStageDiff(state.stage)
-      : {
-          stage: 1,
-          heroLevelBonus: 0,
-          trapMult: 1,
-          monsterHpMult: 1,
-          monsterAtkMult: 1,
-          kingMult: 1,
-          rewardMult: 1,
-          firstClearBonusGold: 0,
-          firstClearBonusSouls: 0
-        };
+    typeof getRaidDiff === 'function'
+      ? getRaidDiff()
+      : state.mode === 'stage' && typeof getStageDiff === 'function'
+        ? getStageDiff(state.stage)
+        : {
+            stage: 1,
+            wave: 1,
+            heroLevelBonus: 0,
+            trapMult: 1,
+            monsterHpMult: 1,
+            monsterAtkMult: 1,
+            kingMult: 1,
+            rewardMult: 1,
+            firstClearBonusGold: 0,
+            firstClearBonusSouls: 0
+          };
 
   var hero = buildHero();
   if (typeof updateHeroCard === 'function') updateHeroCard(hero);
   if (typeof showHeroToken === 'function') showHeroToken(hero);
 
   if (typeof logLine === 'function') {
-    if (state.mode === 'stage') {
-      logLine('Stage ' + stageDiff.stage + ' / ' + STAGE_MAX + ' — hero memasuki dungeon.', 'info');
+    if (state.mode === 'arcade') {
+      logLine('Arcade Wave ' + (state.arcadeWave || 1) + ' — hero memasuki dungeon.', 'info');
+    } else if (state.mode === 'stage') {
+      logLine('Stage ' + (stageDiff.stage || state.stage) + ' / ' + STAGE_MAX + ' — hero memasuki dungeon.', 'info');
     }
     logLine(hero.name + ' the ' + hero.className + ' menatap mulut dungeon yang menganga.', 'info');
   }
@@ -513,6 +521,15 @@ async function runRaid() {
       } else if (typeof logLine === 'function') {
         logLine('Semua Stage (1–' + STAGE_MAX + ') sudah ditaklukkan.', 'success');
       }
+    } else if (state.mode === 'arcade') {
+      var wave = state.arcadeWave || 1;
+      if (wave > (state.arcadeBest || 0)) {
+        state.arcadeBest = wave;
+      }
+      state.arcadeWave = wave + 1;
+      if (typeof logLine === 'function') {
+        logLine('Arcade Wave naik → ' + state.arcadeWave + ' (best ' + state.arcadeBest + ')', 'info');
+      }
     }
   } else if (heroEscape) {
     state.stats.heroEscapes++;
@@ -522,10 +539,10 @@ async function runRaid() {
     goldReward = Math.round(goldReward * 0.5);
   }
 
-  if (state.mode === 'stage' && stageDiff.rewardMult && stageDiff.rewardMult !== 1) {
+  if (stageDiff.rewardMult && stageDiff.rewardMult !== 1) {
     goldReward = Math.round(goldReward * stageDiff.rewardMult);
     if (soulsReward > 0) {
-      soulsReward = Math.max(1, Math.round(soulsReward * Math.min(2, 1 + (stageDiff.rewardMult - 1) * 0.5)));
+      soulsReward = Math.max(1, Math.round(soulsReward * Math.min(2.5, 1 + (stageDiff.rewardMult - 1) * 0.5)));
     }
   }
 
@@ -539,8 +556,11 @@ async function runRaid() {
       goldReward +
       ' Gold' +
       (soulsReward ? ' +' + soulsReward + ' Souls' : '');
-    if (state.mode === 'stage' && stageDiff.rewardMult > 1) {
-      rewardMsg += ' (×' + stageDiff.rewardMult.toFixed(2) + ' stage)';
+    if (stageDiff.rewardMult > 1) {
+      rewardMsg +=
+        ' (×' +
+        stageDiff.rewardMult.toFixed(2) +
+        (state.mode === 'arcade' ? ' arcade)' : ' stage)');
     }
     logLine(rewardMsg, 'info');
   }
