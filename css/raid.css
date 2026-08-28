@@ -105,7 +105,7 @@
   100% { background: var(--panel-raised); }
 }
 
-/* ========== STAGE B: dungeon runway / hero walk ========== */
+/* ========== STAGE B: token position via left; face anim only ========== */
 
 .dungeon-runway {
   position: relative;
@@ -113,14 +113,37 @@
   margin-bottom: 4px;
 }
 
+.dungeon-runway .dungeon-slots {
+  padding-top: 36px;
+}
+
 .hero-token {
   position: absolute;
-  top: 2px;
+  top: 4px;
   left: 0;
   z-index: 5;
   width: 36px;
   height: 36px;
-  margin-left: -18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.hero-token.no-motion {
+  transition: none;
+}
+
+.hero-token.is-visible {
+  opacity: 1;
+}
+
+.hero-token-face {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,51 +152,40 @@
   background: var(--panel-raised);
   box-shadow: 0 0 12px rgba(230, 122, 74, 0.35);
   font-size: 18px;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(0) scale(0.9);
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.25s ease;
 }
 
-.hero-token.is-visible {
-  opacity: 1;
-  transform: translateX(var(--hero-x, 0px)) scale(1);
-}
-
-.hero-token.is-panic {
+.hero-token.is-panic .hero-token-face {
   border-color: var(--ember);
   animation: panic-shake 0.45s ease-in-out infinite;
 }
 
-.hero-token.is-rage {
+.hero-token.is-rage .hero-token-face {
   border-color: var(--ember-bright);
   box-shadow: 0 0 16px rgba(230, 122, 74, 0.55);
-  animation: rage-pulse 0.75s ease-in-out infinite;
+  animation: token-rage-pulse 0.75s ease-in-out infinite;
 }
 
 .hero-token.is-flee {
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateX(calc(var(--hero-x, 0px) + 40px)) scale(0.85);
+  transition: left 0.5s ease, opacity 0.5s ease;
 }
 
-.hero-token.is-dead {
+.hero-token.is-dead .hero-token-face {
   border-color: var(--muted-dim);
   filter: grayscale(0.4);
-  opacity: 0.75;
+  opacity: 0.8;
   animation: none;
 }
 
-.dungeon-runway.is-raiding .dungeon-slot:not(.raid-active) {
-  opacity: 0.55;
+@keyframes token-rage-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.dungeon-runway.is-raiding .dungeon-slot:not(.raid-active):not(.entrance) {
+  opacity: 0.5;
 }
 
 .dungeon-runway.is-raiding .dungeon-slot.raid-active {
   opacity: 1;
-}
-
-.dungeon-runway .dungeon-slots {
-  padding-top: 32px;
 }

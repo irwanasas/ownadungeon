@@ -1,4 +1,15 @@
-/* ========== STAGE B: hero walk along dungeon runway ========== */
+/* ========== STAGE B: hero token on runway + beat helpers ========== */
+
+var STAGE_BEAT = {
+  enterDungeon: 500,
+  arriveRoom: 450,
+  threat: 400,
+  actionGap: 380,
+  combatRound: 420,
+  resolve: 500,
+  betweenRooms: 350,
+  ending: 700
+};
 
 function getRunwayEls() {
   return {
@@ -12,18 +23,31 @@ function showHeroToken(hero) {
   var els = getRunwayEls();
   if (!els.token || !els.runway) return;
 
-  els.token.textContent =
-    typeof getHeroIcon === 'function' ? getHeroIcon(hero) : (hero && hero.icon) || '⚔';
-  els.token.className = 'hero-token is-visible';
+  var inner = els.token.querySelector('.hero-token-face');
+  if (inner) {
+    inner.textContent =
+      typeof getHeroIcon === 'function' ? getHeroIcon(hero) : (hero && hero.icon) || '⚔';
+  }
+
+  els.token.classList.add('is-visible');
+  els.token.classList.remove('is-flee', 'is-dead');
   els.runway.classList.add('is-raiding');
-  moveHeroToEntrance();
+  requestAnimationFrame(function () {
+    moveHeroToEntrance(true);
+  });
 }
 
 function hideHeroToken() {
   var els = getRunwayEls();
   if (!els.token || !els.runway) return;
-  els.token.className = 'hero-token';
-  els.token.style.removeProperty('--hero-x');
+  els.token.classList.remove(
+    'is-visible',
+    'is-panic',
+    'is-rage',
+    'is-flee',
+    'is-dead'
+  );
+  els.token.style.left = '';
   els.runway.classList.remove('is-raiding');
 }
 
@@ -36,54 +60,83 @@ function syncHeroTokenVisual(hero) {
   if (hero.visualState === 'rage') token.classList.add('is-rage');
   if (hero.visualState === 'flee') token.classList.add('is-flee');
   if (hero.visualState === 'dead') token.classList.add('is-dead');
-  if (!token.classList.contains('is-visible') && hero.visualState !== 'flee') {
-    token.classList.add('is-visible');
-  }
 
-  token.textContent =
-    typeof getHeroIcon === 'function' ? getHeroIcon(hero) : token.textContent;
+  var face = token.querySelector('.hero-token-face');
+  if (face && typeof getHeroIcon === 'function') {
+    face.textContent = getHeroIcon(hero);
+  }
 }
 
-function centerXWithin(el, ancestor) {
-  if (!el || !ancestor) return 0;
-  var x = 0;
-  var node = el;
-  while (node && node !== ancestor) {
-    x += node.offsetLeft;
-    node = node.parentElement;
-  }
-  return x + el.offsetWidth / 2;
+function slotCenterLeft(slotEl, runway) {
+  if (!slotEl || !runway) return 0;
+  var sr = slotEl.getBoundingClientRect();
+  var rr = runway.getBoundingClientRect();
+  return sr.left - rr.left + sr.width / 2;
 }
 
-function setHeroX(x) {
+function setHeroLeft(px) {
   var token = document.getElementById('hero-token');
   if (!token) return;
-  token.style.setProperty('--hero-x', Math.round(x) + 'px');
+  token.style.left = Math.round(px) + 'px';
 }
 
-function moveHeroToEntrance() {
+function repositionHeroOver(slotEl, instant) {
+  var els = getRunwayEls();
+  if (!els.runway || !slotEl) return;
+
+  if (instant && els.token) {
+    els.token.classList.add('no-motion');
+  }
+
+  try {
+    slotEl.scrollIntoView({
+      inline: 'center',
+      behavior: instant ? 'auto' : 'smooth',
+      block: 'nearest'
+    });
+  } catch (e) {}
+
+  var apply = function () {
+    setHeroLeft(slotCenterLeft(slotEl, els.runway));
+    if (els.token) els.token.classList.remove('no-motion');
+  };
+
+  if (instant) {
+    requestAnimationFrame(apply);
+  } else {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(apply);
+    });
+    setTimeout(apply, 320);
+  }
+}
+
+function moveHeroToEntrance(instant) {
   var els = getRunwayEls();
   if (!els.runway || !els.slots) return;
   var entrance = els.slots.querySelector('.dungeon-slot.entrance');
   if (entrance) {
-    setHeroX(centerXWithin(entrance, els.runway));
-    try {
-      entrance.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
-    } catch (e) {}
+    repositionHeroOver(entrance, !!instant);
   } else {
-    setHeroX(40);
+    setHeroLeft(48);
   }
 }
 
-function moveHeroToSlot(index) {
-  var els = getRunwayEls();
-  if (!els.runway) return;
+function moveHeroToSlot(index, instant) {
   var slotEl = document.querySelector('.dungeon-slot[data-index="' + index + '"]');
   if (!slotEl) return;
-  setHeroX(centerXWithin(slotEl, els.runway));
-  try {
-    slotEl.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
-  } catch (e) {}
+  repositionHeroOver(slotEl, !!instant);
+}
+
+function refreshHeroTokenPosition() {
+  var token = document.getElementById('hero-token');
+  if (!token || !token.classList.contains('is-visible')) return;
+  var active = document.querySelector('.dungeon-slot.raid-active');
+  if (active) {
+    repositionHeroOver(active, true);
+  } else {
+    moveHeroToEntrance(true);
+  }
 }
 
 function resetStageView() {
@@ -91,4 +144,14 @@ function resetStageView() {
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
   });
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(
+    'resize',
+    function () {
+      refreshHeroTokenPosition();
+    },
+    { passive: true }
+  );
 }
