@@ -335,6 +335,112 @@ async function runRaid() {
     await waitBeat('betweenRooms');
   }
 
+  if (hero.hp > 0 && !heroEscape) {
+    document.querySelectorAll('.dungeon-slot').forEach(function (s) {
+      s.classList.remove('raid-active');
+    });
+    var throneEl = document.querySelector('.dungeon-slot.throne-room');
+    if (throneEl) {
+      throneEl.classList.add('raid-active');
+      if (typeof moveHeroToThrone === 'function') moveHeroToThrone(false);
+    }
+
+    await waitBeat('arriveRoom');
+    if (typeof logLine === 'function') {
+      logLine('Koridor berakhir di aula takhta. Peti harta mengkilat di kaki singgasana.', 'warning');
+    }
+    await waitBeat('threat');
+
+    var king = typeof getKingStats === 'function'
+      ? getKingStats(state.king && state.king.level)
+      : { level: 1, maxHp: 40, atk: 8, def: 2 };
+    var kHp = king.maxHp;
+    var kAtk = king.atk;
+    var kDef = king.def;
+
+    if (typeof logLine === 'function') {
+      logLine(
+        'Raja bangkit dari singgasana (Lv.' +
+          king.level +
+          ', HP ' +
+          kHp +
+          '). Pedang menghunus.',
+        'danger'
+      );
+    }
+    await waitBeat('actionGap');
+
+    while (kHp > 0 && hero.hp > 0) {
+      await waitBeat('combatRound');
+
+      hero.status = hero.status.filter(function (s) {
+        if (s.type === 'poison' && s.rounds > 0) {
+          hero.hp -= s.dmg;
+          if (typeof logLine === 'function') {
+            logLine('Racun menggerogoti dari dalam (−' + s.dmg + ' HP).', 'danger');
+          }
+          s.rounds--;
+          return s.rounds > 0;
+        }
+        return true;
+      });
+      if (typeof updateHeroCard === 'function') updateHeroCard(hero);
+      checkPanic(hero);
+      if (hero.hp <= 0) break;
+
+      if (tryTriggerRage(hero)) {
+        if (typeof logLine === 'function') {
+          logLine(hero.name + ' mengaum — darah dan amarah. RAGE!', 'ember');
+        }
+        if (typeof updateHeroCard === 'function') updateHeroCard(hero);
+        await waitBeat('actionGap');
+      }
+
+      var hDmg = Math.max(1, hero.atk - kDef);
+      kHp -= hDmg;
+      if (typeof logLine === 'function') {
+        logLine(
+          hero.name +
+            ' menyerang Raja. Baja bertubrukan (−' +
+            hDmg +
+            ', sisa Raja ' +
+            Math.max(0, Math.floor(kHp)) +
+            ').'
+        );
+      }
+
+      if (kHp <= 0) {
+        if (typeof logLine === 'function') {
+          logLine('Raja tumbang di atas karpet merah. Peti terbuka lebar.', 'success');
+        }
+        if (typeof flashSlot === 'function') flashSlot(throneEl, 'cleared');
+        goldReward += 40 + king.level * 12;
+        soulsReward += 1;
+        heroVictory = true;
+        break;
+      }
+
+      var mDmg = Math.max(1, kAtk - hero.def);
+      hero.hp -= mDmg;
+      if (typeof logLine === 'function') {
+        logLine('Raja memukul balik dari singgasana (−' + mDmg + ' HP).', 'danger');
+      }
+      if (typeof updateHeroCard === 'function') updateHeroCard(hero);
+      checkPanic(hero);
+    }
+
+    await waitBeat('resolve');
+
+    if (hero.hp <= 0) {
+      if (typeof logLine === 'function') {
+        logLine(hero.name + ' jatuh di kaki takhta. Raja tetap berkuasa.', 'danger');
+      }
+      if (typeof flashSlot === 'function') flashSlot(throneEl, 'kill');
+      if (typeof triggerDeath === 'function') triggerDeath(hero);
+      dungeonWin = true;
+    }
+  }
+
   await waitBeat('ending');
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
