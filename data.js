@@ -1,5 +1,3 @@
-/* ========== DATA & CONSTANTS ========== */
-
 const TRAPS = {
   spike: {
     id: 'spike', name: 'Spike Trap', icon: '🗡', kind: 'trap',
@@ -112,6 +110,25 @@ const NAME_POOL = [
   'Osric Hale'
 ];
 
+const KING_BASE = {
+  maxHp: 40,
+  atk: 8,
+  def: 2,
+  hpPerLevel: 12,
+  atkPerLevel: 2,
+  defPerLevel: 1
+};
+
+function getKingStats(level) {
+  level = Math.max(1, Math.floor(level || 1));
+  return {
+    level: level,
+    maxHp: KING_BASE.maxHp + (level - 1) * KING_BASE.hpPerLevel,
+    atk: KING_BASE.atk + (level - 1) * KING_BASE.atkPerLevel,
+    def: KING_BASE.def + (level - 1) * KING_BASE.defPerLevel
+  };
+}
+
 const DEFAULT_STATE = {
   gold: 30,
   souls: 0,
@@ -141,6 +158,9 @@ const DEFAULT_STATE = {
     dungeonWins: 0,
     heroEscapes: 0,
     heroVictories: 0
+  },
+  king: {
+    level: 1
   },
   lastActive: Date.now()
 };
