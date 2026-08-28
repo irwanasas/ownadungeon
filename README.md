@@ -1,5 +1,4 @@
-# MVP - Own a Dungeon 
-## Idle Dungeon Management Game
+# MVP - Own a Dungeon ## Idle Dungeon Management Game
 
 Prototype web-based untuk memvalidasi pertanyaan inti:
 
