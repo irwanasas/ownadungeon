@@ -27,13 +27,15 @@
       <button id="btn-open-stats" class="btn btn-small" type="button" aria-expanded="false">Statistik</button>
       <button id="btn-reset-game" class="btn btn-small btn-danger" type="button">Reset Game</button>
 
-      <div class="currencies">
-        <div class="currency" title="Gold — hasil raid berhasil">
+      <div class="currencies" aria-label="Resources">
+        <div class="currency" title="Gold">
           <span class="currency-icon gold-icon"></span>
+          <span class="currency-label">Gold</span>
           <span id="gold-value">0</span>
         </div>
-        <div class="currency" title="Souls — mata uang progres permanen">
+        <div class="currency" title="Souls">
           <span class="currency-icon soul-icon"></span>
+          <span class="currency-label">Souls</span>
           <span id="souls-value">0</span>
         </div>
       </div>
@@ -50,6 +52,21 @@
             <button type="button" id="btn-mode-arcade" class="btn btn-small mode-btn">Arcade</button>
           </div>
           <div id="mode-stage-label" class="mode-stage-label">Stage 1 / 10</div>
+        </div>
+      </div>
+
+      <div id="status-strip" class="status-strip" aria-live="polite">
+        <div class="status-chip status-chip--mode">
+          <span class="status-chip-key">Mode</span>
+          <span id="status-mode" class="status-chip-val">Stage</span>
+        </div>
+        <div class="status-chip status-chip--progress">
+          <span class="status-chip-key">Progress</span>
+          <span id="status-progress" class="status-chip-val">1 / 10</span>
+        </div>
+        <div class="status-chip status-chip--king">
+          <span class="status-chip-key">King</span>
+          <span id="status-king" class="status-chip-val">Lv.1 · 48 HP · 9 ATK · 2 DEF</span>
         </div>
       </div>
 
