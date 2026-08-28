@@ -48,6 +48,17 @@ let state = loadState();
 let selectedPaletteItem = null;
 let raidInProgress = false;
 
+function tryUpgradeKing() {
+  if (!state.king) state.king = { level: 1 };
+  var level = state.king.level || 1;
+  var cost = typeof kingUpgradeCost === 'function' ? kingUpgradeCost(level) : { gold: 45, souls: 0 };
+  if (!affordable(cost)) return false;
+  spend(cost);
+  state.king.level = level + 1;
+  saveState();
+  return true;
+}
+
 function upgradeCost(baseCost, level) {
   return Math.round(baseCost * Math.pow(1.6, level - 1));
 }
