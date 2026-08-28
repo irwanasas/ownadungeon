@@ -428,7 +428,11 @@ function renderStats() {
   var king = typeof getKingStats === 'function'
     ? getKingStats(state.king && state.king.level)
     : { level: 1, maxHp: 40, atk: 8, def: 2 };
+  var maxS = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
   var rows = [
+    ['Mode', state.mode === 'stage' ? 'Stage' : state.mode || '—'],
+    ['Stage', (state.stage || 1) + ' / ' + maxS],
+    ['Stage Tertinggi', state.maxStageCleared || 0],
     ['King Level', king.level],
     ['King HP', king.maxHp],
     ['King ATK', king.atk],
@@ -465,7 +469,8 @@ function renderModeStage() {
   var stage = state.stage || 1;
   var max = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
   if (state.mode === 'stage') {
-    el.textContent = 'Stage Mode · ' + stage + ' / ' + max;
+    var cleared = state.maxStageCleared || 0;
+    el.textContent = 'Stage ' + stage + ' / ' + max + ' · Clear ' + cleared;
     el.classList.remove('is-hidden');
   } else {
     el.textContent = '';
