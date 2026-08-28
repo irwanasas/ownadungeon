@@ -430,9 +430,11 @@ function renderStats() {
     : { level: 1, maxHp: 40, atk: 8, def: 2 };
   var maxS = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
   var rows = [
-    ['Mode', state.mode === 'stage' ? 'Stage' : state.mode || '—'],
+    ['Mode', state.mode === 'arcade' ? 'Arcade' : 'Stage'],
     ['Stage', (state.stage || 1) + ' / ' + maxS],
     ['Stage Tertinggi', state.maxStageCleared || 0],
+    ['Arcade Wave', state.arcadeWave || 1],
+    ['Arcade Best', state.arcadeBest || 0],
     ['King Level', king.level],
     ['King HP', king.maxHp],
     ['King ATK', king.atk],
@@ -465,17 +467,37 @@ function renderCurrencies() {
 
 function renderModeStage() {
   var el = document.getElementById('mode-stage-label');
+  var btnStage = document.getElementById('btn-mode-stage');
+  var btnArcade = document.getElementById('btn-mode-arcade');
+  if (btnStage) btnStage.classList.toggle('active', state.mode === 'stage');
+  if (btnArcade) btnArcade.classList.toggle('active', state.mode === 'arcade');
   if (!el) return;
-  var stage = state.stage || 1;
   var max = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
-  if (state.mode === 'stage') {
+  if (state.mode === 'arcade') {
+    el.textContent =
+      'Arcade · Wave ' +
+      (state.arcadeWave || 1) +
+      ' · Best ' +
+      (state.arcadeBest || 0);
+    el.classList.remove('is-hidden');
+  } else {
+    var stage = state.stage || 1;
     var cleared = state.maxStageCleared || 0;
     el.textContent = 'Stage ' + stage + ' / ' + max + ' · Clear ' + cleared;
     el.classList.remove('is-hidden');
-  } else {
-    el.textContent = '';
-    el.classList.add('is-hidden');
   }
+}
+
+function setGameMode(mode) {
+  if (raidInProgress) {
+    showToast('Tunggu raid selesai', 'warning');
+    return;
+  }
+  if (mode !== 'stage' && mode !== 'arcade') return;
+  state.mode = mode;
+  saveState();
+  renderAll();
+  showToast(mode === 'arcade' ? 'Arcade Mode' : 'Stage Mode', 'info');
 }
 
 function renderAll() {
@@ -692,6 +714,19 @@ function init() {
 
   var startButton = document.getElementById('btn-start-raid');
   if (startButton) startButton.addEventListener('click', runRaid);
+
+  var btnModeStage = document.getElementById('btn-mode-stage');
+  var btnModeArcade = document.getElementById('btn-mode-arcade');
+  if (btnModeStage) {
+    btnModeStage.addEventListener('click', function () {
+      setGameMode('stage');
+    });
+  }
+  if (btnModeArcade) {
+    btnModeArcade.addEventListener('click', function () {
+      setGameMode('arcade');
+    });
+  }
 
   var btnReset = document.getElementById('btn-reset-game');
   var resetModal = document.getElementById('reset-modal');
