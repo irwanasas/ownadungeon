@@ -1,12 +1,8 @@
-/* ========== CORE GAME: state, economy, raid ========== */
-
-let state = loadState();
-let selectedPaletteItem = null;
-let raidInProgress = false;
+var STORAGE_KEY = 'idm_state_v1';
 
 function loadState() {
   try {
-    const raw = localStorage.getItem('idm_state_v1');
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw);
     return Object.assign(structuredClone(DEFAULT_STATE), parsed);
@@ -17,8 +13,35 @@ function loadState() {
 
 function saveState() {
   state.lastActive = Date.now();
-  localStorage.setItem('idm_state_v1', JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
+
+function resetGame() {
+  localStorage.removeItem(STORAGE_KEY);
+  state = structuredClone(DEFAULT_STATE);
+  selectedPaletteItem = null;
+  raidInProgress = false;
+  if (typeof hideHeroToken === 'function') hideHeroToken();
+  if (typeof clearRaidLog === 'function') clearRaidLog();
+  var status = document.getElementById('raid-status');
+  if (status) status.textContent = '';
+  var card = document.getElementById('hero-card');
+  if (card) {
+    card.classList.add('hero-card--hidden');
+    card.classList.remove('hero-card--panic', 'hero-card--rage', 'hero-card--flee', 'hero-card--dead');
+  }
+  var log = document.getElementById('raid-log');
+  if (log) {
+    log.innerHTML = '<p class="raid-log-placeholder">Susun dungeon-mu, lalu tekan "Mulai Raid" untuk melihat hero mencoba menaklukkannya.</p>';
+  }
+  saveState();
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof showToast === 'function') showToast('Game direset ke awal', 'warning');
+}
+
+let state = loadState();
+let selectedPaletteItem = null;
+let raidInProgress = false;
 
 function upgradeCost(baseCost, level) {
   return Math.round(baseCost * Math.pow(1.6, level - 1));
