@@ -304,6 +304,11 @@ function renderUpgrades() {
   wrap.innerHTML = '';
   var hasAny = false;
 
+  var secKing = document.createElement('div');
+  secKing.className = 'upgrade-section-title';
+  secKing.textContent = 'Raja / King';
+  wrap.appendChild(secKing);
+
   var kingLevel = (state.king && state.king.level) || 1;
   var kingStats = typeof getKingStats === 'function' ? getKingStats(kingLevel) : null;
   var nextStats = typeof getKingStats === 'function' ? getKingStats(kingLevel + 1) : null;
@@ -350,6 +355,11 @@ function renderUpgrades() {
   });
   wrap.appendChild(kingDiv);
   hasAny = true;
+
+  var secDungeon = document.createElement('div');
+  secDungeon.className = 'upgrade-section-title';
+  secDungeon.textContent = 'Trap & Monster';
+  wrap.appendChild(secDungeon);
 
   UPGRADE_DEFS.forEach(function (def) {
     if (def.requiresUnlock && !isUnlocked(def.requiresUnlock)) return;
@@ -430,15 +440,21 @@ function renderStats() {
     : { level: 1, maxHp: 40, atk: 8, def: 2 };
   var maxS = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
   var rows = [
+    ['— Resources —', ''],
+    ['Gold', state.gold],
+    ['Souls', state.souls],
+    ['— Mode & Progress —', ''],
     ['Mode', state.mode === 'arcade' ? 'Arcade' : 'Stage'],
     ['Stage', (state.stage || 1) + ' / ' + maxS],
     ['Stage Tertinggi', state.maxStageCleared || 0],
     ['Arcade Wave', state.arcadeWave || 1],
     ['Arcade Best', state.arcadeBest || 0],
+    ['— King —', ''],
     ['King Level', king.level],
     ['King HP', king.maxHp],
     ['King ATK', king.atk],
     ['King DEF', king.def],
+    ['— Raid Stats —', ''],
     ['Total Raid', s.raidsTotal],
     ['Dungeon Menang', s.dungeonWins],
     ['Hero Kabur', s.heroEscapes],
@@ -446,6 +462,13 @@ function renderStats() {
   ];
   wrap.innerHTML = rows
     .map(function (r) {
+      if (r[1] === '') {
+        return (
+          '<div class="stat-section">' +
+          r[0].replace(/^— | —$/g, '') +
+          '</div>'
+        );
+      }
       return (
         '<div class="stat-row"><span>' +
         r[0] +
@@ -471,20 +494,39 @@ function renderModeStage() {
   var btnArcade = document.getElementById('btn-mode-arcade');
   if (btnStage) btnStage.classList.toggle('active', state.mode === 'stage');
   if (btnArcade) btnArcade.classList.toggle('active', state.mode === 'arcade');
-  if (!el) return;
   var max = typeof STAGE_MAX !== 'undefined' ? STAGE_MAX : 10;
+  var modeText = state.mode === 'arcade' ? 'Arcade' : 'Stage';
+  var progressText;
   if (state.mode === 'arcade') {
-    el.textContent =
-      'Arcade · Wave ' +
-      (state.arcadeWave || 1) +
-      ' · Best ' +
-      (state.arcadeBest || 0);
-    el.classList.remove('is-hidden');
+    progressText =
+      'Wave ' + (state.arcadeWave || 1) + ' · Best ' + (state.arcadeBest || 0);
   } else {
-    var stage = state.stage || 1;
-    var cleared = state.maxStageCleared || 0;
-    el.textContent = 'Stage ' + stage + ' / ' + max + ' · Clear ' + cleared;
+    progressText =
+      (state.stage || 1) +
+      ' / ' +
+      max +
+      ' · Clear ' +
+      (state.maxStageCleared || 0);
+  }
+  if (el) {
+    el.textContent =
+      state.mode === 'arcade'
+        ? 'Arcade · ' + progressText
+        : 'Stage ' + progressText;
     el.classList.remove('is-hidden');
+  }
+  var statusMode = document.getElementById('status-mode');
+  var statusProgress = document.getElementById('status-progress');
+  var statusKing = document.getElementById('status-king');
+  if (statusMode) statusMode.textContent = modeText;
+  if (statusProgress) statusProgress.textContent = progressText;
+  if (statusKing) {
+    var k =
+      typeof getKingStats === 'function'
+        ? getKingStats(state.king && state.king.level)
+        : { level: 1, maxHp: 48, atk: 9, def: 2 };
+    statusKing.textContent =
+      'Lv.' + k.level + ' · ' + k.maxHp + ' HP · ' + k.atk + ' ATK · ' + k.def + ' DEF';
   }
 }
 
