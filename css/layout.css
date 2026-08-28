@@ -395,3 +395,21 @@
 .raid-log-line.info { color: var(--soul); }
 .raid-log-line.ember { color: var(--ember-bright); font-weight: 600; }
 
+.mode-stage-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.mode-stage-label.is-hidden {
+  display: none;
+}
+
+.stage-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
