@@ -6,7 +6,7 @@ Prototype web-based untuk memvalidasi pertanyaan inti:
 
 Next.js (App Router, JavaScript — bukan TypeScript). Sebelumnya vanilla HTML/CSS/JS; sudah dimigrasi ke Next.js, lihat [Migrasi ke Next.js](#migrasi-ke-nextjs) di bawah.
 
-**Live:** ⚠️ URL GitHub Pages lama (https://irwanasas.github.io/ownadungeon/) sudah tidak berlaku pasca-migrasi — lihat catatan deployment di bawah.
+**Live:** https://irwanasas.github.io/ownadungeon/ (auto-deploy dari `main` via GitHub Actions — lihat catatan deployment di bawah)
 
 ## Migrasi ke Next.js
 
@@ -26,7 +26,11 @@ game-client.js    -> Pengganti game.js lama: expose startGame() (dipanggil dari 
 
 **Dihapus setelah migrasi diverifikasi jalan** (dev, build, start, gameplay, save/load, mobile 360–414px, desktop): `index.html`, `game.js` (orchestrator lama, digantikan `game-client.js`), folder `css/` (isinya sudah dipindah ke `app/styles/`), `style.css` (sudah dead code dari sebelum migrasi ini).
 
-**Catatan deployment:** GitHub Pages sebelumnya serve `index.html` langsung dari branch (bukan lewat Actions workflow). Next.js butuh Node server (`next start`) atau static export — jadi URL GitHub Pages lama **akan 404** sampai deployment baru disiapkan (mis. Vercel, atau host Node lain). Ini di luar scope migrasi kode dan sengaja belum dikerjakan di sini.
+**Catatan deployment:** GitHub Pages cuma serve file statis (gak ada Node server), jadi app di-build sebagai **static export** (`output: 'export'` di `next.config.js`) — cocok karena app ini 100% client-side, gak ada data yang perlu di-SSR. Workflow `.github/workflows/deploy-pages.yml` jalan otomatis tiap push ke `main`: `npm ci` → `npm run build` (hasilnya di `out/`) → deploy ke GitHub Pages lewat `actions/deploy-pages`.
+
+Karena ini project page (bukan `<user>.github.io`), site di-serve dari path `/ownadungeon/`, bukan root domain. `next.config.js` otomatis set `basePath`/`assetPrefix` ke `/ownadungeon` **hanya saat build di GitHub Actions** (dideteksi lewat env var `GITHUB_ACTIONS` + `GITHUB_REPOSITORY`) — `npm run dev`/`npm run build` di lokal tetap jalan di root path seperti biasa, jadi Cara Coba Lokal di atas tidak berubah. `public/.nojekyll` juga disertakan supaya GitHub Pages gak coba proses folder `_next/` lewat Jekyll (yang defaultnya skip folder berawalan underscore).
+
+⚠️ **Satu langkah manual yang wajib dilakukan sekali oleh pemilik repo:** buka **Settings → Pages** di GitHub, dan ubah **Source** dari "Deploy from a branch" jadi **"GitHub Actions"**. Tanpa ini, workflow-nya akan gagal di step `actions/deploy-pages` karena Pages belum dikonfigurasi untuk terima deployment dari Actions.
 
 ## Struktur File
 
