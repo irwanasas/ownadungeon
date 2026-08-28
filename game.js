@@ -67,7 +67,7 @@ function tryUpgradeKing() {
 }
 
 function upgradeCost(baseCost, level) {
-  return Math.round(baseCost * Math.pow(1.6, level - 1));
+  return Math.round(baseCost * Math.pow(1.5, level - 1));
 }
 
 function isUnlocked(id) {
@@ -314,7 +314,7 @@ async function runRaid() {
             logLine(cat.name + ' tumbang. Debu mengendap.', 'success');
           }
           if (typeof flashSlot === 'function') flashSlot(slotEl, 'cleared');
-          goldReward += 8 + level * 3;
+          goldReward += 10 + level * 4;
           break;
         }
 
@@ -444,7 +444,7 @@ async function runRaid() {
           logLine('Raja tumbang di atas karpet merah. Peti terbuka lebar.', 'success');
         }
         if (typeof flashSlot === 'function') flashSlot(throneEl, 'cleared');
-        goldReward += 40 + king.level * 12;
+        goldReward += 35 + king.level * 10;
         soulsReward += 1;
         heroVictory = true;
         break;
@@ -490,7 +490,7 @@ async function runRaid() {
     if (typeof logLine === 'function') {
       logLine('Dungeon menang. Tubuhnya tidak akan keluar dari sini.', 'success');
     }
-    goldReward += 25 + state.slotCount * 8;
+    goldReward += 32 + state.slotCount * 10;
     soulsReward += 1;
     state.stats.dungeonWins++;
 
@@ -533,10 +533,10 @@ async function runRaid() {
     }
   } else if (heroEscape) {
     state.stats.heroEscapes++;
-    goldReward = Math.round(goldReward * 0.3);
+    goldReward = Math.round(goldReward * 0.35);
   } else if (heroVictory) {
     state.stats.heroVictories++;
-    goldReward = Math.round(goldReward * 0.5);
+    goldReward = Math.round(goldReward * 0.45);
   }
 
   if (stageDiff.rewardMult && stageDiff.rewardMult !== 1) {
@@ -585,9 +585,9 @@ function simulateOfflineProgress() {
   for (var i = 0; i < raids; i++) {
     if (Math.random() < 0.55) {
       wins++;
-      gold += 18 + state.slotCount * 5;
+      gold += 22 + state.slotCount * 6;
       if (Math.random() < 0.25) souls += 1;
-    } else gold += 6;
+    } else gold += 8;
   }
   state.gold += gold;
   state.souls += souls;
