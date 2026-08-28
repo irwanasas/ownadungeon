@@ -25,6 +25,7 @@
       <button id="btn-open-palette" class="btn btn-small" type="button" aria-expanded="false">Gudang Dungeon</button>
       <button id="btn-open-upgrades" class="btn btn-small" type="button" aria-expanded="false">Peningkatan</button>
       <button id="btn-open-stats" class="btn btn-small" type="button" aria-expanded="false">Statistik</button>
+      <button id="btn-reset-game" class="btn btn-small btn-danger" type="button">Reset Game</button>
 
       <div class="currencies">
         <div class="currency" title="Gold — hasil raid berhasil">
@@ -134,6 +135,19 @@
       <h2 class="modal-title">Selagi Kau Pergi...</h2>
       <div id="offline-summary" class="modal-body"></div>
       <button id="btn-close-offline" class="btn btn-primary">Kembali ke Dungeon</button>
+    </div>
+  </div>
+
+  <div id="reset-modal" class="modal-overlay modal-overlay--hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+      <h2 id="reset-modal-title" class="modal-title">Reset Game?</h2>
+      <div class="modal-body">
+        <p>Semua progress akan dihapus: gold, souls, upgrade, unlock, layout dungeon, dan statistik. Tidak bisa dibatalkan.</p>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-reset-cancel" class="btn" type="button">Batal</button>
+        <button id="btn-reset-confirm" class="btn btn-danger" type="button">Ya, Reset</button>
+      </div>
     </div>
   </div>
 
