@@ -139,7 +139,10 @@ function getStageDiff(stage) {
     trapMult: 1 + (stage - 1) * 0.12,
     monsterHpMult: 1 + (stage - 1) * 0.14,
     monsterAtkMult: 1 + (stage - 1) * 0.12,
-    kingMult: 1 + (stage - 1) * 0.1
+    kingMult: 1 + (stage - 1) * 0.1,
+    rewardMult: 1 + (stage - 1) * 0.15,
+    firstClearBonusGold: 20 + stage * 15,
+    firstClearBonusSouls: stage >= 5 ? 2 : 1
   };
 }
 
