@@ -130,7 +130,10 @@ async function runRaid() {
           trapMult: 1,
           monsterHpMult: 1,
           monsterAtkMult: 1,
-          kingMult: 1
+          kingMult: 1,
+          rewardMult: 1,
+          firstClearBonusGold: 0,
+          firstClearBonusSouls: 0
         };
 
   var hero = buildHero();
@@ -472,6 +475,9 @@ async function runRaid() {
     heroVictory = true;
   }
 
+  var firstClear = false;
+  var clearedStage = state.stage;
+
   if (dungeonWin) {
     if (typeof logLine === 'function') {
       logLine('Dungeon menang. Tubuhnya tidak akan keluar dari sini.', 'success');
@@ -479,9 +485,25 @@ async function runRaid() {
     goldReward += 25 + state.slotCount * 8;
     soulsReward += 1;
     state.stats.dungeonWins++;
+
     if (state.mode === 'stage') {
-      if (state.stage > state.maxStageCleared) {
+      firstClear = state.stage > state.maxStageCleared;
+      if (firstClear) {
         state.maxStageCleared = state.stage;
+        goldReward += stageDiff.firstClearBonusGold || 0;
+        soulsReward += stageDiff.firstClearBonusSouls || 0;
+        if (typeof logLine === 'function') {
+          logLine(
+            'First clear Stage ' +
+              clearedStage +
+              '! Bonus +' +
+              (stageDiff.firstClearBonusGold || 0) +
+              'g +' +
+              (stageDiff.firstClearBonusSouls || 0) +
+              's',
+            'success'
+          );
+        }
       }
       if (state.stage < STAGE_MAX) {
         state.stage += 1;
@@ -500,12 +522,27 @@ async function runRaid() {
     goldReward = Math.round(goldReward * 0.5);
   }
 
+  if (state.mode === 'stage' && stageDiff.rewardMult && stageDiff.rewardMult !== 1) {
+    goldReward = Math.round(goldReward * stageDiff.rewardMult);
+    if (soulsReward > 0) {
+      soulsReward = Math.max(1, Math.round(soulsReward * Math.min(2, 1 + (stageDiff.rewardMult - 1) * 0.5)));
+    }
+  }
+
   state.gold += goldReward;
   state.souls += soulsReward;
   state.stats.raidsTotal++;
 
   if (typeof logLine === 'function') {
-    logLine('Reward: +' + goldReward + ' Gold' + (soulsReward ? ' +' + soulsReward + ' Souls' : ''), 'info');
+    var rewardMsg =
+      'Reward: +' +
+      goldReward +
+      ' Gold' +
+      (soulsReward ? ' +' + soulsReward + ' Souls' : '');
+    if (state.mode === 'stage' && stageDiff.rewardMult > 1) {
+      rewardMsg += ' (×' + stageDiff.rewardMult.toFixed(2) + ' stage)';
+    }
+    logLine(rewardMsg, 'info');
   }
   if (status) status.textContent = 'Raid selesai';
 
