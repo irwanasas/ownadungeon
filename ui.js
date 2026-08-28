@@ -136,7 +136,7 @@ function renderPalette() {
     trapWrap.innerHTML =
       '<div class="empty-state">Belum ada trap terbuka.<br>Buka di panel Peningkatan.</div>';
   } else {
-    trapItems.forEach(function (item) {
+    unlockedTraps.forEach(function (item) {
       renderPaletteItem(item, trapWrap);
     });
   }
@@ -145,7 +145,7 @@ function renderPalette() {
     monsterWrap.innerHTML =
       '<div class="empty-state">Belum ada monster terbuka.<br>Buka di panel Peningkatan.</div>';
   } else {
-    monsterItems.forEach(function (item) {
+    unlockedMonsters.forEach(function (item) {
       renderPaletteItem(item, monsterWrap);
     });
   }
@@ -418,6 +418,7 @@ function renderUpgrades() {
       state.unlocked[def.id] = true;
       if (def.id === 'slot4') state.slotCount = 4;
       if (def.id === 'slot5') state.slotCount = 5;
+      while (state.dungeon.length < state.slotCount) state.dungeon.push(null);
       saveState();
       renderAll();
       showToast(def.label + ' berhasil!', 'success');
