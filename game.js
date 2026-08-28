@@ -69,23 +69,27 @@ async function runRaid() {
   var status = document.getElementById('raid-status');
   if (status) status.textContent = 'Raid berlangsung...';
 
-  var beat = typeof STAGE_BEAT !== 'undefined' ? STAGE_BEAT : {
-    enterDungeon: 500, arriveRoom: 450, threat: 400, actionGap: 380,
-    combatRound: 420, resolve: 500, betweenRooms: 350, ending: 700
-  };
+  function waitBeat(key) {
+    if (typeof beatWait === 'function') return beatWait(key);
+    var fallback = {
+      enterDungeon: 850, arriveRoom: 750, threat: 800, actionGap: 700,
+      combatRound: 950, resolve: 850, betweenRooms: 650, ending: 1100
+    };
+    return sleep(fallback[key] || 500);
+  }
 
   var hero = buildHero();
   if (typeof updateHeroCard === 'function') updateHeroCard(hero);
   if (typeof showHeroToken === 'function') showHeroToken(hero);
 
   if (typeof logLine === 'function') {
-    logLine(hero.name + ' the ' + hero.className + ' berdiri di pintu masuk...', 'info');
+    logLine(hero.name + ' the ' + hero.className + ' menatap mulut dungeon yang menganga.', 'info');
   }
-  await sleep(beat.enterDungeon);
+  await waitBeat('enterDungeon');
   if (typeof logLine === 'function') {
-    logLine(hero.name + ' melangkah masuk ke dungeon.', 'info');
+    logLine('Langkahnya menggema di batu dingin. Ia masuk.', 'info');
   }
-  await sleep(beat.betweenRooms);
+  await waitBeat('betweenRooms');
 
   var goldReward = 0;
   var soulsReward = 0;
@@ -106,13 +110,13 @@ async function runRaid() {
       if (typeof moveHeroToSlot === 'function') moveHeroToSlot(i, false);
     }
 
-    await sleep(beat.arriveRoom);
+    await waitBeat('arriveRoom');
 
     if (!slot) {
       if (typeof logLine === 'function') {
-        logLine('Ruang ' + (i + 1) + ' kosong. Hanya koridor gelap...', 'info');
+        logLine('Ruang ' + (i + 1) + ' kosong — hanya debu dan gema langkahnya.', 'info');
       }
-      await sleep(beat.resolve);
+      await waitBeat('resolve');
       continue;
     }
 
@@ -121,42 +125,52 @@ async function runRaid() {
 
     if (slot.kind === 'trap') {
       if (typeof logLine === 'function') {
-        logLine('Sesuatu berkilau di lantai ruang ' + (i + 1) + '...', 'warning');
+        logLine('Di ruang ' + (i + 1) + ', lantai berkilau mencurigakan...', 'warning');
       }
-      await sleep(beat.threat);
+      await waitBeat('threat');
 
       if (typeof logLine === 'function') {
-        logLine('Trap: ' + cat.name + ' (Lv.' + level + ')!', 'danger');
+        logLine(cat.name + ' (Lv.' + level + ') menganga di bawah kakinya!', 'danger');
       }
       if (typeof flashSlot === 'function') flashSlot(slotEl, 'triggered');
-      await sleep(beat.actionGap);
+      await waitBeat('actionGap');
 
       var dmg = cat.baseDamage + (level - 1) * cat.dmgPerLevel;
       if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
-        if (typeof logLine === 'function') logLine(hero.name + ' berhasil menghindar!', 'success');
+        if (typeof logLine === 'function') {
+          logLine(hero.name + ' meloncat di detik terakhir — lolos!', 'success');
+        }
         dmg = 0;
       }
 
       if (dmg > 0) {
         hero.hp -= dmg;
-        if (typeof logLine === 'function') logLine('Terkena ' + dmg + ' damage.', 'danger');
+        if (typeof logLine === 'function') {
+          logLine(cat.name + ' menggigit dagingnya (−' + dmg + ' HP).', 'danger');
+        }
         if (typeof updateHeroCard === 'function') updateHeroCard(hero);
         checkPanic(hero);
       }
 
       if (cat.id === 'poison' && dmg > 0) {
         hero.status.push({ type: 'poison', rounds: cat.dotRounds, dmg: Math.round(dmg * 0.4) });
-        if (typeof logLine === 'function') logLine('Racun mengalir di tubuhnya...', 'danger');
+        if (typeof logLine === 'function') {
+          logLine('Racun merayap di uratnya... napasnya memendek.', 'danger');
+        }
       }
       if (cat.id === 'net' && dmg > 0) {
         hero.atk = Math.round(hero.atk * (1 - cat.atkReduction));
-        if (typeof logLine === 'function') logLine('Hero terjerat! ATK menurun.', 'danger');
+        if (typeof logLine === 'function') {
+          logLine('Jaring mengerat. Lengannya kaku — ATK menurun.', 'danger');
+        }
       }
 
-      await sleep(beat.resolve);
+      await waitBeat('resolve');
 
       if (hero.hp <= 0) {
-        if (typeof logLine === 'function') logLine(hero.name + ' gugur di trap.', 'danger');
+        if (typeof logLine === 'function') {
+          logLine(hero.name + ' ambruk di atas perangkapnya sendiri. Sunyi.', 'danger');
+        }
         if (typeof flashSlot === 'function') flashSlot(slotEl, 'kill');
         if (typeof triggerDeath === 'function') triggerDeath(hero);
         dungeonWin = true;
@@ -170,34 +184,36 @@ async function runRaid() {
       var monDef = cat.baseDef || 0;
 
       if (typeof logLine === 'function') {
-        logLine('Bayangan bergerak di ruang ' + (i + 1) + '...', 'warning');
+        logLine('Bayangan di ruang ' + (i + 1) + ' bergerak — bukan angin.', 'warning');
       }
-      await sleep(beat.threat);
+      await waitBeat('threat');
 
       if (typeof logLine === 'function') {
-        logLine(cat.name + ' (Lv.' + level + ') muncul! HP ' + monHp, 'danger');
+        logLine(cat.name + ' (Lv.' + level + ') menghadang! (HP ' + monHp + ')', 'danger');
       }
-      await sleep(beat.actionGap);
+      await waitBeat('actionGap');
 
       var levelGap = level - hero.level;
       if (!hero.fearImmune && levelGap >= hero.fleeThreshold) {
         if (typeof logLine === 'function') {
-          logLine(hero.name + ' merasa kewalahan dan memutuskan kabur!', 'warning');
+          logLine(hero.name + ' memutihkan mata — terlalu kuat. Ia berbalik kabur!', 'warning');
         }
         triggerFlee(hero);
         heroEscape = true;
-        await sleep(beat.resolve);
+        await waitBeat('resolve');
         break;
       }
 
       var mHp = monHp;
       while (mHp > 0 && hero.hp > 0) {
-        await sleep(beat.combatRound);
+        await waitBeat('combatRound');
 
         hero.status = hero.status.filter(function (s) {
           if (s.type === 'poison' && s.rounds > 0) {
             hero.hp -= s.dmg;
-            if (typeof logLine === 'function') logLine('Racun: -' + s.dmg + ' HP', 'danger');
+            if (typeof logLine === 'function') {
+              logLine('Racun menggerogoti dari dalam (−' + s.dmg + ' HP).', 'danger');
+            }
             s.rounds--;
             return s.rounds > 0;
           }
@@ -209,20 +225,25 @@ async function runRaid() {
 
         if (tryTriggerRage(hero)) {
           if (typeof logLine === 'function') {
-            logLine(hero.name + ' mengamuk! ATK naik & heal sedikit.', 'ember');
+            logLine(hero.name + ' mengaum — darah dan amarah. RAGE!', 'ember');
           }
           if (typeof updateHeroCard === 'function') updateHeroCard(hero);
-          await sleep(beat.actionGap);
+          await waitBeat('actionGap');
         }
 
         var hDmg = Math.max(1, hero.atk - monDef);
         mHp -= hDmg;
         if (typeof logLine === 'function') {
-          logLine(hero.name + ' menyerang → ' + hDmg + ' dmg (sisa monster ' + Math.max(0, Math.floor(mHp)) + ')');
+          logLine(
+            hero.name + ' menyerang. ' + cat.name + ' goyah (−' + hDmg + ', sisa ' +
+            Math.max(0, Math.floor(mHp)) + ').'
+          );
         }
 
         if (mHp <= 0) {
-          if (typeof logLine === 'function') logLine(cat.name + ' dikalahkan!', 'success');
+          if (typeof logLine === 'function') {
+            logLine(cat.name + ' tumbang. Debu mengendap.', 'success');
+          }
           if (typeof flashSlot === 'function') flashSlot(slotEl, 'cleared');
           goldReward += 8 + level * 3;
           break;
@@ -230,15 +251,19 @@ async function runRaid() {
 
         var mDmg = Math.max(1, monAtk - hero.def);
         hero.hp -= mDmg;
-        if (typeof logLine === 'function') logLine(cat.name + ' memukul → ' + mDmg + ' dmg');
+        if (typeof logLine === 'function') {
+          logLine(cat.name + ' memukul balik (−' + mDmg + ' HP).', 'danger');
+        }
         if (typeof updateHeroCard === 'function') updateHeroCard(hero);
         checkPanic(hero);
       }
 
-      await sleep(beat.resolve);
+      await waitBeat('resolve');
 
       if (hero.hp <= 0) {
-        if (typeof logLine === 'function') logLine(hero.name + ' gugur dalam pertarungan.', 'danger');
+        if (typeof logLine === 'function') {
+          logLine(hero.name + ' jatuh. Pedangnya berdenting di batu.', 'danger');
+        }
         if (typeof flashSlot === 'function') flashSlot(slotEl, 'kill');
         if (typeof triggerDeath === 'function') triggerDeath(hero);
         dungeonWin = true;
@@ -248,39 +273,45 @@ async function runRaid() {
 
     if (slot.kind === 'treasure') {
       if (typeof logLine === 'function') {
-        logLine('Cahaya emas di ujung ruang ' + (i + 1) + '...', 'warning');
+        logLine('Cahaya emas menari di ujung ruang ' + (i + 1) + '...', 'warning');
       }
-      await sleep(beat.threat);
-      if (typeof logLine === 'function') logLine('Treasure Vault terbuka!');
-      await sleep(beat.actionGap);
+      await waitBeat('threat');
+      if (typeof logLine === 'function') {
+        logLine('Pintu vault terbuka. Bau logam dan keserakahan.');
+      }
+      await waitBeat('actionGap');
 
       if (hero.hp > 0) {
         var stolen = Math.round(goldReward * 0.4 + 15);
         goldReward = Math.max(0, goldReward - stolen);
         if (typeof logLine === 'function') {
-          logLine('Hero mencuri sebagian harta (+' + stolen + ' gold ke hero).', 'warning');
+          logLine(hero.name + ' mengais peti — +' + stolen + ' gold ke kantongnya.', 'warning');
         }
         heroVictory = true;
       }
-      await sleep(beat.resolve);
+      await waitBeat('resolve');
     }
 
     if (slotEl) slotEl.classList.add('raid-cleared');
-    await sleep(beat.betweenRooms);
+    await waitBeat('betweenRooms');
   }
 
-  await sleep(beat.ending);
+  await waitBeat('ending');
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
   });
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
-    if (typeof logLine === 'function') logLine(hero.name + ' berhasil keluar hidup-hidup!', 'warning');
+    if (typeof logLine === 'function') {
+      logLine(hero.name + ' muncul di pintu keluar — berlumur, tapi hidup.', 'warning');
+    }
     heroVictory = true;
   }
 
   if (dungeonWin) {
-    if (typeof logLine === 'function') logLine('Dungeon menang! Hero dihentikan.', 'success');
+    if (typeof logLine === 'function') {
+      logLine('Dungeon menang. Tubuhnya tidak akan keluar dari sini.', 'success');
+    }
     goldReward += 25 + state.slotCount * 8;
     soulsReward += 1;
     state.stats.dungeonWins++;
