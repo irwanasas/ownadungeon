@@ -191,6 +191,11 @@
   background: var(--panel-raised);
 }
 
+.upgrade-item--king {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(216, 170, 77, 0.25) inset;
+}
+
 .upgrade-item-top {
   display: flex;
   justify-content: space-between;
