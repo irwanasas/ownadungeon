@@ -1,15 +1,28 @@
 /* ========== STAGE B: hero token on runway + beat helpers ========== */
 
 var STAGE_BEAT = {
-  enterDungeon: 500,
-  arriveRoom: 450,
-  threat: 400,
-  actionGap: 380,
-  combatRound: 420,
-  resolve: 500,
-  betweenRooms: 350,
-  ending: 700
+  enterDungeon: 850,
+  arriveRoom: 750,
+  threat: 800,
+  actionGap: 700,
+  combatRound: 950,
+  resolve: 850,
+  betweenRooms: 650,
+  ending: 1100,
+  /** ± fraction of base (0.3 = 70%–130%) */
+  jitter: 0.3
 };
+
+/** Wait a named beat with random jitter so pacing feels less robotic. */
+function beatWait(key) {
+  var base = (STAGE_BEAT && STAGE_BEAT[key]) || 500;
+  var j = (STAGE_BEAT && STAGE_BEAT.jitter) || 0.25;
+  var factor = 1 + (Math.random() * 2 - 1) * j;
+  var ms = Math.max(120, Math.round(base * factor));
+  return new Promise(function (r) {
+    setTimeout(r, ms);
+  });
+}
 
 function getRunwayEls() {
   return {
