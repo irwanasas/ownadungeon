@@ -4,17 +4,33 @@ Prototype web-based untuk memvalidasi pertanyaan inti:
 
 > Apakah genuinely satisfying mendesain dungeon, menekan Start, dan menonton hero mencoba menaklukkannya?
 
-Vanilla HTML/CSS/JS, tanpa build step — live di GitHub Pages.
+Next.js (App Router, JavaScript — bukan TypeScript). Sebelumnya vanilla HTML/CSS/JS; sudah dimigrasi ke Next.js, lihat [Migrasi ke Next.js](#migrasi-ke-nextjs) di bawah.
 
-**Live:** https://irwanasas.github.io/ownadungeon/
+**Live:** ⚠️ URL GitHub Pages lama (https://irwanasas.github.io/ownadungeon/) sudah tidak berlaku pasca-migrasi — lihat catatan deployment di bawah.
+
+## Migrasi ke Next.js
+
+Repo ini awalnya vanilla HTML/CSS/JS (tanpa build step, di-serve langsung dari `index.html` via GitHub Pages). Sekarang sudah dimigrasi ke **Next.js App Router + React, JavaScript murni (bukan TypeScript)**. Prinsip migrasinya: **migrate, don't rewrite** — game logic (state, ekonomi, raid simulation) di `src/` dipindah nyaris tanpa perubahan, dan tetap memanipulasi DOM secara langsung (`document.getElementById`, `innerHTML`, dst.) seperti sebelumnya — **bukan** dikonversi jadi `useState`/React state. React di sini cuma dipakai sebagai templating layer sekali render untuk shell HTML statis; semua update dinamis setelahnya tetap jalan lewat kode vanilla yang sama persis.
+
+```
+app/layout.js     -> Root layout: <html>/<body>, metadata, viewport, font Google Fonts, import CSS global
+app/page.js       -> Route tunggal ("/"), render <GameApp/> lewat next/dynamic({ ssr: false })
+app/GameApp.js    -> "use client": shell JSX (id/class sama persis dengan index.html lama) + useEffect yang panggil startGame()
+app/styles/*.css  -> Isi identik dengan css/*.css lama, di-import sebagai global CSS di layout.js
+game-client.js    -> Pengganti game.js lama: expose startGame() (dipanggil dari useEffect, bukan DOMContentLoaded)
+```
+
+`GameApp` di-render lewat `next/dynamic(..., { ssr: false })` supaya seluruh `src/` (yang baca `localStorage` dsb.) tidak pernah dieksekusi di server — cocok karena app ini 100% client-side, gak ada data yang perlu di-SSR.
+
+`src/` (data/state/economy/combat/animation/ui/core) **tidak berubah** dari refactor sebelumnya — masih dipakai apa adanya oleh `game-client.js`. Detail struktur `src/` ada di bagian bawah.
+
+**Dihapus setelah migrasi diverifikasi jalan** (dev, build, start, gameplay, save/load, mobile 360–414px, desktop): `index.html`, `game.js` (orchestrator lama, digantikan `game-client.js`), folder `css/` (isinya sudah dipindah ke `app/styles/`), `style.css` (sudah dead code dari sebelum migrasi ini).
+
+**Catatan deployment:** GitHub Pages sebelumnya serve `index.html` langsung dari branch (bukan lewat Actions workflow). Next.js butuh Node server (`next start`) atau static export — jadi URL GitHub Pages lama **akan 404** sampai deployment baru disiapkan (mis. Vercel, atau host Node lain). Ini di luar scope migrasi kode dan sengaja belum dikerjakan di sini.
 
 ## Struktur File
 
-`index.html` memuat satu entry point saja: `<script type="module" src="game.js">`. `game.js` di root hanyalah orchestrator (boot sequence + top-level event wiring) — semua logic ada di `src/`, di-import lewat ES modules (jadi urutan load tidak lagi jadi masalah manual seperti dulu; dependency dinyatakan eksplisit lewat `import`).
-
 ```
-game.js                         -> Entry point/orchestrator: init(), DOMContentLoaded wiring
-
 src/data/                       -> Konstanta & formula murni (tidak baca state)
   traps.js, monsters.js           trap & monster & treasure catalog
   catalog.js                      lookup generik across catalog
@@ -55,22 +71,27 @@ src/core/                       -> Orkestrasi lintas-domain
 ```
 
 ```
-css/tokens.css       -> variabel warna, base style, keyframes
-css/layout.css       -> app shell, topbar, dungeon slots, stage
-css/components.css   -> overlay, palette, toast, modal
-css/raid.css         -> hero card, reaction visual, runway/token
+app/styles/tokens.css       -> variabel warna, base style, keyframes
+app/styles/layout.css       -> app shell, topbar, dungeon slots, stage
+app/styles/components.css   -> overlay, palette, toast, modal
+app/styles/raid.css         -> hero card, reaction visual, runway/token
 ```
 
-Kalau menambah module baru: taruh di folder `src/` yang sesuai domainnya, lalu `import` eksplisit dari module yang membutuhkannya — tidak ada lagi ketergantungan pada urutan `<script>` tag.
+Kalau menambah module baru: taruh di folder `src/` yang sesuai domainnya, lalu `import` eksplisit dari module yang membutuhkannya.
 
 ## Cara Coba Lokal
 
-`game.js` di-load sebagai ES module (`<script type="module">`), jadi **harus** lewat local server — membuka `index.html` langsung lewat `file://` akan diblokir browser (CORS pada module import). Jalankan local server sederhana:
 ```bash
-python3 -m http.server 8000
-# lalu buka http://localhost:8000
+npm install
+npm run dev
+# lalu buka http://localhost:3000
 ```
-GitHub Pages (deployment live) sudah otomatis serve lewat https, jadi tidak terpengaruh.
+
+Build production:
+```bash
+npm run build
+npm run start
+```
 
 ## Apa yang Ada di MVP Ini
 
