@@ -10,14 +10,48 @@ Vanilla HTML/CSS/JS, tanpa build step — live di GitHub Pages.
 
 ## Struktur File
 
-Proyek ini sudah di-split dari satu file besar jadi beberapa modul agar lebih mudah dikembangkan. **Urutan load di `index.html` penting dan tidak boleh diubah**, karena tiap file bergantung pada konstanta/fungsi dari file sebelumnya:
+`index.html` memuat satu entry point saja: `<script type="module" src="game.js">`. `game.js` di root hanyalah orchestrator (boot sequence + top-level event wiring) — semua logic ada di `src/`, di-import lewat ES modules (jadi urutan load tidak lagi jadi masalah manual seperti dulu; dependency dinyatakan eksplisit lewat `import`).
 
 ```
-data.js         -> 1. Konstanta: trap, monster, upgrade, default state
-characters.js   -> 2. Build hero, logic panic/rage/flee/death
-game.js         -> 3. State, ekonomi, raid loop utama
-stage.js        -> 4. Posisi token, STAGE_BEAT (pacing), jitter timing
-ui.js           -> 5. Render, overlay, toast, log DOM
+game.js                         -> Entry point/orchestrator: init(), DOMContentLoaded wiring
+
+src/data/                       -> Konstanta & formula murni (tidak baca state)
+  traps.js, monsters.js           trap & monster & treasure catalog
+  catalog.js                      lookup generik across catalog
+  heroes.js                       hero archetypes & name pool
+  king.js                         king stat scaling & upgrade cost
+  difficulty.js                   stage/arcade difficulty formulas
+  upgrades.js                     upgrade & unlock definitions
+  defaultState.js                 bentuk awal state tersimpan
+
+src/state/                      -> Game state
+  gameState.js                    load/save/reset ke localStorage
+  runtimeState.js                 state sesi non-persisted (item terpilih, status raid)
+
+src/economy/economy.js          -> Gold/Souls, cost formula, unlock check, king upgrade
+
+src/combat/                     -> Core combat/raid logic
+  hero.js                          build hero, panic/rage/flee/death
+  difficultyResolver.js            jembatan formula difficulty <-> state saat ini
+  raid.js                          simulasi raid penuh (trap/monster/treasure/king)
+
+src/animation/                  -> Pacing & pergerakan token di runway
+  beatTiming.js                    STAGE_BEAT, jitter timing tiap beat
+  heroToken.js                     posisi & visual token hero
+
+src/ui/                         -> Render & interaksi DOM
+  renderBus.js                     titik dekopling untuk trigger re-render penuh
+  toast.js, raidLog.js             notifikasi & log naratif
+  heroIcon.js, heroCard.js         kartu status hero & flash slot
+  palette.js, dungeonSlots.js      panel Gudang & layout dungeon
+  upgradesPanel.js, statsPanel.js  panel Peningkatan & Statistik
+  hud.js                           currency/mode/status strip + renderAll()
+  overlays.js                      buka/tutup side panel, focus trap, swipe
+  offlineModal.js                  modal ringkasan progress offline
+
+src/core/                       -> Orkestrasi lintas-domain
+  resetGame.js                     reset state + UI ke kondisi awal
+  offlineProgress.js               simulasi raid selagi tab ditutup
 ```
 
 ```
@@ -27,15 +61,16 @@ css/components.css   -> overlay, palette, toast, modal
 css/raid.css         -> hero card, reaction visual, runway/token
 ```
 
-Kalau menambah script baru: pastikan ditaruh setelah dependency-nya (misal script yang butuh helper dari `characters.js` harus di-load setelahnya).
+Kalau menambah module baru: taruh di folder `src/` yang sesuai domainnya, lalu `import` eksplisit dari module yang membutuhkannya — tidak ada lagi ketergantungan pada urutan `<script>` tag.
 
 ## Cara Coba Lokal
 
-Buka `index.html` langsung di browser, atau jalankan local server sederhana:
+`game.js` di-load sebagai ES module (`<script type="module">`), jadi **harus** lewat local server — membuka `index.html` langsung lewat `file://` akan diblokir browser (CORS pada module import). Jalankan local server sederhana:
 ```bash
 python3 -m http.server 8000
 # lalu buka http://localhost:8000
 ```
+GitHub Pages (deployment live) sudah otomatis serve lewat https, jadi tidak terpengaruh.
 
 ## Apa yang Ada di MVP Ini
 

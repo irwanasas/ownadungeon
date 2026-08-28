@@ -1,4 +1,11 @@
-function buildHero() {
+// Hero entity: spawning a hero for a raid, and the reaction state machine
+// (panic / rage / flee / death) that drives combat log messages and visuals.
+import { state } from '../state/gameState.js';
+import { HERO_ARCHETYPES, NAME_POOL } from '../data/heroes.js';
+import { getRaidDiff } from './difficultyResolver.js';
+import { setReaction, updateHeroCardVisual } from '../ui/heroCard.js';
+
+export function buildHero() {
   const arch =
     HERO_ARCHETYPES[Math.floor(Math.random() * HERO_ARCHETYPES.length)];
   const name = NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)];
@@ -9,12 +16,7 @@ function buildHero() {
         Object.keys(state.levels).length
     )
   );
-  var stageBonus = 0;
-  if (typeof state !== 'undefined' && typeof getRaidDiff === 'function') {
-    stageBonus = getRaidDiff().heroLevelBonus || 0;
-  } else if (typeof state !== 'undefined' && state.mode === 'stage' && typeof getStageDiff === 'function') {
-    stageBonus = getStageDiff(state.stage).heroLevelBonus;
-  }
+  const stageBonus = getRaidDiff().heroLevelBonus || 0;
   const level = Math.max(1, avgLevel + Math.floor(Math.random() * 3) - 1 + stageBonus);
   const hp = Math.round(arch.baseHp + (level - 1) * 8);
   const atk = Math.round(arch.baseAtk + (level - 1) * 1.5);
@@ -43,21 +45,12 @@ function buildHero() {
   };
 }
 
-function getHeroIcon(hero) {
-  if (!hero) return '⚔';
-  if (hero.visualState === 'dead') return '💀';
-  if (hero.visualState === 'flee') return '💨';
-  if (hero.visualState === 'rage') return '🔥';
-  if (hero.visualState === 'panic') return '😰';
-  return hero.icon || '⚔';
-}
-
 function setHeroReaction(hero, text) {
-  if (typeof setReaction === 'function') setReaction(text);
-  if (typeof updateHeroCardVisual === 'function') updateHeroCardVisual(hero);
+  setReaction(text);
+  updateHeroCardVisual(hero);
 }
 
-function checkPanic(hero) {
+export function checkPanic(hero) {
   if (!hero || hero.hp <= 0) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
   if (hero.hp / hero.maxHp <= 0.35 && hero.visualState !== 'rage') {
@@ -66,7 +59,7 @@ function checkPanic(hero) {
   }
 }
 
-function tryTriggerRage(hero) {
+export function tryTriggerRage(hero) {
   if (!hero || !hero.canRage || hero.hasRaged) return false;
   if (hero.hp / hero.maxHp > hero.rageHpThreshold) return false;
   hero.hasRaged = true;
@@ -80,16 +73,16 @@ function tryTriggerRage(hero) {
   return true;
 }
 
-function triggerFlee(hero) {
+export function triggerFlee(hero) {
   if (!hero) return;
   hero.visualState = 'flee';
   setHeroReaction(hero, 'KABUR');
 }
 
-function triggerDeath(hero) {
+export function triggerDeath(hero) {
   if (!hero) return;
   hero.hp = 0;
   hero.visualState = 'dead';
+  // setHeroReaction() already calls updateHeroCardVisual(hero) internally.
   setHeroReaction(hero, '');
-  if (typeof updateHeroCardVisual === 'function') updateHeroCardVisual(hero);
 }

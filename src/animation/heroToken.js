@@ -1,24 +1,6 @@
-var STAGE_BEAT = {
-  enterDungeon: 850,
-  arriveRoom: 750,
-  threat: 800,
-  actionGap: 700,
-  combatRound: 950,
-  resolve: 850,
-  betweenRooms: 650,
-  ending: 1100,
-  jitter: 0.3
-};
-
-function beatWait(key) {
-  var base = (STAGE_BEAT && STAGE_BEAT[key]) || 500;
-  var j = (STAGE_BEAT && STAGE_BEAT.jitter) || 0.25;
-  var factor = 1 + (Math.random() * 2 - 1) * j;
-  var ms = Math.max(120, Math.round(base * factor));
-  return new Promise(function (r) {
-    setTimeout(r, ms);
-  });
-}
+// Moves the hero token sprite along the dungeon runway and keeps its
+// visual state (idle/panic/rage/flee/dead) in sync during a raid.
+import { getHeroIcon } from '../ui/heroIcon.js';
 
 function getRunwayEls() {
   return {
@@ -28,14 +10,13 @@ function getRunwayEls() {
   };
 }
 
-function showHeroToken(hero) {
+export function showHeroToken(hero) {
   var els = getRunwayEls();
   if (!els.token || !els.runway) return;
 
   var inner = els.token.querySelector('.hero-token-face');
   if (inner) {
-    inner.textContent =
-      typeof getHeroIcon === 'function' ? getHeroIcon(hero) : (hero && hero.icon) || '⚔';
+    inner.textContent = getHeroIcon(hero);
   }
 
   els.token.classList.add('is-visible');
@@ -46,7 +27,7 @@ function showHeroToken(hero) {
   });
 }
 
-function hideHeroToken() {
+export function hideHeroToken() {
   var els = getRunwayEls();
   if (!els.token || !els.runway) return;
   els.token.classList.remove(
@@ -60,7 +41,7 @@ function hideHeroToken() {
   els.runway.classList.remove('is-raiding');
 }
 
-function syncHeroTokenVisual(hero) {
+export function syncHeroTokenVisual(hero) {
   var token = document.getElementById('hero-token');
   if (!token || !hero) return;
 
@@ -71,7 +52,7 @@ function syncHeroTokenVisual(hero) {
   if (hero.visualState === 'dead') token.classList.add('is-dead');
 
   var face = token.querySelector('.hero-token-face');
-  if (face && typeof getHeroIcon === 'function') {
+  if (face) {
     face.textContent = getHeroIcon(hero);
   }
 }
@@ -120,7 +101,7 @@ function repositionHeroOver(slotEl, instant) {
   }
 }
 
-function moveHeroToEntrance(instant) {
+export function moveHeroToEntrance(instant) {
   var els = getRunwayEls();
   if (!els.runway || !els.slots) return;
   var entrance = els.slots.querySelector('.dungeon-slot.entrance');
@@ -131,19 +112,19 @@ function moveHeroToEntrance(instant) {
   }
 }
 
-function moveHeroToSlot(index, instant) {
+export function moveHeroToSlot(index, instant) {
   var slotEl = document.querySelector('.dungeon-slot[data-index="' + index + '"]');
   if (!slotEl) return;
   repositionHeroOver(slotEl, !!instant);
 }
 
-function moveHeroToThrone(instant) {
+export function moveHeroToThrone(instant) {
   var slotEl = document.querySelector('.dungeon-slot.throne-room');
   if (!slotEl) return;
   repositionHeroOver(slotEl, !!instant);
 }
 
-function refreshHeroTokenPosition() {
+export function refreshHeroTokenPosition() {
   var token = document.getElementById('hero-token');
   if (!token || !token.classList.contains('is-visible')) return;
   var active = document.querySelector('.dungeon-slot.raid-active');
@@ -154,7 +135,9 @@ function refreshHeroTokenPosition() {
   }
 }
 
-function resetStageView() {
+// Unused by the current UI flow (kept from the pre-refactor stage.js —
+// flagged in the refactor audit as dead code rather than removed).
+export function resetStageView() {
   hideHeroToken();
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
