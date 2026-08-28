@@ -5,7 +5,12 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw);
-    return Object.assign(structuredClone(DEFAULT_STATE), parsed);
+    var next = Object.assign(structuredClone(DEFAULT_STATE), parsed);
+    if (!next.king || typeof next.king.level !== 'number') {
+      next.king = structuredClone(DEFAULT_STATE.king);
+    }
+    if (!next.stats) next.stats = structuredClone(DEFAULT_STATE.stats);
+    return next;
   } catch {
     return structuredClone(DEFAULT_STATE);
   }
