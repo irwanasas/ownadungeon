@@ -165,6 +165,23 @@ const DEFAULT_STATE = {
   lastActive: Date.now()
 };
 
+const KING_UPGRADE = {
+  baseGold: 45,
+  goldGrowth: 1.55,
+  soulsEvery: 2,
+  soulsBase: 1
+};
+
+function kingUpgradeCost(level) {
+  level = Math.max(1, Math.floor(level || 1));
+  var gold = Math.round(KING_UPGRADE.baseGold * Math.pow(KING_UPGRADE.goldGrowth, level - 1));
+  var souls = 0;
+  if (level >= 2) {
+    souls = Math.floor(level / KING_UPGRADE.soulsEvery) * KING_UPGRADE.soulsBase;
+  }
+  return { gold: gold, souls: souls };
+}
+
 const UPGRADE_DEFS = [
   { id: 'spike', label: 'Spike Trap — Damage', type: 'trap', baseCost: 20 },
   { id: 'poison', label: 'Poison Trap — Damage', type: 'trap', baseCost: 30, requiresUnlock: 'poison' },
