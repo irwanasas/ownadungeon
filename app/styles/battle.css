@@ -1,0 +1,159 @@
+/* Active raid presentation: expanded room field, compact status */
+.app.battle-active .stage-header,
+.app.battle-active #status-strip {
+  display: none !important;
+}
+
+.app.battle-active .stage-controls {
+  min-height: 0;
+  margin: 0;
+}
+
+.app.battle-active .raid-status {
+  font-size: 11px;
+  text-align: center;
+  width: 100%;
+}
+
+.app.battle-active .panel.stage-panel {
+  padding: 8px 8px 6px;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.app.battle-active .layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.app.battle-active .dungeon-runway {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2px;
+}
+
+.app.battle-active .room-stage {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 160px;
+  margin-bottom: 4px;
+}
+
+.app.battle-active .room-chamber {
+  flex: 1;
+  min-height: clamp(140px, 36vh, 280px);
+}
+
+.app.battle-active .room-floor {
+  min-height: clamp(120px, 32vh, 260px);
+}
+
+.app.battle-active .room-content-icon {
+  font-size: clamp(32px, 8vw, 48px);
+}
+
+.app.battle-active .dungeon-runway.is-room-mode .dungeon-slots {
+  max-height: 48px;
+  opacity: 0.35;
+  margin: 0;
+  padding-top: 0;
+}
+
+.app.battle-active .raid-stage {
+  flex: 0 1 auto;
+  gap: 4px;
+  max-height: 42%;
+}
+
+.app.battle-active .hero-card:not(.hero-card--hidden) {
+  padding: 6px 8px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: center;
+}
+
+.app.battle-active .hero-card-top {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.app.battle-active .hero-card-top .hero-name {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app.battle-active .hero-class-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+}
+
+.app.battle-active .hero-hp-bar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: 2px;
+  height: 5px;
+}
+
+.app.battle-active .hero-stats {
+  grid-column: 3;
+  grid-row: 1;
+  margin-top: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.app.battle-active .hero-reaction {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  min-height: 14px;
+  font-size: 11px;
+}
+
+.app.battle-active .raid-log {
+  flex: 1 1 auto;
+  min-height: 64px;
+  max-height: min(28vh, 180px);
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.app.battle-active .play-fab {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.app.battle-active .player-progress {
+  display: none;
+}
+
+.app.battle-active .bottom-nav {
+  opacity: 0.55;
+}
+
+@media (max-width: 400px) {
+  .app.battle-active .room-chamber {
+    min-height: clamp(120px, 34vh, 220px);
+  }
+
+  .app.battle-active .raid-log {
+    max-height: min(24vh, 140px);
+    font-size: 10px;
+  }
+
+  .app.battle-active .hero-card:not(.hero-card--hidden) {
+    padding: 5px 6px;
+  }
+}

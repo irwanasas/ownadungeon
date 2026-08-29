@@ -2,6 +2,7 @@ import './styles/tokens.css';
 import './styles/layout.css';
 import './styles/components.css';
 import './styles/raid.css';
+import './styles/battle.css';
 
 export const metadata = {
   title: 'MVP - Own a Dungeon'
