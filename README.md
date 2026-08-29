@@ -63,8 +63,8 @@ UI battle (`battle-active`) memperbesar chamber dan menyembunyikan chrome manaje
 
 ### Stage & Arcade
 
-- **Stage 1–50** — scaling lembut; kesulitan lebih dari komposisi encounter daripada inflasi stat.
-- **Arcade** — wave naik, best wave tersimpan.
+- **Stage 1–50** — 50 puzzle yang di-hardcode satu per satu (`src/data/stages.ts`), bukan kurva stat. Lihat [Stage 1–50: puzzle & unlock progression](#stage-1-50-puzzle--unlock-progression) di bawah.
+- **Arcade** — mode terpisah, wave naik tanpa batas dengan scaling stat ringan, best wave tersimpan. Roster hero-nya tetap acak dari seluruh kelas yang sudah di-unlock — tidak memakai desain puzzle per-stage.
 - First-clear bonus di Stage.
 
 ### King
@@ -75,9 +75,92 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 
 - Satu layar (mobile-first), tanpa scroll utama.
 - Overlay: Gudang, Upgrade, Stats (swipe / keyboard).
-- Encounter Preview sebelum PLAY.
-- Hero card + log naratif (hybrid cerita + angka, pacing ber-jitter).
+- Panel `#room-preview` gabungan (encounter preview, intro hero, battle card) — lihat [Battle UX: panel gabungan & reaksi kontekstual](#battle-ux-panel-gabungan--reaksi-kontekstual) di bawah.
+- Log naratif (hybrid cerita + angka, pacing ber-jitter) — selalu terlihat penuh selama raid, tidak pernah tertutup/terpotong UI lain.
 - Offline summary saat kembali ke game.
+
+---
+
+## Battle UX: panel gabungan & reaksi kontekstual
+
+Dulu ada dua elemen terpisah — `#hero-card` (status hero selama combat) dan `#room-preview` (preview dungeon sebelum PLAY). Keduanya sekarang **digabung jadi satu panel** (`src/ui/roomPreview.ts`), yang berganti mode lewat class modifier di elemen yang sama:
+
+| Mode | Kapan | Isi |
+|---|---|---|
+| *(default)* | Sebelum raid / sedang menyusun dungeon | Encounter Preview — komposisi tiap ruang, matchup jika ada preview-hero dipilih |
+| `.room-preview--intro` | Hero sudah diketahui, sebelum masuk Ruang 1 | **Musuh Terdeteksi**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, dan trait/ability (Fear-immune, Bisa RAGE, Evasion trap %, Magic ATK, Holy) |
+| `.room-preview--battle` | Sejak hero masuk Ruang 1 sampai raid selesai | Kartu compact: icon, nama, HP bar, dan **reaksi kontekstual** — **tidak ada** teks strengths/weaknesses lagi |
+
+**Kenapa dipisah begini:** strengths/weaknesses/traits (jawaban puzzle-nya) cuma muncul sekali, di fase intro, sebelum combat dimulai. Begitu combat berjalan, panel beralih total ke reaksi — supaya combat tetap "readable" tanpa mengulang-ulang jawaban puzzle di tengah pertarungan (`ReactionKind` di `src/types.ts`):
+
+- **PANIK** — HP hero ≤35% (kecuali sedang RAGE).
+- **RAGE** — Berserker memicu RAGE-nya.
+- **KABUR** — hero mundur karena gap level terlalu jauh.
+- **TAKUT** — aura takut Shadow Wraith berhasil menggoyahkan hero non-fear-immune.
+- **SAKIT!** — hero baru kena hit (trap, monster, atau King) yang tidak memicu reaksi lain.
+- **TERKEJUT** — ancaman ruang baru saja terungkap (trap berkilau, bayangan monster bergerak, Raja bangkit dari singgasana).
+
+Setelah raid selesai, panel otomatis kembali ke mode Encounter Preview lewat `renderRoomPreview()`.
+
+### Raid log: selalu terlihat, tidak pernah ketutup
+
+Layout `.raid-stage` selama battle sekarang cuma berisi `#raid-log` (dulu berbagi ruang dengan `#hero-card`). Prioritas ruang vertikal saat raid berlangsung (`app/styles/battle.css`):
+
+1. `#room-preview` (battle card) — ukuran tetap, kecil, tidak pernah menyusut.
+2. `.raid-stage` / `#raid-log` — **punya `min-height` sebagai lantai keras** (140px normal, turun bertahap ke 100px di viewport pendek), dijamin selalu dapat ruang.
+3. `.dungeon-runway` (room chamber) — satu-satunya elemen yang boleh menyusut duluan lewat `flex-shrink` saat viewport sempit.
+
+Karena `min-height` di flexbox tidak bisa dilanggar oleh `flex-shrink`, log dijamin tidak pernah terpotong — yang mengalah adalah chamber ruang di atasnya. Ditambah breakpoint `@media (max-height: 640px)` dan `(max-height: 520px)` untuk viewport pendek (mis. landscape phone), serta `position: relative; z-index: 1` di `.raid-log` supaya tidak ada elemen lain yang bisa menimpanya.
+
+---
+
+## Stage 1–50: puzzle & unlock progression
+
+Stage 1–50 tidak lagi berupa kurva stat (`data/stages.ts` menggantikan sistem lama di mana `trapMult`/`monsterHpMult`/`monsterAtkMult`/`kingMult`/`heroLevelBonus` naik terus seiring stage). Sekarang **setiap stage men-hardcode kelas hero mana saja yang bisa menyerang** (`heroPool`) — kesulitan datang dari *interaksi* (matchup, combo trap→monster, urutan ruang, timing DOT/fear), bukan dari HP/ATK/DEF yang membesar. Base stat trap & monster (`data/traps.ts`, `data/monsters.ts`) sama persis di Stage 1 maupun Stage 50; yang berubah cuma reward gold/soul (pacing ekonomi, bukan combat power).
+
+**Jaminan desain:** setiap stage hanya pernah mengirim hero yang *bisa* dikalahkan dengan trap/monster yang sudah ter-unlock di stage itu. Item baru selalu terbuka **sebelum** stage yang membutuhkannya, tidak pernah sesudah.
+
+### Tutorial (Stage 1–5)
+
+Hanya toolkit awal — **Spike Trap + Skeleton Archer** — dan hero yang menyerang dibatasi ke kelas yang memang rentan terhadap keduanya:
+
+- **Mage** — sangat rentan Spike Trap (×1.30) dan lemah lawan apa pun yang mengandalkan trap fisik instan.
+- **Berserker** — matchup terburuknya justru chip damage konsisten seperti Skeleton Archer (×1.05, angka terendah di seluruh tabel monster).
+
+Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terlalu tahan terhadap Spike+Skeleton sehingga tutorial jadi mustahil dimenangkan tanpa unlock lain.
+
+- Stage 1 — hanya Mage.
+- Stage 2 — hanya Berserker.
+- Stage 3 — Mage + Berserker bergantian. **Clear → buka Poison Trap + Goblin Brute.**
+- Stage 4 — sama, tapi kombinasikan urutan ruang Spike vs Skeleton.
+- Stage 5 — ujian akhir tutorial. **Clear → buka Ruang ke-4.**
+
+### Jadwal unlock progresif
+
+| Stage | Unlock | Kenapa di sini |
+|---|---|---|
+| 3 | Poison Trap + Goblin Brute | Poison adalah satu-satunya penawar Warrior (×1.28) & Paladin (×1.22); Goblin Brute matchup terburuk Mage (×0.8) |
+| 5 | Ruang ke-4 | Penutup tutorial, dungeon mulai lebih lega |
+| 8 | Net Trap | Dibuat khusus menjerat Rogue (×1.22), kelas paling evasive terhadap trap fisik lain |
+| 12 | Fire Trap | DOT bakar susulan — jawaban untuk hero yang bertahan lama |
+| 14 | Acid Slime | Dinding physical-resist untuk meredam hero non-magic |
+| 17 | Frost Trap | Mengurangi DEF hero — combo starter untuk ruang monster sesudahnya |
+| 21 | Bone Ogre | Tank yang jadi matchup terburuk Rogue (×0.8), pelengkap Net Trap |
+| 26 | Shadow Wraith | Aura takut — efektif ke semua kelas kecuali Berserker & Paladin (fear-immune) |
+| 32 | Ruang ke-5 | Perluasan dungeon terakhir, membuka layout 5-ruang penuh |
+
+Setiap stage unlock (3, 8, 12, 14, 17, 21, 26, 32) hanya membuka **kesempatan membeli** item itu di panel Peningkatan (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.
+
+### Roster hero: dari 2 kelas ke 5 kelas
+
+- **Stage 1–5** — Mage, Berserker saja (lihat Tutorial di atas).
+- **Stage 6** — Warrior masuk, dibarengi Poison Trap yang baru terbuka sebagai penawarnya.
+- **Stage 8** — Paladin masuk (poison-vulnerable juga, ×1.22).
+- **Stage 9–34** — Rogue melengkapi roster (Net Trap baru terbuka sebagai penawar) → **5 kelas penuh** mulai stage 9, dan tetap penuh untuk sisa game.
+- **Stage 35–39** — lima "gauntlet" single-class berturut-turut (Berserker → Mage → Rogue → Warrior → Paladin), masing-masing menguji counter spesifik kelas itu satu per satu.
+- **Stage 40–50** — roster campuran lagi; kesulitan sepenuhnya dari komposisi/urutan/combo ruang (Frost→Fire, Net→Ogre, Poison→Shadow Wraith, dll.), bukan hero baru atau stat baru.
+
+Detail lengkap 50 stage (`heroPool` + catatan desain per stage) ada di `src/data/stages.ts`.
 
 ---
 
@@ -92,7 +175,7 @@ app/
 game-client.ts       # bootstrap client
 src/
   types.ts           # shared type definitions (GameState, Hero, data model, dll.)
-  data/              # heroes, monsters, traps, matchups, difficulty, king, …
+  data/              # heroes, monsters, traps, matchups, difficulty, king, stages, …
   state/             # gameState, runtimeState
   economy/           # unlock, level cost, rewards
   combat/            # hero, raid, difficultyResolver

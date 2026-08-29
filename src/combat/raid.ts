@@ -6,7 +6,7 @@ import { runtime } from '../state/runtimeState';
 import { catalogFor } from '../data/catalog';
 import { STAGE_MAX } from '../data/difficulty';
 import { getItemLevel } from '../economy/economy';
-import { buildHero, checkPanic, tryTriggerRage, triggerFlee, triggerDeath } from './hero';
+import { buildHero, checkPanic, tryTriggerRage, triggerFlee, triggerDeath, triggerPain, triggerSurprise, triggerFear } from './hero';
 import { getRaidDiff } from './difficultyResolver';
 import { getKingStats } from '../data/king';
 import { beatWait as waitBeat } from '../animation/beatTiming';
@@ -24,7 +24,7 @@ import {
   setDoorOpen
 } from '../animation/roomStage';
 import { logLine, clearRaidLog } from '../ui/raidLog';
-import { updateHeroCard, flashSlot } from '../ui/heroCard';
+import { flashSlot } from '../ui/dungeonSlots';
 import { renderAll } from '../ui/renderBus';
 import {
   heroMonsterMult,
@@ -33,7 +33,7 @@ import {
   applySpecialOnTrap,
   applySpecialOnMonsterHit
 } from '../data/matchups';
-import { renderRoomPreview, setPreviewHero, clearPreviewHero } from '../ui/roomPreview';
+import { renderRoomPreview, clearPreviewHero, showHeroIntro, showBattleCard, updateBattleCard } from '../ui/roomPreview';
 import type { DungeonSlotData, MonsterDef, TrapDef } from '../types';
 
 export async function runRaid(): Promise<void> {
@@ -49,7 +49,7 @@ export async function runRaid(): Promise<void> {
 
   var hero = buildHero();
   clearPreviewHero();
-  updateHeroCard(hero);
+  showHeroIntro(hero);
   enterRaidRoomMode();
   presentEntrance();
   showHeroToken(hero);
@@ -74,6 +74,11 @@ export async function runRaid(): Promise<void> {
   await waitBeat('enterDungeon');
   logLine('Langkahnya menggema di batu dingin. Ia masuk.', 'info');
   await waitBeat('betweenRooms');
+
+  // Battle proper starts here: swap the rich pre-battle intro for the
+  // compact live card. From this point on, strengths/weaknesses are never
+  // shown again — only contextual reactions.
+  showBattleCard(hero);
 
   var goldReward = 0;
   var soulsReward = 0;
@@ -108,6 +113,7 @@ export async function runRaid(): Promise<void> {
     if (slot.kind === 'trap' && cat) {
       var trapCat = cat as TrapDef;
       logLine('Di ruang ' + (i + 1) + ', lantai berkilau mencurigakan...', 'warning');
+      triggerSurprise(hero);
       await waitBeat('threat');
 
       logLine(trapCat.name + ' (Lv.' + level + ') menganga di bawah kakinya!', 'danger');
@@ -134,7 +140,8 @@ export async function runRaid(): Promise<void> {
         dmg = spec.dmg;
         hero.hp -= dmg;
         logLine(trapCat.name + ' menggigit (−' + dmg + ' HP).', 'danger');
-        updateHeroCard(hero);
+        triggerPain(hero);
+        updateBattleCard(hero);
         checkPanic(hero);
         if (spec.special === 'net_blocks_rage') {
           logLine('Jaring menahan amarah — RAGE tertunda.', 'warning');
@@ -175,6 +182,7 @@ export async function runRaid(): Promise<void> {
       var monDef = monCat.baseDef || 0;
 
       logLine('Bayangan di ruang ' + (i + 1) + ' bergerak — bukan angin.', 'warning');
+      triggerSurprise(hero);
       await waitBeat('threat');
 
       logLine(monCat.name + ' (Lv.' + level + ') menghadang! (HP ' + monHp + ')', 'danger');
@@ -191,6 +199,7 @@ export async function runRaid(): Promise<void> {
         if (Math.random() < 0.22) {
           logLine(hero.name + ' goyah — hampir kabur!', 'warning');
           hero.atk = Math.max(1, Math.round(hero.atk * 0.9));
+          triggerFear(hero);
         }
       }
 
@@ -216,13 +225,13 @@ export async function runRaid(): Promise<void> {
           }
           return true;
         });
-        updateHeroCard(hero);
+        updateBattleCard(hero);
         checkPanic(hero);
         if (hero.hp <= 0) break;
 
         if (tryTriggerRage(hero)) {
           logLine(hero.name + ' mengaum — darah dan amarah. RAGE!', 'ember');
-          updateHeroCard(hero);
+          updateBattleCard(hero);
           await waitBeat('actionGap');
         }
 
@@ -256,7 +265,8 @@ export async function runRaid(): Promise<void> {
         var mDmg = Math.max(1, monAtk - hero.def);
         hero.hp -= mDmg;
         logLine(monCat.name + ' memukul balik (−' + mDmg + ' HP).', 'danger');
-        updateHeroCard(hero);
+        triggerPain(hero);
+        updateBattleCard(hero);
         checkPanic(hero);
       }
 
@@ -302,6 +312,7 @@ export async function runRaid(): Promise<void> {
     presentThrone();
     await playDoorEnterSequence(waitBeat);
     logLine('Koridor berakhir di aula takhta. Peti harta mengkilat di kaki singgasana.', 'warning');
+    triggerSurprise(hero);
     await waitBeat('threat');
 
     var king = getKingStats(state.king && state.king.level);
@@ -331,13 +342,13 @@ export async function runRaid(): Promise<void> {
         }
         return true;
       });
-      updateHeroCard(hero);
+      updateBattleCard(hero);
       checkPanic(hero);
       if (hero.hp <= 0) break;
 
       if (tryTriggerRage(hero)) {
         logLine(hero.name + ' mengaum — darah dan amarah. RAGE!', 'ember');
-        updateHeroCard(hero);
+        updateBattleCard(hero);
         await waitBeat('actionGap');
       }
 
@@ -364,7 +375,8 @@ export async function runRaid(): Promise<void> {
       var mDmg = Math.max(1, kAtk - hero.def);
       hero.hp -= mDmg;
       logLine('Raja memukul balik dari singgasana (−' + mDmg + ' HP).', 'danger');
-      updateHeroCard(hero);
+      triggerPain(hero);
+      updateBattleCard(hero);
       checkPanic(hero);
     }
 

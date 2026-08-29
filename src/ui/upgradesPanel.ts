@@ -114,6 +114,10 @@ export function renderUpgrades(): void {
     if (state.unlocked[def.id]) return;
     if (def.id === 'slot4' && state.slotCount !== 3) return;
     if (def.id === 'slot5' && state.slotCount !== 4) return;
+    // Stage-gated: hidden until the player has reached the stage that
+    // introduces it, so nothing in the shop ever promises a counter the
+    // current stage progression hasn't earned yet.
+    if (def.unlockAtStage && state.stage < def.unlockAtStage) return;
     hasAny = true;
     var can = affordable(def.cost);
     var div = document.createElement('div');
