@@ -55,6 +55,17 @@ export function renderModeStage() {
     statusKing.textContent =
       'Lv.' + k.level + ' · ' + k.maxHp + ' HP · ' + k.atk + ' ATK · ' + k.def + ' DEF';
   }
+
+  var hudLevel = document.getElementById('hud-king-level');
+  var hudProgress = document.getElementById('hud-progress');
+  if (hudLevel) {
+    var kingLv = (state.king && state.king.level) || 1;
+    hudLevel.textContent = 'Lv.' + kingLv;
+  }
+  if (hudProgress) {
+    hudProgress.textContent =
+      state.mode === 'arcade' ? progressText : 'Stage ' + progressText;
+  }
 }
 
 export function setGameMode(mode) {
