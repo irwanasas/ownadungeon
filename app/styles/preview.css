@@ -1,0 +1,145 @@
+.room-preview {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.preview-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.preview-hero {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.preview-hero--muted {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.preview-hero-blurb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.preview-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.preview-tag--good {
+  color: var(--poison-bright);
+  border-color: rgba(122, 149, 86, 0.45);
+}
+
+.preview-tag--bad {
+  color: var(--ember-bright);
+  border-color: rgba(192, 71, 43, 0.4);
+}
+
+.preview-rooms {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.preview-room {
+  flex: 0 0 88px;
+  min-width: 88px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.preview-room--throne {
+  border-color: rgba(216, 170, 77, 0.4);
+}
+
+.preview-room-num {
+  font-size: 9px;
+  color: var(--muted-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.preview-threat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.preview-icon {
+  font-size: 18px;
+}
+
+.preview-name {
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.preview-lv {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.preview-empty {
+  font-size: 10px;
+  color: var(--muted-dim);
+  text-align: center;
+  padding: 8px 0;
+}
+
+.preview-matchup {
+  margin-top: 4px;
+  font-size: 9px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.preview-matchup--strong {
+  color: var(--poison-bright);
+}
+
+.preview-matchup--weak {
+  color: var(--ember-bright);
+}
+
+.preview-hint {
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--muted-dim);
+  line-height: 1.35;
+}
+
+.app.battle-active .room-preview {
+  display: none;
+}
