@@ -2,6 +2,7 @@
 // renderAll() aggregator that refreshes every panel after a state change.
 import { state, saveState } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
+import { clearPendingHero } from '../combat/hero';
 import { getKingStats } from '../data/king';
 import { STAGE_MAX } from '../data/difficulty';
 import { showToast } from './toast';
@@ -77,6 +78,7 @@ export function setGameMode(mode: GameMode): void {
   }
   if (mode !== 'stage' && mode !== 'arcade') return;
   state.mode = mode;
+  clearPendingHero();
   saveState();
   renderAll();
   showToast(mode === 'arcade' ? 'Arcade Mode' : 'Stage Mode', 'info');
