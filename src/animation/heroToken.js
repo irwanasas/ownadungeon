@@ -37,6 +37,9 @@ export function hideHeroToken() {
   );
   els.token.style.left = '';
   els.runway.classList.remove('is-raiding', 'is-room-mode');
+  var app = document.querySelector('.app');
+  if (app) app.classList.remove('battle-active');
+  document.body.classList.remove('battle-active');
 }
 
 export function syncHeroTokenVisual(hero) {
