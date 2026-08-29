@@ -141,6 +141,13 @@ export interface UnlockDef {
   id: string;
   label: string;
   cost: Cost;
+  unlockAtStage?: number;
+}
+
+export interface StageDef {
+  stage: number;
+  heroPool: string[];
+  note: string;
 }
 
 export type GameMode = 'stage' | 'arcade';

@@ -1,30 +1,33 @@
 import type { StageDifficulty, ArcadeDifficulty } from '../types';
+import { getStageDef } from './stages';
 
 export const STAGE_MAX = 50;
 
+// Stage difficulty deliberately does NOT scale trap/monster HP or ATK with
+// stage number — that would be a stat-check power curve, exactly what this
+// puzzle-first redesign avoids. Every stage uses the same base trap and
+// monster numbers (see data/traps.ts / data/monsters.ts); what changes
+// stage-to-stage is which hero classes can invade (data/stages.ts) and
+// which counters the player has unlocked (data/upgrades.ts). The only
+// growth left here is the gold/soul reward curve, which is pure economy
+// pacing, not combat power.
 export function getStageDiff(stage?: number): StageDifficulty {
-  var s = Math.max(1, Math.min(STAGE_MAX, stage || 1));
-  var band = s <= 5 ? 0 : s <= 15 ? 1 : s <= 30 ? 2 : 3;
-  var t = (s - 1) / (STAGE_MAX - 1);
+  const s = Math.max(1, Math.min(STAGE_MAX, stage || 1));
+  const band = s <= 5 ? 0 : s <= 20 ? 1 : s <= 35 ? 2 : 3;
+  const t = (s - 1) / (STAGE_MAX - 1);
+  const def = getStageDef(s);
   return {
     stage: s,
     band: band,
-    trapMult: 1 + t * 0.55,
-    monsterHpMult: 1 + t * 0.65,
-    monsterAtkMult: 1 + t * 0.5,
-    kingMult: 1 + t * 0.7,
-    rewardMult: 1 + t * 0.85,
-    heroLevelBonus: Math.floor((s - 1) / 8),
+    trapMult: 1,
+    monsterHpMult: 1,
+    monsterAtkMult: 1,
+    kingMult: 1,
+    rewardMult: 1 + t * 0.4,
+    heroLevelBonus: 0,
     firstClearBonusGold: 18 + s * 3,
     firstClearBonusSouls: s >= 10 ? 1 : 0,
-    compositionHint:
-      band === 0
-        ? 'Belajar matchup dasar'
-        : band === 1
-          ? 'Kombinasi 2 ancaman'
-          : band === 2
-            ? 'Multi-tag rooms'
-            : 'Persiapan wajib'
+    compositionHint: def.note
   };
 }
 

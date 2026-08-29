@@ -1,13 +1,26 @@
 import { state } from '../state/gameState';
 import { HERO_ARCHETYPES, NAME_POOL } from '../data/heroes';
+import { getStageDef } from '../data/stages';
 import { getRaidDiff } from './difficultyResolver';
 import { setReaction, updateHeroCardVisual } from '../ui/heroCard';
 import { isUnlocked } from '../economy/economy';
 import type { Hero } from '../types';
 
+// In Stage mode, which hero classes can invade is hardcoded per stage
+// (data/stages.ts) — that's what turns Stage 1-50 into a handcrafted
+// puzzle progression instead of a fully random gauntlet. Arcade mode keeps
+// drawing from the full roster, since it has no stage-by-stage puzzle
+// design and is meant to be an open-ended, unlock-gated endless mode.
+function eligibleArchetypes() {
+  if (state.mode !== 'stage') return HERO_ARCHETYPES;
+  const pool = getStageDef(state.stage).heroPool;
+  const filtered = HERO_ARCHETYPES.filter((a) => pool.includes(a.id));
+  return filtered.length ? filtered : HERO_ARCHETYPES;
+}
+
 export function buildHero(): Hero {
-  const arch =
-    HERO_ARCHETYPES[Math.floor(Math.random() * HERO_ARCHETYPES.length)];
+  const roster = eligibleArchetypes();
+  const arch = roster[Math.floor(Math.random() * roster.length)];
   const name = NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)];
   const unlockedLevels = Object.keys(state.levels).filter(function (id) {
     return isUnlocked(id) || id === 'spike' || id === 'skeleton';
