@@ -6,7 +6,7 @@ import { runtime } from '../state/runtimeState';
 import { catalogFor } from '../data/catalog';
 import { STAGE_MAX } from '../data/difficulty';
 import { getItemLevel } from '../economy/economy';
-import { buildHero, checkPanic, tryTriggerRage, triggerFlee, triggerDeath, triggerPain, triggerSurprise, triggerFear } from './hero';
+import { takePendingHero, clearPendingHero, checkPanic, tryTriggerRage, triggerFlee, triggerDeath, triggerPain, triggerSurprise, triggerFear } from './hero';
 import { getRaidDiff } from './difficultyResolver';
 import { getKingStats } from '../data/king';
 import { beatWait as waitBeat } from '../animation/beatTiming';
@@ -33,7 +33,7 @@ import {
   applySpecialOnTrap,
   applySpecialOnMonsterHit
 } from '../data/matchups';
-import { renderRoomPreview, clearPreviewHero, showHeroIntro, showBattleCard, updateBattleCard } from '../ui/roomPreview';
+import { renderRoomPreview, showHeroIntro, showBattleCard, updateBattleCard } from '../ui/roomPreview';
 import type { DungeonSlotData, MonsterDef, TrapDef } from '../types';
 
 export async function runRaid(): Promise<void> {
@@ -47,8 +47,7 @@ export async function runRaid(): Promise<void> {
 
   var stageDiff = getRaidDiff();
 
-  var hero = buildHero();
-  clearPreviewHero();
+  var hero = takePendingHero();
   showHeroIntro(hero);
   enterRaidRoomMode();
   presentEntrance();
@@ -75,9 +74,6 @@ export async function runRaid(): Promise<void> {
   logLine('Langkahnya menggema di batu dingin. Ia masuk.', 'info');
   await waitBeat('betweenRooms');
 
-  // Battle proper starts here: swap the rich pre-battle intro for the
-  // compact live card. From this point on, strengths/weaknesses are never
-  // shown again — only contextual reactions.
   showBattleCard(hero);
 
   var goldReward = 0;
@@ -396,7 +392,7 @@ export async function runRaid(): Promise<void> {
   });
   setDoorOpen(false);
   exitRaidRoomMode();
-  clearPreviewHero();
+  clearPendingHero();
   renderRoomPreview();
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
