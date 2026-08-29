@@ -20,7 +20,7 @@ export default function GameApp() {
       <header className="player-hud" aria-label="Player status">
         <div className="player-hud-left">
           <div className="player-avatar" aria-hidden="true">
-            👑
+            \uD83D\uDC51
           </div>
           <div className="player-meta">
             <div className="player-name">Raja</div>
@@ -88,8 +88,29 @@ export default function GameApp() {
           </div>
 
           <div className="dungeon-runway" id="dungeon-runway">
-            <div id="hero-token" className="hero-token" aria-hidden="true">
-              <span className="hero-token-face">⚔</span>
+            <div
+              id="room-stage"
+              className="room-stage is-hidden"
+              aria-hidden="true"
+            >
+              <div id="room-depth" className="room-depth">
+                Entrance
+              </div>
+              <div id="room-chamber" className="room-chamber">
+                <div id="room-door" className="room-door" aria-hidden="true">
+                  <div className="room-door-panel"></div>
+                  <div className="room-door-frame"></div>
+                </div>
+                <div className="room-floor">
+                  <div id="room-content" className="room-content">
+                    <span className="room-content-icon">\uD83D\uDEAA</span>
+                    <span className="room-content-label">Mulut Dungeon</span>
+                  </div>
+                  <div id="hero-token" className="hero-token" aria-hidden="true">
+                    <span className="hero-token-face">\u2694</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <div id="dungeon-slots" className="dungeon-slots"></div>
           </div>
@@ -102,7 +123,7 @@ export default function GameApp() {
             <div id="hero-card" className="hero-card hero-card--hidden">
               <div className="hero-card-top">
                 <span id="hero-icon" className="hero-icon">
-                  ⚔
+                  \u2694
                 </span>
                 <span id="hero-name" className="hero-name">
                   —
@@ -126,7 +147,7 @@ export default function GameApp() {
 
             <div id="raid-log" className="raid-log">
               <p className="raid-log-placeholder">
-                Susun dungeon-mu, lalu tekan &quot;Mulai Raid&quot; untuk melihat hero
+                Susun dungeon-mu, lalu tekan "Mulai Raid" untuk melihat hero
                 mencoba menaklukkannya.
               </p>
             </div>
@@ -141,7 +162,7 @@ export default function GameApp() {
         aria-label="Mulai Raid"
       >
         <span className="play-fab-icon" aria-hidden="true">
-          ▶
+          \u25B6
         </span>
         <span className="play-fab-label">Raid</span>
       </button>
@@ -155,7 +176,7 @@ export default function GameApp() {
           data-nav="palette"
         >
           <span className="bottom-nav-icon" aria-hidden="true">
-            🗡
+            \uD83D\uDDE1
           </span>
           <span className="bottom-nav-label">Gudang</span>
         </button>
@@ -167,7 +188,7 @@ export default function GameApp() {
           data-nav="upgrades"
         >
           <span className="bottom-nav-icon" aria-hidden="true">
-            ⬆
+            \u2B06
           </span>
           <span className="bottom-nav-label">Upgrade</span>
         </button>
@@ -179,7 +200,7 @@ export default function GameApp() {
           aria-current="page"
         >
           <span className="bottom-nav-icon" aria-hidden="true">
-            🏛
+            \uD83C\uDFDB
           </span>
           <span className="bottom-nav-label">Battle</span>
         </button>
@@ -191,7 +212,7 @@ export default function GameApp() {
           data-nav="stats"
         >
           <span className="bottom-nav-icon" aria-hidden="true">
-            📊
+            \uD83D\uDCCA
           </span>
           <span className="bottom-nav-label">Stats</span>
         </button>
@@ -202,7 +223,7 @@ export default function GameApp() {
           data-nav="reset"
         >
           <span className="bottom-nav-icon" aria-hidden="true">
-            ↺
+            \u21BA
           </span>
           <span className="bottom-nav-label">Reset</span>
         </button>
@@ -235,7 +256,7 @@ export default function GameApp() {
               type="button"
               aria-label="Tutup"
             >
-              ×
+              \u00D7
             </button>
           </div>
           <div className="palette-group">
@@ -279,7 +300,7 @@ export default function GameApp() {
               type="button"
               aria-label="Tutup"
             >
-              ×
+              \u00D7
             </button>
           </div>
           <div id="upgrade-list" className="upgrade-list"></div>
@@ -309,7 +330,7 @@ export default function GameApp() {
               type="button"
               aria-label="Tutup"
             >
-              ×
+              \u00D7
             </button>
           </div>
           <div id="stats-list" className="stats-list"></div>
