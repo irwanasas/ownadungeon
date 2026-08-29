@@ -22,6 +22,9 @@ export function enterRaidRoomMode() {
     e.stage.classList.remove('is-hidden');
     e.stage.setAttribute('aria-hidden', 'false');
   }
+  var app = document.querySelector('.app');
+  if (app) app.classList.add('battle-active');
+  document.body.classList.add('battle-active');
 }
 
 export function exitRaidRoomMode() {
@@ -34,6 +37,9 @@ export function exitRaidRoomMode() {
   if (e.door) e.door.classList.remove('is-open', 'is-opening');
   if (e.chamber) e.chamber.classList.remove('is-throne', 'is-empty', 'hero-inside');
   if (e.token) e.token.classList.remove('is-entering');
+  var app = document.querySelector('.app');
+  if (app) app.classList.remove('battle-active');
+  document.body.classList.remove('battle-active');
 }
 
 export function setDoorOpen(open) {
