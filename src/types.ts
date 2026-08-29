@@ -194,6 +194,7 @@ export interface SelectedPaletteItem {
 export interface RuntimeState {
   selectedPaletteItem: SelectedPaletteItem | null;
   raidInProgress: boolean;
+  pendingHero: Hero | null;
 }
 
 export type HeroVisualState = 'idle' | 'panic' | 'rage' | 'flee' | 'dead';
@@ -249,6 +250,6 @@ export type RaidLogType = 'info' | 'warning' | 'danger' | 'success' | 'ember' | 
 // Contextual battle reactions shown on the merged hero battle card once a
 // raid is underway. Deliberately emotional/tactical ("PANIK", "TAKUT")
 // rather than analytical ("weak vs Spike") — the puzzle solution (which
-// trap/monster counters this hero) stays in the pre-battle intro and the
-// Encounter Preview, never in the live reaction feed.
+// trap/monster counters this hero) stays in the pre-raid Musuh Terdeteksi panel,
+// never in the live reaction feed.
 export type ReactionKind = 'none' | 'panic' | 'rage' | 'flee' | 'fear' | 'pain' | 'surprise' | 'dead';
