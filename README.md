@@ -75,9 +75,42 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 
 - Satu layar (mobile-first), tanpa scroll utama.
 - Overlay: Gudang, Upgrade, Stats (swipe / keyboard).
-- Encounter Preview sebelum PLAY.
-- Hero card + log naratif (hybrid cerita + angka, pacing ber-jitter).
+- Panel `#room-preview` gabungan (encounter preview, intro hero, battle card) — lihat [Battle UX: panel gabungan & reaksi kontekstual](#battle-ux-panel-gabungan--reaksi-kontekstual) di bawah.
+- Log naratif (hybrid cerita + angka, pacing ber-jitter) — selalu terlihat penuh selama raid, tidak pernah tertutup/terpotong UI lain.
 - Offline summary saat kembali ke game.
+
+---
+
+## Battle UX: panel gabungan & reaksi kontekstual
+
+Dulu ada dua elemen terpisah — `#hero-card` (status hero selama combat) dan `#room-preview` (preview dungeon sebelum PLAY). Keduanya sekarang **digabung jadi satu panel** (`src/ui/roomPreview.ts`), yang berganti mode lewat class modifier di elemen yang sama:
+
+| Mode | Kapan | Isi |
+|---|---|---|
+| *(default)* | Sebelum raid / sedang menyusun dungeon | Encounter Preview — komposisi tiap ruang, matchup jika ada preview-hero dipilih |
+| `.room-preview--intro` | Hero sudah diketahui, sebelum masuk Ruang 1 | **Musuh Terdeteksi**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, dan trait/ability (Fear-immune, Bisa RAGE, Evasion trap %, Magic ATK, Holy) |
+| `.room-preview--battle` | Sejak hero masuk Ruang 1 sampai raid selesai | Kartu compact: icon, nama, HP bar, dan **reaksi kontekstual** — **tidak ada** teks strengths/weaknesses lagi |
+
+**Kenapa dipisah begini:** strengths/weaknesses/traits (jawaban puzzle-nya) cuma muncul sekali, di fase intro, sebelum combat dimulai. Begitu combat berjalan, panel beralih total ke reaksi — supaya combat tetap "readable" tanpa mengulang-ulang jawaban puzzle di tengah pertarungan (`ReactionKind` di `src/types.ts`):
+
+- **PANIK** — HP hero ≤35% (kecuali sedang RAGE).
+- **RAGE** — Berserker memicu RAGE-nya.
+- **KABUR** — hero mundur karena gap level terlalu jauh.
+- **TAKUT** — aura takut Shadow Wraith berhasil menggoyahkan hero non-fear-immune.
+- **SAKIT!** — hero baru kena hit (trap, monster, atau King) yang tidak memicu reaksi lain.
+- **TERKEJUT** — ancaman ruang baru saja terungkap (trap berkilau, bayangan monster bergerak, Raja bangkit dari singgasana).
+
+Setelah raid selesai, panel otomatis kembali ke mode Encounter Preview lewat `renderRoomPreview()`.
+
+### Raid log: selalu terlihat, tidak pernah ketutup
+
+Layout `.raid-stage` selama battle sekarang cuma berisi `#raid-log` (dulu berbagi ruang dengan `#hero-card`). Prioritas ruang vertikal saat raid berlangsung (`app/styles/battle.css`):
+
+1. `#room-preview` (battle card) — ukuran tetap, kecil, tidak pernah menyusut.
+2. `.raid-stage` / `#raid-log` — **punya `min-height` sebagai lantai keras** (140px normal, turun bertahap ke 100px di viewport pendek), dijamin selalu dapat ruang.
+3. `.dungeon-runway` (room chamber) — satu-satunya elemen yang boleh menyusut duluan lewat `flex-shrink` saat viewport sempit.
+
+Karena `min-height` di flexbox tidak bisa dilanggar oleh `flex-shrink`, log dijamin tidak pernah terpotong — yang mengalah adalah chamber ruang di atasnya. Ditambah breakpoint `@media (max-height: 640px)` dan `(max-height: 520px)` untuk viewport pendek (mis. landscape phone), serta `position: relative; z-index: 1` di `.raid-log` supaya tidak ada elemen lain yang bisa menimpanya.
 
 ---
 

@@ -96,3 +96,20 @@ export function renderDungeonSlots(): void {
     '<span class="slot-sub">Chest · King Lv.' + kingLv + '</span>';
   wrap.appendChild(throne);
 }
+
+// Brief flash effect on a dungeon slot when it's triggered/cleared/killed
+// during a raid. Lives here (not in the battle-card module) since it only
+// ever touches .dungeon-slot elements.
+export function flashSlot(slotEl: Element | null, kind: 'kill' | 'cleared' | 'triggered'): void {
+  if (!slotEl) return;
+  var cls =
+    kind === 'kill'
+      ? 'slot-kill'
+      : kind === 'cleared'
+        ? 'slot-cleared-flash'
+        : 'slot-triggered';
+  slotEl.classList.add(cls);
+  setTimeout(function () {
+    slotEl.classList.remove(cls);
+  }, 400);
+}

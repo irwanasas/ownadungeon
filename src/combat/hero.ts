@@ -2,9 +2,9 @@ import { state } from '../state/gameState';
 import { HERO_ARCHETYPES, NAME_POOL } from '../data/heroes';
 import { getStageDef } from '../data/stages';
 import { getRaidDiff } from './difficultyResolver';
-import { setReaction, updateHeroCardVisual } from '../ui/heroCard';
+import { setHeroReaction as setBattleReaction, syncBattleCardVisual } from '../ui/roomPreview';
 import { isUnlocked } from '../economy/economy';
-import type { Hero } from '../types';
+import type { Hero, ReactionKind } from '../types';
 
 // In Stage mode, which hero classes can invade is hardcoded per stage
 // (data/stages.ts) — that's what turns Stage 1-50 into a handcrafted
@@ -69,9 +69,9 @@ export function buildHero(): Hero {
   };
 }
 
-function setHeroReaction(hero: Hero, text: string): void {
-  setReaction(text);
-  updateHeroCardVisual(hero);
+function setHeroReaction(hero: Hero, kind: ReactionKind, text: string): void {
+  setBattleReaction(text, kind);
+  syncBattleCardVisual(hero);
 }
 
 export function checkPanic(hero: Hero): void {
@@ -79,7 +79,7 @@ export function checkPanic(hero: Hero): void {
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
   if (hero.hp / hero.maxHp <= 0.35 && hero.visualState !== 'rage') {
     hero.visualState = 'panic';
-    setHeroReaction(hero, 'PANIK');
+    setHeroReaction(hero, 'panic', 'PANIK');
   }
 }
 
@@ -94,19 +94,42 @@ export function tryTriggerRage(hero: Hero): boolean {
     hero.maxHp,
     hero.hp + Math.round(hero.maxHp * hero.rageHealFraction)
   );
-  setHeroReaction(hero, 'RAGE');
+  setHeroReaction(hero, 'rage', 'RAGE');
   return true;
 }
 
 export function triggerFlee(hero: Hero): void {
   if (!hero) return;
   hero.visualState = 'flee';
-  setHeroReaction(hero, 'KABUR');
+  setHeroReaction(hero, 'flee', 'KABUR');
 }
 
 export function triggerDeath(hero: Hero): void {
   if (!hero) return;
   hero.hp = 0;
   hero.visualState = 'dead';
-  setHeroReaction(hero, '');
+  setHeroReaction(hero, 'dead', '');
+}
+
+// Transient reactions: they don't change hero.visualState (so they never
+// block/override the panic/rage/flee/dead state machine above), just flash
+// a contextual line on the battle card at a narrative beat. A later call
+// to checkPanic/tryTriggerRage/etc. in the same beat naturally overwrites
+// them, which is fine — the more "final" state should win.
+export function triggerPain(hero: Hero): void {
+  if (!hero || hero.hp <= 0) return;
+  if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
+  setBattleReaction('SAKIT!', 'pain');
+}
+
+export function triggerSurprise(hero: Hero): void {
+  if (!hero || hero.hp <= 0) return;
+  if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
+  setBattleReaction('TERKEJUT', 'surprise');
+}
+
+export function triggerFear(hero: Hero): void {
+  if (!hero || hero.hp <= 0 || hero.fearImmune) return;
+  if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
+  setBattleReaction('TAKUT', 'fear');
 }

@@ -122,31 +122,6 @@ export default function GameApp() {
           </div>
 
           <div className="raid-stage">
-            <div id="hero-card" className="hero-card hero-card--hidden">
-              <div className="hero-card-top">
-                <span id="hero-icon" className="hero-icon">
-                  ⚔
-                </span>
-                <span id="hero-name" className="hero-name">
-                  —
-                </span>
-                <span id="hero-class" className="hero-class-tag">
-                  —
-                </span>
-              </div>
-
-              <div className="hero-hp-bar">
-                <div id="hero-hp-fill" className="hero-hp-fill"></div>
-              </div>
-
-              <div className="hero-stats">
-                <span id="hero-level">Lv. —</span>
-                <span id="hero-hp-text">HP —/—</span>
-              </div>
-
-              <div id="hero-reaction" className="hero-reaction"></div>
-            </div>
-
             <div id="raid-log" className="raid-log">
               <p className="raid-log-placeholder">
                 Susun dungeon, cek Encounter Preview, lalu PLAY.

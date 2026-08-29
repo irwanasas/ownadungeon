@@ -15,10 +15,9 @@ export function resetGame(): void {
   clearRaidLog();
   var status = document.getElementById('raid-status');
   if (status) status.textContent = '';
-  var card = document.getElementById('hero-card');
-  if (card) {
-    card.classList.add('hero-card--hidden');
-    card.classList.remove('hero-card--panic', 'hero-card--rage', 'hero-card--flee', 'hero-card--dead');
+  var preview = document.getElementById('room-preview');
+  if (preview) {
+    preview.classList.remove('room-preview--intro', 'room-preview--battle', 'is-panic', 'is-rage', 'is-flee', 'is-dead');
   }
   var log = document.getElementById('raid-log');
   if (log) {
