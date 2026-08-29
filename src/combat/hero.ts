@@ -1,16 +1,12 @@
 import { state } from '../state/gameState';
+import { runtime } from '../state/runtimeState';
 import { HERO_ARCHETYPES, NAME_POOL } from '../data/heroes';
 import { getStageDef } from '../data/stages';
 import { getRaidDiff } from './difficultyResolver';
-import { setHeroReaction as setBattleReaction, syncBattleCardVisual } from '../ui/roomPreview';
+import { setBattleReaction, syncBattleCardVisual } from '../ui/battleReaction';
 import { isUnlocked } from '../economy/economy';
 import type { Hero, ReactionKind } from '../types';
 
-// In Stage mode, which hero classes can invade is hardcoded per stage
-// (data/stages.ts) — that's what turns Stage 1-50 into a handcrafted
-// puzzle progression instead of a fully random gauntlet. Arcade mode keeps
-// drawing from the full roster, since it has no stage-by-stage puzzle
-// design and is meant to be an open-ended, unlock-gated endless mode.
 function eligibleArchetypes() {
   if (state.mode !== 'stage') return HERO_ARCHETYPES;
   const pool = getStageDef(state.stage).heroPool;
@@ -69,6 +65,23 @@ export function buildHero(): Hero {
   };
 }
 
+export function clearPendingHero(): void {
+  runtime.pendingHero = null;
+}
+
+export function ensurePendingHero(): Hero {
+  if (!runtime.pendingHero) {
+    runtime.pendingHero = buildHero();
+  }
+  return runtime.pendingHero;
+}
+
+export function takePendingHero(): Hero {
+  var hero = ensurePendingHero();
+  runtime.pendingHero = null;
+  return hero;
+}
+
 function setHeroReaction(hero: Hero, kind: ReactionKind, text: string): void {
   setBattleReaction(text, kind);
   syncBattleCardVisual(hero);
@@ -111,11 +124,6 @@ export function triggerDeath(hero: Hero): void {
   setHeroReaction(hero, 'dead', '');
 }
 
-// Transient reactions: they don't change hero.visualState (so they never
-// block/override the panic/rage/flee/dead state machine above), just flash
-// a contextual line on the battle card at a narrative beat. A later call
-// to checkPanic/tryTriggerRage/etc. in the same beat naturally overwrites
-// them, which is fine — the more "final" state should win.
 export function triggerPain(hero: Hero): void {
   if (!hero || hero.hp <= 0) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
