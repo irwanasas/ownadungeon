@@ -10,6 +10,7 @@ import { renderPalette } from './palette.js';
 import { renderDungeonSlots } from './dungeonSlots.js';
 import { renderUpgrades } from './upgradesPanel.js';
 import { renderStats } from './statsPanel.js';
+import { renderRoomPreview } from './roomPreview.js';
 
 export function renderCurrencies() {
   var gold = document.getElementById('gold-value');
@@ -87,6 +88,7 @@ export function renderAll() {
   renderDungeonSlots();
   renderUpgrades();
   renderStats();
+  renderRoomPreview();
   var startButton = document.getElementById('btn-start-raid');
   if (startButton) startButton.disabled = runtime.raidInProgress;
 }

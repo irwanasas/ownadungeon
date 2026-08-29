@@ -21,6 +21,8 @@ export function loadState() {
     if (typeof next.arcadeWave !== 'number' || next.arcadeWave < 1) next.arcadeWave = 1;
     if (typeof next.arcadeBest !== 'number') next.arcadeBest = 0;
     if (next.mode !== 'stage' && next.mode !== 'arcade') next.mode = 'stage';
+    next.unlocked = Object.assign({}, DEFAULT_STATE.unlocked, next.unlocked || {});
+    next.levels = Object.assign({}, DEFAULT_STATE.levels, next.levels || {});
     return next;
   } catch {
     return structuredClone(DEFAULT_STATE);
@@ -34,10 +36,6 @@ export function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// Reassigns the module-level `state` binding back to a fresh default state
-// and clears it from storage. Other modules see the change immediately
-// through their live import of `state`. Does not touch UI/runtime state —
-// see core/resetGame.js for the full reset orchestration.
 export function resetState() {
   localStorage.removeItem(STORAGE_KEY);
   state = structuredClone(DEFAULT_STATE);
