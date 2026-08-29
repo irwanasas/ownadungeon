@@ -11,6 +11,7 @@ export function resetGame(): void {
   resetState();
   runtime.selectedPaletteItem = null;
   runtime.raidInProgress = false;
+  runtime.pendingHero = null;
   hideHeroToken();
   clearRaidLog();
   var status = document.getElementById('raid-status');
@@ -21,7 +22,7 @@ export function resetGame(): void {
   }
   var log = document.getElementById('raid-log');
   if (log) {
-    log.innerHTML = '<p class="raid-log-placeholder">Susun dungeon-mu, lalu tekan "Mulai Raid" untuk melihat hero mencoba menaklukkannya.</p>';
+    log.innerHTML = '<p class="raid-log-placeholder">Cek Musuh Terdeteksi, susun trap/monster, lalu tekan Raid.</p>';
   }
   saveState();
   renderAll();
