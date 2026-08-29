@@ -28,7 +28,7 @@ export default function GameApp() {
               Lv.1
             </div>
             <div id="hud-progress" className="player-progress">
-              Stage 1 / 10
+              Stage 1 / 50
             </div>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function GameApp() {
                 </button>
               </div>
               <div id="mode-stage-label" className="mode-stage-label">
-                Stage 1 / 10
+                Stage 1 / 50
               </div>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function GameApp() {
             <div className="status-chip status-chip--progress">
               <span className="status-chip-key">Progress</span>
               <span id="status-progress" className="status-chip-val">
-                1 / 10
+                1 / 50
               </span>
             </div>
             <div className="status-chip status-chip--king">
@@ -86,6 +86,8 @@ export default function GameApp() {
               </span>
             </div>
           </div>
+
+          <div id="room-preview" className="room-preview" aria-label="Encounter preview"></div>
 
           <div className="dungeon-runway" id="dungeon-runway">
             <div
@@ -147,8 +149,7 @@ export default function GameApp() {
 
             <div id="raid-log" className="raid-log">
               <p className="raid-log-placeholder">
-                Susun dungeon-mu, lalu tekan &quot;Mulai Raid&quot; untuk melihat hero
-                mencoba menaklukkannya.
+                Susun dungeon, cek Encounter Preview, lalu PLAY.
               </p>
             </div>
           </div>
