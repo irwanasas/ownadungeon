@@ -18,6 +18,13 @@ function updateActiveButtons() {
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-expanded', isActive ? 'true' : 'false');
   });
+  var homeBtn = document.getElementById('btn-nav-home');
+  if (homeBtn) {
+    var homeActive = !currentOverlay;
+    homeBtn.classList.toggle('active', homeActive);
+    if (homeActive) homeBtn.setAttribute('aria-current', 'page');
+    else homeBtn.removeAttribute('aria-current');
+  }
 }
 
 function getFocusable(container) {
@@ -158,6 +165,11 @@ export function initOverlayControls() {
   if (btnStats)
     btnStats.addEventListener('click', function () {
       openOverlay('stats');
+    });
+  var btnHome = document.getElementById('btn-nav-home');
+  if (btnHome)
+    btnHome.addEventListener('click', function () {
+      closeAllOverlays();
     });
   if (btnClosePalette) btnClosePalette.addEventListener('click', closeAllOverlays);
   if (btnCloseUpgrades)
