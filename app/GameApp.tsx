@@ -87,7 +87,7 @@ export default function GameApp() {
             </div>
           </div>
 
-          <div id="room-preview" className="room-preview" aria-label="Encounter preview"></div>
+          <div id="room-preview" className="room-preview" aria-label="Musuh terdeteksi"></div>
 
           <div className="dungeon-runway" id="dungeon-runway">
             <div
@@ -124,7 +124,7 @@ export default function GameApp() {
           <div className="raid-stage">
             <div id="raid-log" className="raid-log">
               <p className="raid-log-placeholder">
-                Susun dungeon, cek Encounter Preview, lalu PLAY.
+                Cek Musuh Terdeteksi, susun trap/monster di Gudang, lalu Raid.
               </p>
             </div>
           </div>
