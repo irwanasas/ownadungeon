@@ -20,11 +20,8 @@ export function showHeroToken(hero) {
   }
 
   els.token.classList.add('is-visible');
-  els.token.classList.remove('is-flee', 'is-dead');
+  els.token.classList.remove('is-flee', 'is-dead', 'is-entering');
   els.runway.classList.add('is-raiding');
-  requestAnimationFrame(function () {
-    moveHeroToEntrance(true);
-  });
 }
 
 export function hideHeroToken() {
@@ -35,10 +32,11 @@ export function hideHeroToken() {
     'is-panic',
     'is-rage',
     'is-flee',
-    'is-dead'
+    'is-dead',
+    'is-entering'
   );
   els.token.style.left = '';
-  els.runway.classList.remove('is-raiding');
+  els.runway.classList.remove('is-raiding', 'is-room-mode');
 }
 
 export function syncHeroTokenVisual(hero) {
@@ -135,8 +133,6 @@ export function refreshHeroTokenPosition() {
   }
 }
 
-// Unused by the current UI flow (kept from the pre-refactor stage.js —
-// flagged in the refactor audit as dead code rather than removed).
 export function resetStageView() {
   hideHeroToken();
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
