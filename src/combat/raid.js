@@ -26,6 +26,14 @@ import {
 import { logLine, clearRaidLog } from '../ui/raidLog.js';
 import { updateHeroCard, flashSlot } from '../ui/heroCard.js';
 import { renderAll } from '../ui/renderBus.js';
+import {
+  heroMonsterMult,
+  heroTrapMult,
+  matchupLabel,
+  applySpecialOnTrap,
+  applySpecialOnMonsterHit
+} from '../data/matchups.js';
+import { renderRoomPreview, setPreviewHero, clearPreviewHero } from '../ui/roomPreview.js';
 
 export async function runRaid() {
   if (runtime.raidInProgress) return;
@@ -39,10 +47,21 @@ export async function runRaid() {
   var stageDiff = getRaidDiff();
 
   var hero = buildHero();
+  clearPreviewHero();
   updateHeroCard(hero);
   enterRaidRoomMode();
   presentEntrance();
   showHeroToken(hero);
+  logLine(
+    hero.name +
+      ' the ' +
+      hero.className +
+      ' (' +
+      (hero.role || 'Hero') +
+      ') — ' +
+      (hero.strengths || ''),
+    'info'
+  );
 
   if (state.mode === 'arcade') {
     logLine('Arcade Wave ' + (state.arcadeWave || 1) + ' — hero memasuki dungeon.', 'info');
@@ -93,26 +112,47 @@ export async function runRaid() {
       flashSlot(slotEl, 'triggered');
       await waitBeat('actionGap');
 
-      var dmg = Math.round((cat.baseDamage + (level - 1) * cat.dmgPerLevel) * stageDiff.trapMult);
+      var baseTrap = Math.round((cat.baseDamage + (level - 1) * cat.dmgPerLevel) * stageDiff.trapMult);
+      var tMult = heroTrapMult(hero.classId, cat.id);
+      var dmg = Math.round(baseTrap * tMult);
+      var tLabel = matchupLabel(tMult);
+      if (tLabel === 'strong') {
+        logLine('Matchup trap: ' + hero.className + ' rentan vs ' + cat.name + '.', 'warning');
+      } else if (tLabel === 'weak') {
+        logLine('Matchup trap: ' + hero.className + ' tahan vs ' + cat.name + '.', 'success');
+      }
+
       if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
         logLine(hero.name + ' meloncat di detik terakhir — lolos!', 'success');
         dmg = 0;
       }
 
       if (dmg > 0) {
+        var spec = applySpecialOnTrap(hero, cat.id, dmg);
+        dmg = spec.dmg;
         hero.hp -= dmg;
-        logLine(cat.name + ' menggigit dagingnya (−' + dmg + ' HP).', 'danger');
+        logLine(cat.name + ' menggigit (−' + dmg + ' HP).', 'danger');
         updateHeroCard(hero);
         checkPanic(hero);
+        if (spec.special === 'net_blocks_rage') {
+          logLine('Jaring menahan amarah — RAGE tertunda.', 'warning');
+        }
+        if (spec.special === 'frost_def') {
+          logLine('Dingin merayap — DEF hero turun.', 'warning');
+        }
       }
 
       if (cat.id === 'poison' && dmg > 0) {
         hero.status.push({ type: 'poison', rounds: cat.dotRounds, dmg: Math.round(dmg * 0.4) });
-        logLine('Racun merayap di uratnya... napasnya memendek.', 'danger');
+        logLine('Racun merayap di uratnya...', 'danger');
+      }
+      if (cat.id === 'fire' && dmg > 0 && cat.burnRounds) {
+        hero.status.push({ type: 'poison', rounds: cat.burnRounds, dmg: Math.round(dmg * 0.35) });
+        logLine('Api sisa membakar kulitnya.', 'danger');
       }
       if (cat.id === 'net' && dmg > 0) {
         hero.atk = Math.round(hero.atk * (1 - cat.atkReduction));
-        logLine('Jaring mengerat. Lengannya kaku — ATK menurun.', 'danger');
+        logLine('Jaring mengerat — ATK menurun.', 'danger');
       }
 
       await waitBeat('resolve');
@@ -135,7 +175,21 @@ export async function runRaid() {
       await waitBeat('threat');
 
       logLine(cat.name + ' (Lv.' + level + ') menghadang! (HP ' + monHp + ')', 'danger');
+      var mm = heroMonsterMult(hero.classId, cat.id);
+      if (matchupLabel(mm) === 'strong') {
+        logLine(hero.className + ' unggul vs ' + cat.name + '.', 'success');
+      } else if (matchupLabel(mm) === 'weak') {
+        logLine(hero.className + ' kesulitan vs ' + cat.name + '.', 'warning');
+      }
       await waitBeat('actionGap');
+
+      if (cat.fearAura && !hero.fearImmune) {
+        logLine('Aura ketakutan merayap dari ' + cat.name + '...', 'warning');
+        if (Math.random() < 0.22) {
+          logLine(hero.name + ' goyah — hampir kabur!', 'warning');
+          hero.atk = Math.max(1, Math.round(hero.atk * 0.9));
+        }
+      }
 
       var levelGap = level - hero.level;
       if (!hero.fearImmune && levelGap >= hero.fleeThreshold) {
@@ -169,11 +223,24 @@ export async function runRaid() {
           await waitBeat('actionGap');
         }
 
-        var hDmg = Math.max(1, hero.atk - monDef);
+        var mMult = heroMonsterMult(hero.classId, cat.id);
+        var raw = Math.max(1, hero.atk - monDef);
+        if (hero.magicAtk) raw = Math.max(1, hero.atk - Math.floor(monDef * 0.4));
+        var hit = applySpecialOnMonsterHit(hero, cat, Math.round(raw * mMult));
+        var hDmg = Math.max(1, hit.dmg);
         mHp -= hDmg;
+        var mTag = matchupLabel(mMult);
         logLine(
-          hero.name + ' menyerang. ' + cat.name + ' goyah (−' + hDmg + ', sisa ' +
-          Math.max(0, Math.floor(mHp)) + ').'
+          hero.name +
+            ' menyerang' +
+            (mTag === 'strong' ? ' (advantage)' : mTag === 'weak' ? ' (disadvantage)' : '') +
+            '. ' +
+            cat.name +
+            ' (−' +
+            hDmg +
+            ', sisa ' +
+            Math.max(0, Math.floor(mHp)) +
+            ').'
         );
 
         if (mHp <= 0) {
@@ -314,6 +381,8 @@ export async function runRaid() {
   });
   setDoorOpen(false);
   exitRaidRoomMode();
+  clearPreviewHero();
+  renderRoomPreview(null);
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
     logLine(hero.name + ' muncul di pintu keluar — berlumur, tapi hidup.', 'warning');
