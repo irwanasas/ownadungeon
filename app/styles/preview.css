@@ -25,17 +25,6 @@
   color: var(--gold);
 }
 
-.preview-hero {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--bone);
-}
-
-.preview-hero--muted {
-  color: var(--muted);
-  font-weight: 400;
-}
-
 .preview-hero-blurb {
   display: flex;
   flex-wrap: wrap;
@@ -58,64 +47,6 @@
 .preview-tag--bad {
   color: var(--ember-bright);
   border-color: rgba(192, 71, 43, 0.4);
-}
-
-.preview-rooms {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-
-.preview-room {
-  flex: 0 0 88px;
-  min-width: 88px;
-  padding: 6px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.preview-room--throne {
-  border-color: rgba(216, 170, 77, 0.4);
-}
-
-.preview-room-num {
-  font-size: 9px;
-  color: var(--muted-dim);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.preview-threat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.preview-icon {
-  font-size: 18px;
-}
-
-.preview-name {
-  font-size: 10px;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.preview-lv {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-}
-
-.preview-empty {
-  font-size: 10px;
-  color: var(--muted-dim);
-  text-align: center;
-  padding: 8px 0;
 }
 
 .preview-matchup {
@@ -153,11 +84,10 @@
   font-size: 9px;
 }
 
-.app.battle-active .room-preview {
+.app.battle-active .room-preview:not(.room-preview--battle) {
   display: none;
 }
 
-/* ---- Pre-battle hero intro (.room-preview--intro) ---- */
 .room-preview--intro {
   max-height: none;
 }
@@ -217,7 +147,6 @@
   border-color: rgba(216, 170, 77, 0.35);
 }
 
-/* ---- Live battle card (.room-preview--battle) ---- */
 #room-preview.room-preview--battle {
   max-height: none;
   padding: 6px 8px;
@@ -288,18 +217,12 @@
   letter-spacing: 0.06em;
 }
 
-.battle-card-reaction.is-panic {
-  color: var(--ember-bright);
-}
-
+.battle-card-reaction.is-panic,
 .battle-card-reaction.is-rage {
   color: var(--ember-bright);
 }
 
-.battle-card-reaction.is-flee {
-  color: var(--soul);
-}
-
+.battle-card-reaction.is-flee,
 .battle-card-reaction.is-fear {
   color: var(--soul);
 }
