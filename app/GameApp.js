@@ -20,7 +20,7 @@ export default function GameApp() {
       <header className="player-hud" aria-label="Player status">
         <div className="player-hud-left">
           <div className="player-avatar" aria-hidden="true">
-            \uD83D\uDC51
+            👑
           </div>
           <div className="player-meta">
             <div className="player-name">Raja</div>
@@ -103,11 +103,11 @@ export default function GameApp() {
                 </div>
                 <div className="room-floor">
                   <div id="room-content" className="room-content">
-                    <span className="room-content-icon">\uD83D\uDEAA</span>
+                    <span className="room-content-icon">🚪</span>
                     <span className="room-content-label">Mulut Dungeon</span>
                   </div>
                   <div id="hero-token" className="hero-token" aria-hidden="true">
-                    <span className="hero-token-face">\u2694</span>
+                    <span className="hero-token-face">⚔</span>
                   </div>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default function GameApp() {
             <div id="hero-card" className="hero-card hero-card--hidden">
               <div className="hero-card-top">
                 <span id="hero-icon" className="hero-icon">
-                  \u2694
+                  ⚔
                 </span>
                 <span id="hero-name" className="hero-name">
                   —
@@ -147,7 +147,7 @@ export default function GameApp() {
 
             <div id="raid-log" className="raid-log">
               <p className="raid-log-placeholder">
-                Susun dungeon-mu, lalu tekan "Mulai Raid" untuk melihat hero
+                Susun dungeon-mu, lalu tekan &quot;Mulai Raid&quot; untuk melihat hero
                 mencoba menaklukkannya.
               </p>
             </div>
@@ -162,102 +162,43 @@ export default function GameApp() {
         aria-label="Mulai Raid"
       >
         <span className="play-fab-icon" aria-hidden="true">
-          \u25B6
+          ▶
         </span>
         <span className="play-fab-label">Raid</span>
       </button>
 
       <nav className="bottom-nav" aria-label="Main">
-        <button
-          type="button"
-          id="btn-open-palette"
-          className="bottom-nav-item"
-          aria-expanded="false"
-          data-nav="palette"
-        >
-          <span className="bottom-nav-icon" aria-hidden="true">
-            \uD83D\uDDE1
-          </span>
+        <button type="button" id="btn-open-palette" className="bottom-nav-item" aria-expanded="false" data-nav="palette">
+          <span className="bottom-nav-icon" aria-hidden="true">🗡</span>
           <span className="bottom-nav-label">Gudang</span>
         </button>
-        <button
-          type="button"
-          id="btn-open-upgrades"
-          className="bottom-nav-item"
-          aria-expanded="false"
-          data-nav="upgrades"
-        >
-          <span className="bottom-nav-icon" aria-hidden="true">
-            \u2B06
-          </span>
+        <button type="button" id="btn-open-upgrades" className="bottom-nav-item" aria-expanded="false" data-nav="upgrades">
+          <span className="bottom-nav-icon" aria-hidden="true">⬆</span>
           <span className="bottom-nav-label">Upgrade</span>
         </button>
-        <button
-          type="button"
-          id="btn-nav-home"
-          className="bottom-nav-item bottom-nav-item--center active"
-          data-nav="home"
-          aria-current="page"
-        >
-          <span className="bottom-nav-icon" aria-hidden="true">
-            \uD83C\uDFDB
-          </span>
+        <button type="button" id="btn-nav-home" className="bottom-nav-item bottom-nav-item--center active" data-nav="home" aria-current="page">
+          <span className="bottom-nav-icon" aria-hidden="true">🏛</span>
           <span className="bottom-nav-label">Battle</span>
         </button>
-        <button
-          type="button"
-          id="btn-open-stats"
-          className="bottom-nav-item"
-          aria-expanded="false"
-          data-nav="stats"
-        >
-          <span className="bottom-nav-icon" aria-hidden="true">
-            \uD83D\uDCCA
-          </span>
+        <button type="button" id="btn-open-stats" className="bottom-nav-item" aria-expanded="false" data-nav="stats">
+          <span className="bottom-nav-icon" aria-hidden="true">📊</span>
           <span className="bottom-nav-label">Stats</span>
         </button>
-        <button
-          type="button"
-          id="btn-reset-game"
-          className="bottom-nav-item bottom-nav-item--danger"
-          data-nav="reset"
-        >
-          <span className="bottom-nav-icon" aria-hidden="true">
-            \u21BA
-          </span>
+        <button type="button" id="btn-reset-game" className="bottom-nav-item bottom-nav-item--danger" data-nav="reset">
+          <span className="bottom-nav-icon" aria-hidden="true">↺</span>
           <span className="bottom-nav-label">Reset</span>
         </button>
       </nav>
 
-      <div
-        id="palette-overlay"
-        className="side-overlay side-overlay-left side-overlay--hidden"
-        aria-hidden="true"
-      >
+      <div id="palette-overlay" className="side-overlay side-overlay-left side-overlay--hidden" aria-hidden="true">
         <div className="side-overlay-backdrop" data-close-overlay="palette"></div>
-        <aside
-          className="side-panel"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Gudang Dungeon"
-          tabIndex={-1}
-        >
+        <aside className="side-panel" role="dialog" aria-modal="true" aria-label="Gudang Dungeon" tabIndex={-1}>
           <div className="side-panel-header">
             <div>
               <h2 className="panel-title">Gudang Dungeon</h2>
-              <p className="panel-hint">
-                Pilih item, lalu klik ruang kosong di layout dungeon untuk
-                memasangnya.
-              </p>
+              <p className="panel-hint">Pilih item, lalu klik ruang kosong di layout dungeon untuk memasangnya.</p>
             </div>
-            <button
-              id="btn-close-palette"
-              className="overlay-close"
-              type="button"
-              aria-label="Tutup"
-            >
-              \u00D7
-            </button>
+            <button id="btn-close-palette" className="overlay-close" type="button" aria-label="Tutup">×</button>
           </div>
           <div className="palette-group">
             <h3 className="palette-group-title">Trap</h3>
@@ -274,64 +215,23 @@ export default function GameApp() {
         </aside>
       </div>
 
-      <div
-        id="upgrades-overlay"
-        className="side-overlay side-overlay-right side-overlay--hidden"
-        aria-hidden="true"
-      >
-        <div
-          className="side-overlay-backdrop"
-          data-close-overlay="upgrades"
-        ></div>
-        <aside
-          className="side-panel"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Peningkatan"
-          tabIndex={-1}
-        >
+      <div id="upgrades-overlay" className="side-overlay side-overlay-right side-overlay--hidden" aria-hidden="true">
+        <div className="side-overlay-backdrop" data-close-overlay="upgrades"></div>
+        <aside className="side-panel" role="dialog" aria-modal="true" aria-label="Peningkatan" tabIndex={-1}>
           <div className="side-panel-header">
-            <div>
-              <h2 className="panel-title">Peningkatan</h2>
-            </div>
-            <button
-              id="btn-close-upgrades"
-              className="overlay-close"
-              type="button"
-              aria-label="Tutup"
-            >
-              \u00D7
-            </button>
+            <div><h2 className="panel-title">Peningkatan</h2></div>
+            <button id="btn-close-upgrades" className="overlay-close" type="button" aria-label="Tutup">×</button>
           </div>
           <div id="upgrade-list" className="upgrade-list"></div>
         </aside>
       </div>
 
-      <div
-        id="stats-overlay"
-        className="side-overlay side-overlay-right side-overlay--hidden"
-        aria-hidden="true"
-      >
+      <div id="stats-overlay" className="side-overlay side-overlay-right side-overlay--hidden" aria-hidden="true">
         <div className="side-overlay-backdrop" data-close-overlay="stats"></div>
-        <aside
-          className="side-panel"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Statistik"
-          tabIndex={-1}
-        >
+        <aside className="side-panel" role="dialog" aria-modal="true" aria-label="Statistik" tabIndex={-1}>
           <div className="side-panel-header">
-            <div>
-              <h2 className="panel-title">Statistik</h2>
-            </div>
-            <button
-              id="btn-close-stats"
-              className="overlay-close"
-              type="button"
-              aria-label="Tutup"
-            >
-              \u00D7
-            </button>
+            <div><h2 className="panel-title">Statistik</h2></div>
+            <button id="btn-close-stats" className="overlay-close" type="button" aria-label="Tutup">×</button>
           </div>
           <div id="stats-list" className="stats-list"></div>
         </aside>
@@ -341,35 +241,19 @@ export default function GameApp() {
         <div className="modal">
           <h2 className="modal-title">Selagi Kau Pergi...</h2>
           <div id="offline-summary" className="modal-body"></div>
-          <button id="btn-close-offline" className="btn btn-primary">
-            Kembali ke Dungeon
-          </button>
+          <button id="btn-close-offline" className="btn btn-primary">Kembali ke Dungeon</button>
         </div>
       </div>
 
       <div id="reset-modal" className="modal-overlay modal-overlay--hidden">
-        <div
-          className="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="reset-modal-title"
-        >
-          <h2 id="reset-modal-title" className="modal-title">
-            Reset Game?
-          </h2>
+        <div className="modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+          <h2 id="reset-modal-title" className="modal-title">Reset Game?</h2>
           <div className="modal-body">
-            <p>
-              Semua progress akan dihapus: gold, souls, upgrade, unlock, layout
-              dungeon, dan statistik. Tidak bisa dibatalkan.
-            </p>
+            <p>Semua progress akan dihapus: gold, souls, upgrade, unlock, layout dungeon, dan statistik. Tidak bisa dibatalkan.</p>
           </div>
           <div className="modal-actions">
-            <button id="btn-reset-cancel" className="btn" type="button">
-              Batal
-            </button>
-            <button id="btn-reset-confirm" className="btn btn-danger" type="button">
-              Ya, Reset
-            </button>
+            <button id="btn-reset-cancel" className="btn" type="button">Batal</button>
+            <button id="btn-reset-confirm" className="btn btn-danger" type="button">Ya, Reset</button>
           </div>
         </div>
       </div>
