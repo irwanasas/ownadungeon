@@ -1,20 +1,22 @@
-// Hero entity: spawning a hero for a raid, and the reaction state machine
-// (panic / rage / flee / death) that drives combat log messages and visuals.
 import { state } from '../state/gameState.js';
 import { HERO_ARCHETYPES, NAME_POOL } from '../data/heroes.js';
 import { getRaidDiff } from './difficultyResolver.js';
 import { setReaction, updateHeroCardVisual } from '../ui/heroCard.js';
+import { isUnlocked } from '../economy/economy.js';
 
 export function buildHero() {
   const arch =
     HERO_ARCHETYPES[Math.floor(Math.random() * HERO_ARCHETYPES.length)];
   const name = NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)];
+  const unlockedLevels = Object.keys(state.levels).filter(function (id) {
+    return isUnlocked(id) || id === 'spike' || id === 'skeleton';
+  });
+  const vals = unlockedLevels.map(function (id) {
+    return state.levels[id] || 1;
+  });
   const avgLevel = Math.max(
     1,
-    Math.round(
-      Object.values(state.levels).reduce((a, b) => a + b, 0) /
-        Object.keys(state.levels).length
-    )
+    Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / Math.max(1, vals.length))
   );
   const stageBonus = getRaidDiff().heroLevelBonus || 0;
   const level = Math.max(1, avgLevel + Math.floor(Math.random() * 3) - 1 + stageBonus);
@@ -23,15 +25,17 @@ export function buildHero() {
   const def = Math.round(arch.baseDef + (level - 1) * 0.4);
 
   return {
-    name,
+    name: name,
+    classId: arch.id,
     className: arch.className,
     icon: arch.icon,
     color: arch.color,
-    level,
+    role: arch.role,
+    level: level,
     maxHp: hp,
-    hp,
-    atk,
-    def,
+    hp: hp,
+    atk: atk,
+    def: def,
     fleeThreshold: arch.fleeThreshold,
     fearImmune: !!arch.fearImmune,
     trapEvasion: arch.trapEvasion || 0,
@@ -39,7 +43,13 @@ export function buildHero() {
     rageHpThreshold: arch.rageHpThreshold || 0.3,
     rageAtkMultiplier: arch.rageAtkMultiplier || 1.5,
     rageHealFraction: arch.rageHealFraction || 0.15,
+    magicAtk: !!arch.magicAtk,
+    holy: !!arch.holy,
+    tags: arch.tags ? arch.tags.slice() : [],
+    strengths: arch.strengths || '',
+    weaknesses: arch.weaknesses || '',
     hasRaged: false,
+    netBlocksRage: false,
     status: [],
     visualState: 'idle'
   };
@@ -61,6 +71,7 @@ export function checkPanic(hero) {
 
 export function tryTriggerRage(hero) {
   if (!hero || !hero.canRage || hero.hasRaged) return false;
+  if (hero.netBlocksRage) return false;
   if (hero.hp / hero.maxHp > hero.rageHpThreshold) return false;
   hero.hasRaged = true;
   hero.visualState = 'rage';
@@ -83,6 +94,5 @@ export function triggerDeath(hero) {
   if (!hero) return;
   hero.hp = 0;
   hero.visualState = 'dead';
-  // setHeroReaction() already calls updateHeroCardVisual(hero) internally.
   setHeroReaction(hero, '');
 }
