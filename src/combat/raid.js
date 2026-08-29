@@ -12,10 +12,17 @@ import { getKingStats } from '../data/king.js';
 import { beatWait as waitBeat } from '../animation/beatTiming.js';
 import {
   showHeroToken,
-  hideHeroToken,
-  moveHeroToSlot,
-  moveHeroToThrone
+  hideHeroToken
 } from '../animation/heroToken.js';
+import {
+  enterRaidRoomMode,
+  exitRaidRoomMode,
+  presentEntrance,
+  presentRoom,
+  presentThrone,
+  playDoorEnterSequence,
+  setDoorOpen
+} from '../animation/roomStage.js';
 import { logLine, clearRaidLog } from '../ui/raidLog.js';
 import { updateHeroCard, flashSlot } from '../ui/heroCard.js';
 import { renderAll } from '../ui/renderBus.js';
@@ -33,6 +40,8 @@ export async function runRaid() {
 
   var hero = buildHero();
   updateHeroCard(hero);
+  enterRaidRoomMode();
+  presentEntrance();
   showHeroToken(hero);
 
   if (state.mode === 'arcade') {
@@ -62,10 +71,10 @@ export async function runRaid() {
     });
     if (slotEl) {
       slotEl.classList.add('raid-active');
-      moveHeroToSlot(i, false);
     }
 
-    await waitBeat('arriveRoom');
+    presentRoom(i, slot);
+    await playDoorEnterSequence(waitBeat);
 
     if (!slot) {
       logLine('Ruang ' + (i + 1) + ' kosong — hanya debu dan gema langkahnya.', 'info');
@@ -218,10 +227,10 @@ export async function runRaid() {
     var throneEl = document.querySelector('.dungeon-slot.throne-room');
     if (throneEl) {
       throneEl.classList.add('raid-active');
-      moveHeroToThrone(false);
     }
 
-    await waitBeat('arriveRoom');
+    presentThrone();
+    await playDoorEnterSequence(waitBeat);
     logLine('Koridor berakhir di aula takhta. Peti harta mengkilat di kaki singgasana.', 'warning');
     await waitBeat('threat');
 
@@ -303,6 +312,8 @@ export async function runRaid() {
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
   });
+  setDoorOpen(false);
+  exitRaidRoomMode();
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
     logLine(hero.name + ' muncul di pintu keluar — berlumur, tapi hidup.', 'warning');
