@@ -1,8 +1,7 @@
-// Pacing for the raid animation timeline: each named "beat" waits a
-// jittered delay so combat log lines and hero-token movement read at a
-// legible, slightly organic pace instead of instantly.
 const STAGE_BEAT = {
   enterDungeon: 850,
+  doorClosed: 500,
+  doorOpen: 600,
   arriveRoom: 750,
   threat: 800,
   actionGap: 700,
