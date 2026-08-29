@@ -1,6 +1,5 @@
-// The initial shape of persisted game state (used on first load and on reset).
 export const DEFAULT_STATE = {
-  gold: 45,
+  gold: 55,
   souls: 0,
   slotCount: 3,
   maxSlotCount: 5,
@@ -9,17 +8,25 @@ export const DEFAULT_STATE = {
     spike: 1,
     poison: 1,
     net: 1,
+    fire: 1,
+    frost: 1,
     skeleton: 1,
     goblin: 1,
-    ogre: 1
+    ogre: 1,
+    slime: 1,
+    shade: 1
   },
   unlocked: {
     spike: true,
     poison: false,
     net: false,
+    fire: false,
+    frost: false,
     skeleton: true,
     goblin: false,
     ogre: false,
+    slime: false,
+    shade: false,
     slot4: false,
     slot5: false
   },
