@@ -4,7 +4,7 @@ Idle dungeon management — desain perangkap & monster, tekan **Raid**, lalu ton
 
 **Prototype web** untuk menguji apakah loop “susun → tonton → upgrade” terasa memuaskan.
 
-- **Stack:** Next.js App Router (JavaScript), CSS modular, game logic vanilla di `src/`
+- **Stack:** Next.js App Router (TypeScript), CSS modular, game logic vanilla di `src/`
 - **Live:** https://irwanasas.github.io/ownadungeon/
 - **Persistensi:** `localStorage` (client-side only)
 
@@ -50,7 +50,7 @@ Bukan sekadar HP/ATK lebih besar. Tiap room adalah puzzle **Hero × Monster × T
 
 - Spike · Poison · Net · Fire · Frost
 
-Matrix di `src/data/matchups.js` (advantage ~×1.25, disadvantage ~×0.8, plus special: net-blocks-rage, frost DEF, holy/magic bonus, dll.). Tidak ada multiplier yang menumpuk sampai broken.
+Matrix di `src/data/matchups.ts` (advantage ~×1.25, disadvantage ~×0.8, plus special: net-blocks-rage, frost DEF, holy/magic bonus, dll.). Tidak ada multiplier yang menumpuk sampai broken.
 
 ### Room-by-room progression
 
@@ -85,12 +85,13 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 
 ```
 app/
-  layout.js          # fonts + global CSS
-  page.js            # dynamic GameApp (ssr: false)
-  GameApp.js         # shell JSX + startGame()
+  layout.tsx         # fonts + global CSS
+  page.tsx           # dynamic GameApp (ssr: false)
+  GameApp.tsx         # shell JSX + startGame()
   styles/            # tokens, layout, components, raid, battle, preview
-game-client.js       # bootstrap client
+game-client.ts       # bootstrap client
 src/
+  types.ts           # shared type definitions (GameState, Hero, data model, dll.)
   data/              # heroes, monsters, traps, matchups, difficulty, king, …
   state/             # gameState, runtimeState
   economy/           # unlock, level cost, rewards
@@ -104,11 +105,25 @@ Prinsip: **migrate, don’t rewrite**. Logic game tetap DOM/vanilla; React hanya
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev         # http://localhost:3000
+npm run type-check  # tsc --noEmit
 npm run build && npm start
 ```
 
 Deploy: GitHub Actions → GitHub Pages dari `main`.
+
+---
+
+## TypeScript
+
+Seluruh codebase (`src/`, `app/`, `game-client.ts`, `next.config.ts`) sudah dimigrasi dari JavaScript ke **TypeScript** (`strict: true`), tanpa mengubah gameplay/behavior — migrasi murni menambahkan tipe di atas logic yang sama persis.
+
+- **`src/types.ts`** — definisi tipe pusat: bentuk data model (`TrapDef`, `MonsterDef`, `HeroArchetype`, dll.), state tersimpan (`GameState`), state sesi (`RuntimeState`), entitas combat (`Hero`), dan hasil formula difficulty (`RaidDifficulty`). Modul lain meng-import tipe dari sini alih-alih saling menurunkan bentuk data satu sama lain.
+- Prioritas pengetikan mengikuti urutan: **data model → state → game logic (economy/combat) → utility (animation) → UI**, karena UI paling banyak bergantung pada bentuk data yang sudah stabil dari layer di bawahnya.
+- **Tanpa `any`/`@ts-ignore`/`as any`** di seluruh kode aplikasi — satu-satunya cast eksplisit adalah pada `catalogFor()` di `combat/raid.ts` (narrowing `TrapDef | MonsterDef | TreasureDef` ke variant yang sesuai `slot.kind`, yang tidak bisa disimpulkan otomatis oleh TypeScript dari relasi antar dua parameter runtime yang terpisah).
+- Import relatif antar-modul TypeScript ditulis **tanpa ekstensi file** (mis. `from '../state/gameState'`, bukan `.js`) — konvensi ini dibutuhkan Turbopack (bundler Next.js) untuk me-resolve modul `.ts`/`.tsx` lewat dynamic maupun static import.
+- `tsconfig.json` dan `next-env.d.ts` di-generate otomatis oleh Next.js (`next build`) mengikuti konvensi App Router, dengan `strict: true` diaktifkan manual.
+- `npm run type-check` menjalankan `tsc --noEmit` secara terpisah dari build untuk validasi cepat tanpa menghasilkan output.
 
 ---
 

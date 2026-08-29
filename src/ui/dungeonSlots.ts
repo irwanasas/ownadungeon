@@ -1,0 +1,98 @@
+// Renders the dungeon layout (entrance → item slots → throne room) and
+// wires up placing/removing items in each slot.
+import { state } from '../state/gameState';
+import { runtime } from '../state/runtimeState';
+import { saveState } from '../state/gameState';
+import { catalogFor } from '../data/catalog';
+import { showToast } from './toast';
+import { renderAll } from './renderBus';
+
+export function renderDungeonSlots(): void {
+  var wrap = document.getElementById('dungeon-slots');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  var entrance = document.createElement('div');
+  entrance.className = 'dungeon-slot entrance';
+  entrance.innerHTML =
+    '<span class="slot-icon">🚪</span><span class="slot-label">Masuk</span>';
+  wrap.appendChild(entrance);
+
+  for (var i = 0; i < state.maxSlotCount; i++) {
+    if (i > 0) {
+      var connector = document.createElement('div');
+      connector.className = 'slot-connector';
+      wrap.appendChild(connector);
+    }
+
+    var locked = i >= state.slotCount;
+    var slotData = state.dungeon[i];
+    var slotEl = document.createElement('div');
+    slotEl.className =
+      'dungeon-slot' +
+      (locked ? ' locked-slot' : '') +
+      (slotData ? ' filled' : '');
+    slotEl.dataset.index = String(i);
+
+    var indexTag = '<span class="slot-index">' + (i + 1) + '</span>';
+
+    if (locked) {
+      slotEl.innerHTML =
+        indexTag +
+        '<span class="slot-icon">⛏</span><span class="slot-label">Terkunci</span>';
+    } else if (slotData) {
+      var cat = catalogFor(slotData.catalogId, slotData.kind);
+      slotEl.innerHTML =
+        indexTag +
+        '<span class="slot-icon">' +
+        (cat ? cat.icon : '') +
+        '</span><span class="slot-label">' +
+        (cat ? cat.name : '') +
+        '</span>';
+      (function (idx, c) {
+        slotEl.addEventListener('click', function () {
+          if (runtime.raidInProgress) return;
+          state.dungeon[idx] = null;
+          saveState();
+          renderAll();
+          showToast((c ? c.name : 'Item') + ' dihapus', 'info');
+        });
+      })(i, cat);
+    } else {
+      slotEl.innerHTML =
+        indexTag +
+        '<span class="slot-icon">·</span><span class="slot-label">Kosong</span>';
+      (function (idx) {
+        slotEl.addEventListener('click', function () {
+          if (runtime.raidInProgress || !runtime.selectedPaletteItem) return;
+          var c = catalogFor(runtime.selectedPaletteItem.id, runtime.selectedPaletteItem.kind);
+          state.dungeon[idx] = {
+            catalogId: runtime.selectedPaletteItem.id,
+            kind: runtime.selectedPaletteItem.kind
+          };
+          runtime.selectedPaletteItem = null;
+          saveState();
+          renderAll();
+          showToast((c ? c.name : 'Item') + ' dipasang', 'success');
+        });
+      })(i);
+    }
+
+    wrap.appendChild(slotEl);
+  }
+
+  var endConn = document.createElement('div');
+  endConn.className = 'slot-connector';
+  wrap.appendChild(endConn);
+
+  var throne = document.createElement('div');
+  throne.className = 'dungeon-slot throne-room filled';
+  throne.dataset.index = 'throne';
+  var kingLv = (state.king && state.king.level) || 1;
+  throne.innerHTML =
+    '<span class="slot-index">◆</span>' +
+    '<span class="slot-icon">👑</span>' +
+    '<span class="slot-label">Throne</span>' +
+    '<span class="slot-sub">Chest · King Lv.' + kingLv + '</span>';
+  wrap.appendChild(throne);
+}
