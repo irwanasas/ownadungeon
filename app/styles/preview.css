@@ -140,10 +140,27 @@
   line-height: 1.35;
 }
 
+.preview-layout-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.preview-layout-hints .preview-matchup {
+  margin-top: 0;
+  font-size: 9px;
+}
+
+.app.battle-active .room-preview {
+  display: none;
+}
+
 /* ---- Pre-battle hero intro (.room-preview--intro) ---- */
-/* Shown once per raid, right after the invading hero is revealed and
-   before it steps into Room 1. This is the only place strengths,
-   weaknesses, and traits/abilities are spelled out. */
+.room-preview--intro {
+  max-height: none;
+}
 
 .hero-intro {
   display: flex;
@@ -153,9 +170,9 @@
 }
 
 .hero-intro-icon {
-  flex-shrink: 0;
   font-size: 28px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .hero-intro-main {
@@ -164,31 +181,28 @@
 
 .hero-intro-name {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--bone);
 }
 
 .hero-intro-class {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--muted);
-  padding: 1px 6px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  font-weight: 500;
+  color: var(--gold);
+  font-size: 12px;
 }
 
 .hero-intro-stats {
-  margin-top: 2px;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted);
+  margin-top: 2px;
 }
 
 .hero-intro-traits {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .hero-trait-chip {
@@ -196,24 +210,17 @@
   padding: 2px 6px;
   border-radius: 3px;
   border: 1px solid var(--border-bright);
-  color: var(--gold);
-  background: rgba(216, 170, 77, 0.08);
+  color: var(--soul);
 }
 
 #room-preview.room-preview--intro {
-  max-height: 220px;
+  border-color: rgba(216, 170, 77, 0.35);
 }
 
 /* ---- Live battle card (.room-preview--battle) ---- */
-/* Replaces the old standalone #hero-card once the hero enters Room 1.
-   Deliberately shows no strengths/weaknesses — only name/HP/reaction. */
-
 #room-preview.room-preview--battle {
   max-height: none;
-  overflow: visible;
-  flex-shrink: 0;
-  padding: 6px 10px;
-  transition: border-color 0.2s ease;
+  padding: 6px 8px;
 }
 
 .battle-card-top {
@@ -223,28 +230,26 @@
 }
 
 .battle-card-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .battle-card-name {
+  font-weight: 700;
+  font-size: 13px;
   flex: 1;
   min-width: 0;
-  font-weight: 600;
-  font-size: 13px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .battle-card-class {
   font-size: 10px;
   color: var(--muted);
-  padding: 1px 6px;
+  padding: 1px 5px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  flex-shrink: 0;
+  border-radius: 3px;
 }
 
 .battle-card-hp-bar {
@@ -276,7 +281,7 @@
 }
 
 .battle-card-reaction {
-  margin-top: 2px;
+  margin-top: 4px;
   min-height: 14px;
   font-size: 11px;
   font-weight: 700;
@@ -284,18 +289,15 @@
 }
 
 .battle-card-reaction.is-panic {
-  color: var(--ember);
-  animation: panic-shake 0.5s ease-in-out infinite;
+  color: var(--ember-bright);
 }
 
 .battle-card-reaction.is-rage {
   color: var(--ember-bright);
-  text-shadow: 0 0 12px rgba(230, 122, 74, 0.55);
-  animation: rage-pulse 0.6s ease-in-out infinite;
 }
 
 .battle-card-reaction.is-flee {
-  color: var(--gold);
+  color: var(--soul);
 }
 
 .battle-card-reaction.is-fear {
@@ -303,7 +305,7 @@
 }
 
 .battle-card-reaction.is-pain {
-  color: var(--ember-bright);
+  color: var(--ember);
 }
 
 .battle-card-reaction.is-surprise {
@@ -311,13 +313,11 @@
 }
 
 #room-preview.is-panic {
-  border-color: var(--ember);
-  animation: panic-shake 0.45s ease-in-out infinite;
+  border-color: rgba(230, 122, 74, 0.5);
 }
 
 #room-preview.is-rage {
-  border-color: var(--ember-bright);
-  box-shadow: 0 0 18px rgba(230, 122, 74, 0.4);
+  border-color: rgba(192, 71, 43, 0.55);
 }
 
 #room-preview.is-flee {
