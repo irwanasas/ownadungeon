@@ -1,6 +1,6 @@
-// Slide-in side panels (Gudang Dungeon / Peningkatan / Statistik): open,
+// Slide-in side panels (Armory / Upgrades / Statistics / Settings): open,
 // close, focus trapping, and swipe-to-close gestures.
-type OverlayKey = 'palette' | 'upgrades' | 'stats';
+type OverlayKey = 'palette' | 'upgrades' | 'stats' | 'settings';
 
 let currentOverlay: OverlayKey | null = null;
 let lastFocusedBeforeOverlay: Element | null = null;
@@ -8,7 +8,8 @@ let lastFocusedBeforeOverlay: Element | null = null;
 var OVERLAY_MAP: Record<OverlayKey, { id: string; btn: string }> = {
   palette: { id: 'palette-overlay', btn: 'btn-open-palette' },
   upgrades: { id: 'upgrades-overlay', btn: 'btn-open-upgrades' },
-  stats: { id: 'stats-overlay', btn: 'btn-open-stats' }
+  stats: { id: 'stats-overlay', btn: 'btn-open-stats' },
+  settings: { id: 'settings-overlay', btn: 'btn-open-settings' }
 };
 
 function updateActiveButtons(): void {
@@ -152,6 +153,7 @@ export function initOverlayControls(): void {
   var btnPalette = document.getElementById('btn-open-palette');
   var btnUpgrades = document.getElementById('btn-open-upgrades');
   var btnStats = document.getElementById('btn-open-stats');
+  var btnSettings = document.getElementById('btn-open-settings');
   var btnClosePalette = document.getElementById('btn-close-palette');
   var btnCloseUpgrades = document.getElementById('btn-close-upgrades');
   var btnCloseStats = document.getElementById('btn-close-stats');
@@ -168,6 +170,10 @@ export function initOverlayControls(): void {
     btnStats.addEventListener('click', function () {
       openOverlay('stats');
     });
+  if (btnSettings)
+    btnSettings.addEventListener('click', function () {
+      openOverlay('settings');
+    });
   var btnHome = document.getElementById('btn-nav-home');
   if (btnHome)
     btnHome.addEventListener('click', function () {
@@ -177,6 +183,8 @@ export function initOverlayControls(): void {
   if (btnCloseUpgrades)
     btnCloseUpgrades.addEventListener('click', closeAllOverlays);
   if (btnCloseStats) btnCloseStats.addEventListener('click', closeAllOverlays);
+  var btnCloseSettings = document.getElementById('btn-close-settings');
+  if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeAllOverlays);
 
   document.querySelectorAll('[data-close-overlay]').forEach(function (el) {
     el.addEventListener('click', closeAllOverlays);
