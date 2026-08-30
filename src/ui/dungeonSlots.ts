@@ -15,7 +15,7 @@ export function renderDungeonSlots(): void {
   var entrance = document.createElement('div');
   entrance.className = 'dungeon-slot entrance';
   entrance.innerHTML =
-    '<span class="slot-icon">🚪</span><span class="slot-label">Masuk</span>';
+    '<span class="slot-icon">🚪</span><span class="slot-label">Entrance</span>';
   wrap.appendChild(entrance);
 
   for (var i = 0; i < state.maxSlotCount; i++) {
@@ -39,7 +39,7 @@ export function renderDungeonSlots(): void {
     if (locked) {
       slotEl.innerHTML =
         indexTag +
-        '<span class="slot-icon">⛏</span><span class="slot-label">Terkunci</span>';
+        '<span class="slot-icon">⛏</span><span class="slot-label">Locked</span>';
     } else if (slotData) {
       var cat = catalogFor(slotData.catalogId, slotData.kind);
       slotEl.innerHTML =
@@ -55,13 +55,13 @@ export function renderDungeonSlots(): void {
           state.dungeon[idx] = null;
           saveState();
           renderAll();
-          showToast((c ? c.name : 'Item') + ' dihapus', 'info');
+          showToast((c ? c.name : 'Item') + ' removed', 'info');
         });
       })(i, cat);
     } else {
       slotEl.innerHTML =
         indexTag +
-        '<span class="slot-icon">·</span><span class="slot-label">Kosong</span>';
+        '<span class="slot-icon">·</span><span class="slot-label">Empty</span>';
       (function (idx) {
         slotEl.addEventListener('click', function () {
           if (runtime.raidInProgress || !runtime.selectedPaletteItem) return;
@@ -73,7 +73,7 @@ export function renderDungeonSlots(): void {
           runtime.selectedPaletteItem = null;
           saveState();
           renderAll();
-          showToast((c ? c.name : 'Item') + ' dipasang', 'success');
+          showToast((c ? c.name : 'Item') + ' placed', 'success');
         });
       })(i);
     }
@@ -97,9 +97,6 @@ export function renderDungeonSlots(): void {
   wrap.appendChild(throne);
 }
 
-// Brief flash effect on a dungeon slot when it's triggered/cleared/killed
-// during a raid. Lives here (not in the battle-card module) since it only
-// ever touches .dungeon-slot elements.
 export function flashSlot(slotEl: Element | null, kind: 'kill' | 'cleared' | 'triggered'): void {
   if (!slotEl) return;
   var cls =
