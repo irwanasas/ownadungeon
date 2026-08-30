@@ -16,8 +16,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     canRage: false,
     trapEvasion: 0.05,
     tags: ['physical', 'tank'],
-    strengths: 'Tahan spike & brute force',
-    weaknesses: 'Lemah vs racun & ethereal'
+    strengths: 'Resists spikes and brute force',
+    weaknesses: 'Weak to poison and ethereal foes'
   },
   {
     id: 'rogue',
@@ -34,8 +34,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     canRage: false,
     trapEvasion: 0.45,
     tags: ['physical', 'agile'],
-    strengths: 'Lolos trap, bunuh archer cepat',
-    weaknesses: 'Rentan vs DEF tinggi & jaring'
+    strengths: 'Evades traps; shreds archers',
+    weaknesses: 'Struggles vs high DEF and nets'
   },
   {
     id: 'berserker',
@@ -55,8 +55,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     rageHealFraction: 0.12,
     trapEvasion: 0,
     tags: ['physical', 'rage'],
-    strengths: 'Takut-immune, hancurkan tank',
-    weaknesses: 'Net menunda RAGE; rawan DOT'
+    strengths: 'Fear-immune; smashes tanks',
+    weaknesses: 'Nets delay RAGE; vulnerable to DoT'
   },
   {
     id: 'mage',
@@ -74,8 +74,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     trapEvasion: 0.1,
     magicAtk: true,
     tags: ['magic', 'ranged'],
-    strengths: 'Abaikan sebagian DEF; kuat vs slime/shade',
-    weaknesses: 'HP tipis; rawan spike & brute'
+    strengths: 'Ignores some DEF; strong vs slime/shade',
+    weaknesses: 'Fragile HP; weak to spikes and brutes'
   },
   {
     id: 'paladin',
@@ -93,8 +93,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     trapEvasion: 0.08,
     holy: true,
     tags: ['physical', 'holy', 'tank'],
-    strengths: 'Holy vs undead/shade; tahan fear',
-    weaknesses: 'Lambat vs agile; poison residual'
+    strengths: 'Holy vs undead/shade; resists fear',
+    weaknesses: 'Slow vs agile foes; residual poison'
   }
 ];
 
@@ -109,6 +109,9 @@ export const NAME_POOL: string[] = [
   'Marrow the Grim',
   'Petra Loam',
   'Osric Hale',
-  'Lyra Quill',
-  'Thane Rook'
+  'Lira Quill',
+  'Tamsin Reed',
+  'Cedric Moss',
+  'Vesper Grey',
+  'Alden Crowe'
 ];
