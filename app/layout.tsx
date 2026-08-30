@@ -6,6 +6,7 @@ import './styles/components.css';
 import './styles/raid.css';
 import './styles/battle.css';
 import './styles/preview.css';
+import './styles/isometric.css';
 
 export const metadata: Metadata = {
   title: 'MVP - Own a Dungeon'

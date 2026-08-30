@@ -99,11 +99,15 @@ export default function GameApp() {
                 Entrance
               </div>
               <div id="room-chamber" className="room-chamber">
-                <div id="room-door" className="room-door" aria-hidden="true">
-                  <div className="room-door-panel"></div>
-                  <div className="room-door-frame"></div>
-                </div>
                 <div className="room-floor">
+                  {/* Isometric diamond tile grid (src/animation/roomStage.ts)
+                      is injected here at runtime as #room-iso-floor, so
+                      every entity below shares one coordinate space
+                      (src/animation/isoGrid.ts). */}
+                  <div id="room-door" className="room-door" aria-hidden="true">
+                    <div className="room-door-panel"></div>
+                    <div className="room-door-frame"></div>
+                  </div>
                   <div id="room-content" className="room-content">
                     <span className="room-content-icon">🚪</span>
                     <span className="room-content-label">Dungeon Mouth</span>

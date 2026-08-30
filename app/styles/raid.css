@@ -48,33 +48,9 @@
   padding-top: 8px;
 }
 
-.hero-token {
-  position: absolute;
-  top: 4px;
-  left: 0;
-  z-index: 5;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-50%);
-  transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
-}
-
-.hero-token.no-motion {
-  transition: none;
-}
-
-.hero-token.is-visible {
-  opacity: 1;
-}
-
 .hero-token-face {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,7 +58,7 @@
   border: 2px solid var(--ember-bright);
   background: var(--panel-raised);
   box-shadow: 0 0 12px rgba(230, 122, 74, 0.35);
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .hero-token.is-panic .hero-token-face {
@@ -94,11 +70,6 @@
   border-color: var(--ember-bright);
   box-shadow: 0 0 16px rgba(230, 122, 74, 0.55);
   animation: token-rage-pulse 0.75s ease-in-out infinite;
-}
-
-.hero-token.is-flee {
-  opacity: 0;
-  transition: left 0.5s ease, opacity 0.5s ease;
 }
 
 .hero-token.is-dead .hero-token-face {
@@ -178,61 +149,6 @@
     0 0 12px rgba(216, 170, 77, 0.2);
 }
 
-.room-door {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
-
-.room-door-panel {
-  position: relative;
-  width: 42%;
-  max-width: 120px;
-  margin: 10% 0;
-  border: 2px solid var(--border-bright);
-  border-radius: 4px 4px 2px 2px;
-  background:
-    linear-gradient(90deg, rgba(60, 49, 34, 0.95), rgba(36, 29, 21, 0.98));
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
-  transform-origin: left center;
-  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
-}
-
-.room-door-panel::after {
-  content: '';
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  transform: translateY(-50%);
-  opacity: 0.7;
-}
-
-.room-door.is-open .room-door-panel {
-  transform: perspective(400px) rotateY(-72deg);
-  opacity: 0.35;
-}
-
-.room-floor {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  padding: 16px 12px 20px;
-  gap: 10px;
-}
-
 .room-content {
   display: flex;
   flex-direction: column;
@@ -263,29 +179,6 @@
 
 .room-chamber.is-empty .room-content-icon {
   opacity: 0.45;
-}
-
-.room-stage .hero-token {
-  position: relative;
-  top: auto;
-  left: auto;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.room-stage .hero-token.is-visible {
-  opacity: 0;
-}
-
-.room-stage .hero-token.is-visible.is-entering {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.room-stage .hero-token.is-flee {
-  opacity: 0;
-  transform: translateY(8px) scale(0.9);
 }
 
 .dungeon-runway.is-room-mode .dungeon-slots {
@@ -324,9 +217,5 @@
 
   .room-content-icon {
     font-size: 30px;
-  }
-
-  .room-door-panel {
-    width: 48%;
   }
 }

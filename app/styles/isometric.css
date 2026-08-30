@@ -1,0 +1,141 @@
+/* Isometric raid battlefield presentation (MVP): diamond tile grid, an
+   iso-oriented door, and percentage-positioned entities — all sharing the
+   0..300 / 0..150 logical space defined in src/animation/isoGrid.ts. No
+   art assets, no 3D: pure CSS/SVG geometric placeholders. */
+
+/* Deliberately no fixed aspect-ratio here: .room-chamber already sizes
+   .room-floor via the responsive min-height rules in battle.css. The SVG
+   floor uses preserveAspectRatio="none" and every entity is positioned as
+   a percentage of this exact same box, so alignment holds regardless of
+   the box's actual aspect ratio — only the tiles' diamond shape gets
+   slightly stretched/squished on unusual viewport shapes, which is a
+   cosmetic MVP tradeoff, not a functional one. */
+.room-floor {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.room-iso-floor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.iso-floor-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.iso-tile {
+  fill: rgba(60, 49, 34, 0.4);
+  stroke: rgba(216, 170, 77, 0.22);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.iso-tile--alt {
+  fill: rgba(60, 49, 34, 0.58);
+}
+
+.room-chamber.is-throne .iso-tile {
+  stroke: rgba(216, 170, 77, 0.4);
+}
+
+/* Encounter marker (trap/monster/treasure/King icon) — anchored so its
+   base sits on the tile point, like a standee. */
+.room-content {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+  transition: left 0.4s ease, top 0.4s ease;
+}
+
+/* Door: a small parallelogram laid flat on the floor plane, rotated to
+   align with the isometric grid's down-right edge direction
+   (atan2(TILE_HEIGHT/2, TILE_WIDTH/2) ≈ 26.565deg), sitting at the
+   Entrance tile. Opens by collapsing along its own length rather than the
+   old flat rotateY() swing. */
+.room-door {
+  position: absolute;
+  width: 46px;
+  height: 13px;
+  transform: translate(-50%, -50%) rotate(-26.565deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.room-door-panel {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--gold);
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(216, 170, 77, 0.55), rgba(192, 71, 43, 0.5));
+  box-shadow: 0 0 8px rgba(216, 170, 77, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.room-door.is-open .room-door-panel {
+  transform: scaleX(0.08);
+  opacity: 0.3;
+}
+
+/* Hero token: lives in the same tile space as the floor/door/content.
+   heroToken.ts sets left/top as percentages of this space per tile hop;
+   the transition below is what makes each hop read as a smooth step
+   rather than a teleport. */
+.hero-token {
+  position: absolute;
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.hero-token.no-motion {
+  transition: opacity 0.25s ease;
+}
+
+.hero-token.is-visible {
+  opacity: 1;
+}
+
+.hero-token.is-flee {
+  opacity: 0;
+  transition: left 0.5s ease, top 0.5s ease, opacity 0.5s ease;
+}
+
+.hero-token.is-entering .hero-token-face {
+  animation: hero-step-bounce 0.4s ease;
+}
+
+@keyframes hero-step-bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+@media (max-width: 400px) {
+  .hero-token {
+    width: 28px;
+    height: 28px;
+  }
+
+  .room-door {
+    width: 38px;
+    height: 11px;
+  }
+}

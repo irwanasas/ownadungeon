@@ -12,7 +12,8 @@ import { getKingStats } from '../data/king';
 import { beatWait as waitBeat } from '../animation/beatTiming';
 import {
   showHeroToken,
-  hideHeroToken
+  hideHeroToken,
+  walkHeroToExit
 } from '../animation/heroToken';
 import {
   enterRaidRoomMode,
@@ -100,6 +101,7 @@ export async function runRaid(): Promise<void> {
     if (!slot) {
       logLine('Ruang ' + (i + 1) + ' kosong — hanya debu dan gema langkahnya.', 'info');
       await waitBeat('resolve');
+      walkHeroToExit();
       continue;
     }
 
@@ -293,6 +295,7 @@ export async function runRaid(): Promise<void> {
     }
 
     if (slotEl) slotEl.classList.add('raid-cleared');
+    walkHeroToExit();
     await waitBeat('betweenRooms');
   }
 
@@ -383,6 +386,8 @@ export async function runRaid(): Promise<void> {
       flashSlot(throneEl, 'kill');
       triggerDeath(hero);
       dungeonWin = true;
+    } else {
+      walkHeroToExit();
     }
   }
 
