@@ -7,16 +7,18 @@ Idle dungeon management — desain perangkap & monster, tekan **Raid**, lalu ton
 - **Stack:** Next.js App Router (TypeScript), CSS modular, game logic vanilla di `src/`
 - **Live:** https://irwanasas.github.io/ownadungeon/
 - **Persistensi:** `localStorage` (client-side only)
+- **Bahasa UI:** seluruh teks in-game (label, toast, log, nama hero/monster/trap) sudah di-i18n penuh ke **English**. README ini sendiri tetap ditulis dalam Bahasa Indonesia sebagai dokumentasi dev.
 
 ---
 
 ## Cara main
 
-1. Buka **Gudang** → pasang trap / monster ke slot ruangan.
-2. Lihat **Encounter Preview** (isi tiap room + Throne).
+1. Panel **Enemy Detected** (`#room-preview`) langsung menampilkan hero yang akan menyerang **sebelum** kamu menekan PLAY — nama, stat, strengths/weaknesses, trait, plus hint matchup per ruang berdasarkan layout dungeon saat ini.
+2. Buka **Armory** (dulu "Gudang") → pasang trap / monster ke slot ruangan untuk melawan hero itu.
 3. Tekan **Raid** (tombol ▶).
-4. Hero random masuk **pintu per ruang**: pintu buka → enter → encounter → resolve → next → **Throne / King**.
+4. Hero masuk **pintu per ruang**: pintu buka → enter → encounter → resolve → next → **Throne / King**. Begitu masuk Ruang 1, panel Enemy Detected beralih jadi battle card compact (HP bar + reaksi kontekstual).
 5. Gold & Souls → **Upgrade** level item, unlock konten baru, naikkan King.
+6. **Settings** (bottom nav, dulu "Reset") → pilihan bahasa (saat ini English-only) dan tombol Reset Game di Danger Zone.
 
 Mode: **Stage** (1–50) atau **Arcade** (wave tak terbatas).
 
@@ -74,8 +76,8 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 ### UI
 
 - Satu layar (mobile-first), tanpa scroll utama.
-- Overlay: Gudang, Upgrade, Stats (swipe / keyboard).
-- Panel `#room-preview` gabungan (encounter preview, intro hero, battle card) — lihat [Battle UX: panel gabungan & reaksi kontekstual](#battle-ux-panel-gabungan--reaksi-kontekstual) di bawah.
+- Overlay: Armory, Upgrades, Stats, **Settings** (swipe / keyboard) — Settings menggantikan tombol Reset langsung di bottom nav; Reset Game sekarang ada di dalam Settings → Danger Zone.
+- Panel `#room-preview` gabungan (Enemy Detected pre-raid, battle card saat combat) — lihat [Battle UX: panel gabungan & reaksi kontekstual](#battle-ux-panel-gabungan--reaksi-kontekstual) di bawah.
 - Log naratif (hybrid cerita + angka, pacing ber-jitter) — selalu terlihat penuh selama raid, tidak pernah tertutup/terpotong UI lain.
 - Offline summary saat kembali ke game.
 
@@ -83,15 +85,19 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 
 ## Battle UX: panel gabungan & reaksi kontekstual
 
-Dulu ada dua elemen terpisah — `#hero-card` (status hero selama combat) dan `#room-preview` (preview dungeon sebelum PLAY). Keduanya sekarang **digabung jadi satu panel** (`src/ui/roomPreview.ts`), yang berganti mode lewat class modifier di elemen yang sama:
+Dulu ada dua elemen terpisah — `#hero-card` (status hero selama combat) dan `#room-preview` (preview komposisi dungeon sebelum PLAY, dengan hero cuma diketahui random saat raid mulai). Keduanya sekarang **digabung jadi satu panel** (`src/ui/roomPreview.ts` + `src/ui/battleReaction.ts`), dan hero yang akan menyerang sekarang **sudah ditentukan dan ditampilkan sebelum PLAY**, bukan lagi cuma di-reveal begitu raid dimulai:
+
+- **`ensurePendingHero()` / `takePendingHero()`** (`src/combat/hero.ts`) — begitu panel di-render (idle, belum raid), sebuah hero "pending" di-roll sekali dan disimpan di `runtime.pendingHero` (`RuntimeState`, `src/types.ts`). Panel Enemy Detected menampilkan hero *itu juga*, bukan preview generik — jadi hero yang kamu lihat sebelum PLAY adalah hero yang benar-benar akan menyerang. `takePendingHero()` dipanggil sekali saat raid benar-benar dimulai (`combat/raid.ts`) untuk "mengambil" hero yang sama, lalu slot pending dikosongkan lagi untuk raid berikutnya.
+- Pending hero di-reset (`clearPendingHero()`) saat ganti mode Stage/Arcade atau saat Reset Game, supaya tidak ada hero pending yang salah konteks nyangkut ke mode lain.
+
+Panel berganti mode lewat class modifier di elemen yang sama:
 
 | Mode | Kapan | Isi |
 |---|---|---|
-| *(default)* | Sebelum raid / sedang menyusun dungeon | Encounter Preview — komposisi tiap ruang, matchup jika ada preview-hero dipilih |
-| `.room-preview--intro` | Hero sudah diketahui, sebelum masuk Ruang 1 | **Musuh Terdeteksi**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, dan trait/ability (Fear-immune, Bisa RAGE, Evasion trap %, Magic ATK, Holy) |
+| `.room-preview--intro` | Idle (sebelum PLAY) **dan** saat entrance-beat awal raid | **Enemy Detected**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, trait/ability (Fear Immune, RAGE, Trap Evasion, Magic ATK, Holy), plus hint matchup ringkas per ruang (`R1`, `R2`, dst.) berdasarkan isi dungeon saat ini vs hero yang sudah diketahui |
 | `.room-preview--battle` | Sejak hero masuk Ruang 1 sampai raid selesai | Kartu compact: icon, nama, HP bar, dan **reaksi kontekstual** — **tidak ada** teks strengths/weaknesses lagi |
 
-**Kenapa dipisah begini:** strengths/weaknesses/traits (jawaban puzzle-nya) cuma muncul sekali, di fase intro, sebelum combat dimulai. Begitu combat berjalan, panel beralih total ke reaksi — supaya combat tetap "readable" tanpa mengulang-ulang jawaban puzzle di tengah pertarungan (`ReactionKind` di `src/types.ts`):
+**Kenapa dipisah begini:** strengths/weaknesses/traits/matchup-hint (jawaban puzzle-nya) selalu terlihat sebelum & saat entrance — sengaja, supaya player bisa menyusun ulang layout sebelum PLAY. Begitu combat benar-benar berjalan (Ruang 1+), panel beralih total ke reaksi — supaya combat tetap "readable" tanpa mengulang-ulang jawaban puzzle di tengah pertarungan (`ReactionKind` di `src/types.ts`):
 
 - **PANIK** — HP hero ≤35% (kecuali sedang RAGE).
 - **RAGE** — Berserker memicu RAGE-nya.
@@ -100,7 +106,9 @@ Dulu ada dua elemen terpisah — `#hero-card` (status hero selama combat) dan `#
 - **SAKIT!** — hero baru kena hit (trap, monster, atau King) yang tidak memicu reaksi lain.
 - **TERKEJUT** — ancaman ruang baru saja terungkap (trap berkilau, bayangan monster bergerak, Raja bangkit dari singgasana).
 
-Setelah raid selesai, panel otomatis kembali ke mode Encounter Preview lewat `renderRoomPreview()`.
+(Label reaksi ini masih dalam Bahasa Indonesia — belum ikut ke-i18n saat UI lain dipindah ke English.)
+
+Setelah raid selesai, panel otomatis kembali ke mode Enemy Detected lewat `renderRoomPreview()`, sekaligus me-roll pending hero berikutnya.
 
 ### Raid log: selalu terlihat, tidak pernah ketutup
 
@@ -149,7 +157,7 @@ Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terla
 | 26 | Shadow Wraith | Aura takut — efektif ke semua kelas kecuali Berserker & Paladin (fear-immune) |
 | 32 | Ruang ke-5 | Perluasan dungeon terakhir, membuka layout 5-ruang penuh |
 
-Setiap stage unlock (3, 8, 12, 14, 17, 21, 26, 32) hanya membuka **kesempatan membeli** item itu di panel Peningkatan (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.
+Setiap stage unlock (3, 8, 12, 14, 17, 21, 26, 32) hanya membuka **kesempatan membeli** item itu di panel Upgrades (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.
 
 ### Roster hero: dari 2 kelas ke 5 kelas
 
@@ -180,7 +188,7 @@ src/
   economy/           # unlock, level cost, rewards
   combat/            # hero, raid, difficultyResolver
   animation/         # roomStage, heroToken, beatTiming
-  ui/                # overlays, palette, roomPreview, hud, …
+  ui/                # overlays, palette, roomPreview, battleReaction, hud, …
   core/              # reset, offline, event wiring
 ```
 
