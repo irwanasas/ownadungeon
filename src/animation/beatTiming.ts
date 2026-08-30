@@ -24,11 +24,19 @@ const STAGE_BEAT: Record<BeatKey, number> & { jitter: number } = {
   jitter: 0.3
 };
 
-export function beatWait(key: BeatKey): Promise<void> {
+// Jittered duration for a beat, without waiting on it. Split out of
+// beatWait() so presentation code that needs to *budget* an animation
+// (e.g. the isometric hero walk) can reuse the exact same timing numbers
+// as the beat it's running alongside, instead of inventing new constants.
+export function beatMs(key: BeatKey): number {
   var base = (STAGE_BEAT && STAGE_BEAT[key]) || 500;
   var j = (STAGE_BEAT && STAGE_BEAT.jitter) || 0.25;
   var factor = 1 + (Math.random() * 2 - 1) * j;
-  var ms = Math.max(120, Math.round(base * factor));
+  return Math.max(120, Math.round(base * factor));
+}
+
+export function beatWait(key: BeatKey): Promise<void> {
+  var ms = beatMs(key);
   return new Promise(function (r) {
     setTimeout(r, ms);
   });

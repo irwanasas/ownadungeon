@@ -1,40 +1,60 @@
-// Moves the hero token sprite along the dungeon runway and keeps its
+// Moves the hero token across the isometric room grid and keeps its
 // visual state (idle/panic/rage/flee/dead) in sync during a raid.
 import { getHeroIcon } from '../ui/heroIcon';
+import {
+  ENTRANCE_TILE,
+  ENCOUNTER_TILE,
+  EXIT_TILE,
+  VIEW_W,
+  VIEW_H,
+  toScreenCoords,
+  depthKey,
+  tilePath,
+  type Tile
+} from './isoGrid';
+import { beatMs } from './beatTiming';
 import type { Hero } from '../types';
 
-interface RunwayEls {
-  runway: HTMLElement | null;
-  token: HTMLElement | null;
-  slots: HTMLElement | null;
+const WALK_STEPS = 3;
+const TOKEN_Z_BASE = 100;
+
+let currentTile: Tile = ENTRANCE_TILE;
+let walkToken = 0;
+
+function getToken(): HTMLElement | null {
+  return document.getElementById('hero-token');
 }
 
-function getRunwayEls(): RunwayEls {
-  return {
-    runway: document.getElementById('dungeon-runway'),
-    token: document.getElementById('hero-token'),
-    slots: document.getElementById('dungeon-slots')
-  };
+function setTokenTile(tile: Tile): void {
+  var token = getToken();
+  currentTile = tile;
+  if (!token) return;
+  var p = toScreenCoords(tile.x, tile.y, tile.z || 0);
+  token.style.left = (p.x / VIEW_W) * 100 + '%';
+  token.style.top = (p.y / VIEW_H) * 100 + '%';
+  token.style.zIndex = String(TOKEN_Z_BASE + depthKey(tile.x, tile.y));
 }
 
 export function showHeroToken(hero: Hero): void {
-  var els = getRunwayEls();
-  if (!els.token || !els.runway) return;
+  var token = getToken();
+  var runway = document.getElementById('dungeon-runway');
+  if (!token || !runway) return;
 
-  var inner = els.token.querySelector('.hero-token-face');
+  var inner = token.querySelector('.hero-token-face');
   if (inner) {
     inner.textContent = getHeroIcon(hero);
   }
 
-  els.token.classList.add('is-visible');
-  els.token.classList.remove('is-flee', 'is-dead', 'is-entering');
-  els.runway.classList.add('is-raiding');
+  token.classList.add('is-visible');
+  token.classList.remove('is-flee', 'is-dead', 'is-entering');
+  runway.classList.add('is-raiding');
 }
 
 export function hideHeroToken(): void {
-  var els = getRunwayEls();
-  if (!els.token || !els.runway) return;
-  els.token.classList.remove(
+  var token = getToken();
+  var runway = document.getElementById('dungeon-runway');
+  if (!token || !runway) return;
+  token.classList.remove(
     'is-visible',
     'is-panic',
     'is-rage',
@@ -42,15 +62,16 @@ export function hideHeroToken(): void {
     'is-dead',
     'is-entering'
   );
-  els.token.style.left = '';
-  els.runway.classList.remove('is-raiding', 'is-room-mode');
+  token.style.left = '';
+  token.style.top = '';
+  runway.classList.remove('is-raiding', 'is-room-mode');
   var app = document.querySelector('.app');
   if (app) app.classList.remove('battle-active');
   document.body.classList.remove('battle-active');
 }
 
 export function syncHeroTokenVisual(hero: Hero | null): void {
-  var token = document.getElementById('hero-token');
+  var token = getToken();
   if (!token || !hero) return;
 
   token.classList.remove('is-panic', 'is-rage', 'is-flee', 'is-dead');
@@ -65,97 +86,58 @@ export function syncHeroTokenVisual(hero: Hero | null): void {
   }
 }
 
-function slotCenterLeft(slotEl: Element | null, runway: HTMLElement | null): number {
-  if (!slotEl || !runway) return 0;
-  var sr = slotEl.getBoundingClientRect();
-  var rr = runway.getBoundingClientRect();
-  return sr.left - rr.left + sr.width / 2;
-}
-
-function setHeroLeft(px: number): void {
-  var token = document.getElementById('hero-token');
-  if (!token) return;
-  token.style.left = Math.round(px) + 'px';
-}
-
-function repositionHeroOver(slotEl: Element | null, instant: boolean): void {
-  var els = getRunwayEls();
-  if (!els.runway || !slotEl) return;
-
-  if (instant && els.token) {
-    els.token.classList.add('no-motion');
+// Instant reset to the room's Entrance tile — called at the start of every
+// room (and the initial "Mulut Dungeon" entrance) before the door-enter
+// sequence runs, so each room's walk always starts from the same place.
+export function placeHeroAtEntrance(): void {
+  const token = getToken();
+  walkToken++; // cancel any in-flight walk
+  if (!token) {
+    setTokenTile(ENTRANCE_TILE);
+    return;
   }
+  token.classList.add('no-motion');
+  setTokenTile(ENTRANCE_TILE);
+  requestAnimationFrame(function () {
+    token.classList.remove('no-motion');
+  });
+}
 
-  try {
-    slotEl.scrollIntoView({
-      inline: 'center',
-      behavior: instant ? 'auto' : 'smooth',
-      block: 'nearest'
+async function walk(path: Tile[], totalMs: number): Promise<void> {
+  var myToken = ++walkToken;
+  var legMs = Math.max(60, Math.round(totalMs / Math.max(1, path.length - 1)));
+  for (var i = 1; i < path.length; i++) {
+    if (myToken !== walkToken) return; // superseded by a newer walk/reset
+    setTokenTile(path[i]);
+    await new Promise<void>(function (r) {
+      setTimeout(r, legMs);
     });
-  } catch (e) {}
-
-  var apply = function () {
-    setHeroLeft(slotCenterLeft(slotEl, els.runway));
-    if (els.token) els.token.classList.remove('no-motion');
-  };
-
-  if (instant) {
-    requestAnimationFrame(apply);
-  } else {
-    requestAnimationFrame(function () {
-      requestAnimationFrame(apply);
-    });
-    setTimeout(apply, 320);
   }
 }
 
-export function moveHeroToEntrance(instant?: boolean): void {
-  var els = getRunwayEls();
-  if (!els.runway || !els.slots) return;
-  var entrance = els.slots.querySelector('.dungeon-slot.entrance');
-  if (entrance) {
-    repositionHeroOver(entrance, !!instant);
-  } else {
-    setHeroLeft(48);
-  }
+// Tile-by-tile walk from the Entrance to the room's encounter tile. Fired
+// (not awaited) from roomStage.ts's heroEnterRoom(), budgeted off the same
+// 'arriveRoom' beat duration that playDoorEnterSequence() awaits — so the
+// visual walk and the raid's own pacing finish at roughly the same time
+// without adding any new awaits to the raid flow itself.
+export function walkHeroToEncounter(): void {
+  var path = tilePath(ENTRANCE_TILE, ENCOUNTER_TILE, WALK_STEPS);
+  void walk(path, beatMs('arriveRoom'));
 }
 
-export function moveHeroToSlot(index: number, instant?: boolean): void {
-  var slotEl = document.querySelector('.dungeon-slot[data-index="' + index + '"]');
-  if (!slotEl) return;
-  repositionHeroOver(slotEl, !!instant);
-}
-
-export function moveHeroToThrone(instant?: boolean): void {
-  var slotEl = document.querySelector('.dungeon-slot.throne-room');
-  if (!slotEl) return;
-  repositionHeroOver(slotEl, !!instant);
-}
-
-export function refreshHeroTokenPosition(): void {
-  var token = document.getElementById('hero-token');
-  if (!token || !token.classList.contains('is-visible')) return;
-  var active = document.querySelector('.dungeon-slot.raid-active');
-  if (active) {
-    repositionHeroOver(active, true);
-  } else {
-    moveHeroToEntrance(true);
-  }
+// Tile-by-tile walk from the encounter tile out to the Exit (far/top)
+// corner, toward the next room. Fired the same fire-and-forget way,
+// budgeted off 'betweenRooms' (Stage/Arcade room loop) — raid.ts calls
+// this immediately before its existing `await waitBeat('betweenRooms')`.
+export function walkHeroToExit(): void {
+  var path = tilePath(ENCOUNTER_TILE, EXIT_TILE, WALK_STEPS);
+  void walk(path, beatMs('betweenRooms'));
 }
 
 export function resetStageView(): void {
   hideHeroToken();
+  placeHeroAtEntrance();
   document.querySelectorAll('.dungeon-slot').forEach(function (s) {
     s.classList.remove('raid-active', 'raid-cleared', 'slot-triggered', 'slot-kill');
   });
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener(
-    'resize',
-    function () {
-      refreshHeroTokenPosition();
-    },
-    { passive: true }
-  );
 }
