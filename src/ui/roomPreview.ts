@@ -1,5 +1,5 @@
 // #room-preview has two live modes + one idle mode:
-//   (default / --intro)  — Musuh Terdeteksi: invading hero is known BEFORE
+//   (default / --intro)  — Enemy Detected: invading hero is known BEFORE
 //                          PLAY so the player can counter-place traps/monsters.
 //   .room-preview--battle — compact live card once Room 1 starts (HP/reaction).
 // After raid ends, intro is restored with the next pending invader.
@@ -68,13 +68,13 @@ function layoutMatchupHints(hero: Hero): string {
     var tip =
       label === 'strong'
         ? slot.kind === 'trap'
-          ? 'berbahaya'
-          : 'hero unggul'
+          ? 'dangerous'
+          : 'hero favored'
         : label === 'weak'
           ? slot.kind === 'trap'
-            ? 'lemah'
-            : 'hero kesulitan'
-          : 'netral';
+            ? 'weak'
+            : 'hero struggles'
+          : 'neutral';
     bits.push(
       '<span class="preview-matchup preview-matchup--' +
         label +
@@ -88,14 +88,14 @@ function layoutMatchupHints(hero: Hero): string {
     );
   }
   if (!bits.length) {
-    return '<p class="preview-hint">Pasang trap/monster di Gudang agar matchup terlihat di sini.</p>';
+    return '<p class="preview-hint">Place traps/monsters in the Armory to see matchups here.</p>';
   }
   return '<div class="preview-layout-hints">' + bits.join(' ') + '</div>';
 }
 
 function heroIntroHtml(hero: Hero, hint: string): string {
   return (
-    '<div class="preview-header"><span class="preview-title">Musuh Terdeteksi</span></div>' +
+    '<div class="preview-header"><span class="preview-title">Enemy Detected</span></div>' +
     '<div class="hero-intro">' +
     '<span class="hero-intro-icon">' +
     hero.icon +
@@ -137,7 +137,6 @@ function heroIntroHtml(hero: Hero, hint: string): string {
 export function renderRoomPreview(): void {
   var wrap = document.getElementById('room-preview');
   if (!wrap) return;
-  // Only skip while a raid is actively running (battle card owns the panel).
   if (runtime.raidInProgress) return;
 
   var hero = ensurePendingHero();
@@ -145,7 +144,7 @@ export function renderRoomPreview(): void {
   wrap.classList.add('room-preview--intro');
   wrap.innerHTML = heroIntroHtml(
     hero,
-    'Susun trap & monster sesuai kelemahan musuh, lalu tekan Raid.'
+    'Build traps and monsters against this enemy weaknesses, then start the Raid.'
   );
 }
 
@@ -156,7 +155,7 @@ export function showHeroIntro(hero: Hero): void {
   wrap.classList.add('room-preview--intro');
   wrap.innerHTML = heroIntroHtml(
     hero,
-    'Raid dimulai — perhatikan reaksinya begitu pertarungan dimulai.'
+    'Raid started — watch their reactions as the fight begins.'
   );
 }
 
