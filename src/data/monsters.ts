@@ -1,89 +1,78 @@
 import type { MonsterDef, TreasureDef } from '../types';
 
-export const MONSTERS: Record<string, MonsterDef> = {
-  skeleton: {
+export const MONSTERS: MonsterDef[] = [
+  {
     id: 'skeleton',
+    kind: 'monster',
     name: 'Skeleton Archer',
     icon: '\uD83C\uDFF9',
-    kind: 'monster',
-    type: 'ranged',
-    tags: ['undead', 'ranged'],
-    desc: 'Ranged konsisten. Lemah vs gap-close.',
-    baseHp: 30,
-    baseAtk: 9,
-    baseDef: 1,
-    hpPerLevel: 8,
-    atkPerLevel: 2,
-    cost: { gold: 0, souls: 0 }
+    baseHp: 18,
+    hpPerLevel: 4,
+    baseAtk: 5,
+    atkPerLevel: 1,
+    baseDef: 0,
+    desc: 'Steady ranged chip. Weak to gap-closers.',
+    tags: ['ranged', 'undead']
   },
-  goblin: {
+  {
     id: 'goblin',
+    kind: 'monster',
     name: 'Goblin Brute',
     icon: '\uD83D\uDC79',
-    kind: 'monster',
-    type: 'brute',
-    tags: ['physical', 'burst'],
-    desc: 'Burst ATK tinggi, HP rendah.',
-    baseHp: 26,
-    baseAtk: 13,
-    baseDef: 0,
-    hpPerLevel: 7,
-    atkPerLevel: 3,
-    cost: { gold: 40, souls: 0 }
+    baseHp: 22,
+    hpPerLevel: 5,
+    baseAtk: 8,
+    atkPerLevel: 2,
+    baseDef: 1,
+    desc: 'High burst ATK, low HP.',
+    tags: ['physical', 'brute']
   },
-  ogre: {
+  {
     id: 'ogre',
+    kind: 'monster',
     name: 'Bone Ogre',
-    icon: '\uD83E\uDDB4',
-    kind: 'monster',
-    type: 'tank',
-    tags: ['undead', 'tank', 'physical'],
-    desc: 'HP & DEF tinggi. Menguras stamina.',
-    baseHp: 58,
-    baseAtk: 7,
-    baseDef: 4,
-    hpPerLevel: 12,
-    atkPerLevel: 2,
-    cost: { gold: 75, souls: 3 }
-  },
-  slime: {
-    id: 'slime',
-    name: 'Acid Slime',
-    icon: '\uD83D\uDFE2',
-    kind: 'monster',
-    type: 'resist',
-    tags: ['acid', 'resist'],
-    desc: 'Tahan fisik; rentan magic & fire.',
+    icon: '\uD83E\uDDCC',
     baseHp: 40,
+    hpPerLevel: 8,
     baseAtk: 7,
-    baseDef: 5,
-    hpPerLevel: 10,
-    atkPerLevel: 2,
-    physicalResist: 0.3,
-    cost: { gold: 55, souls: 2 }
+    atkPerLevel: 1,
+    baseDef: 4,
+    desc: 'High HP and DEF. Drains stamina.',
+    tags: ['physical', 'tank']
   },
-  shade: {
+  {
+    id: 'slime',
+    kind: 'monster',
+    name: 'Acid Slime',
+    icon: '\uD83D\uDC0A',
+    baseHp: 28,
+    hpPerLevel: 6,
+    baseAtk: 4,
+    atkPerLevel: 1,
+    baseDef: 2,
+    desc: 'Physical resist; weak to magic and fire.',
+    tags: ['physical', 'resist']
+  },
+  {
     id: 'shade',
+    kind: 'monster',
     name: 'Shadow Wraith',
     icon: '\uD83D\uDC7B',
-    kind: 'monster',
-    type: 'ethereal',
-    tags: ['ethereal', 'fear'],
-    desc: 'Ethereal + aura takut. Lemah vs holy/magic.',
-    baseHp: 34,
-    baseAtk: 10,
-    baseDef: 2,
-    hpPerLevel: 9,
+    baseHp: 26,
+    hpPerLevel: 5,
+    baseAtk: 6,
     atkPerLevel: 2,
-    fearAura: 1,
-    cost: { gold: 90, souls: 5 }
+    baseDef: 1,
+    fearAura: true,
+    desc: 'Ethereal with fear aura. Weak to holy/magic.',
+    tags: ['ethereal', 'fear']
   }
-};
+];
 
 export const TREASURE: TreasureDef = {
   id: 'treasure',
+  kind: 'treasure',
   name: 'Treasure Vault',
   icon: '\uD83D\uDCB0',
-  kind: 'treasure',
-  desc: 'Jika hero hidup sampai sini, ia mencuri sebagian reward.'
+  desc: 'If the hero reaches this room alive, they steal some of your reward.'
 };
