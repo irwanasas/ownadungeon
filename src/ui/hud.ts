@@ -1,24 +1,23 @@
-// Top-level HUD: currency readout, mode toggle + status strip, and the
-// renderAll() aggregator that refreshes every panel after a state change.
+// HUD: currencies, mode/stage labels, king strip, and mode switching.
 import { state, saveState } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
-import { clearPendingHero } from '../combat/hero';
-import { getKingStats } from '../data/king';
 import { STAGE_MAX } from '../data/difficulty';
+import { getKingStats } from '../data/king';
+import { clearPendingHero } from '../combat/hero';
 import { showToast } from './toast';
-import { registerRenderAll } from './renderBus';
 import { renderPalette } from './palette';
 import { renderDungeonSlots } from './dungeonSlots';
 import { renderUpgrades } from './upgradesPanel';
 import { renderStats } from './statsPanel';
 import { renderRoomPreview } from './roomPreview';
+import { registerRenderAll } from './renderBus';
 import type { GameMode } from '../types';
 
 export function renderCurrencies(): void {
-  var gold = document.getElementById('gold-value');
-  var souls = document.getElementById('souls-value');
-  if (gold) gold.textContent = String(Math.floor(state.gold));
-  if (souls) souls.textContent = String(Math.floor(state.souls));
+  var goldEl = document.getElementById('gold-value');
+  var soulsEl = document.getElementById('souls-value');
+  if (goldEl) goldEl.textContent = String(state.gold);
+  if (soulsEl) soulsEl.textContent = String(state.souls);
 }
 
 export function renderModeStage(): void {
@@ -73,7 +72,7 @@ export function renderModeStage(): void {
 
 export function setGameMode(mode: GameMode): void {
   if (runtime.raidInProgress) {
-    showToast('Tunggu raid selesai', 'warning');
+    showToast('Wait for the raid to finish', 'warning');
     return;
   }
   if (mode !== 'stage' && mode !== 'arcade') return;
