@@ -393,7 +393,6 @@ export async function runRaid(): Promise<void> {
   setDoorOpen(false);
   exitRaidRoomMode();
   clearPendingHero();
-  renderRoomPreview();
 
   if (hero.hp > 0 && !heroEscape && !heroVictory) {
     logLine(hero.name + ' muncul di pintu keluar — berlumur, tapi hidup.', 'warning');
@@ -475,6 +474,8 @@ export async function runRaid(): Promise<void> {
 
   runtime.raidInProgress = false;
   saveState();
+  // Restore Musuh Terdeteksi for the next invader (pending was cleared above).
+  renderRoomPreview();
   renderAll();
   setTimeout(function () {
     hideHeroToken();
