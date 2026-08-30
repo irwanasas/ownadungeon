@@ -1,78 +1,89 @@
 import type { MonsterDef, TreasureDef } from '../types';
 
-export const MONSTERS: MonsterDef[] = [
-  {
+export const MONSTERS: Record<string, MonsterDef> = {
+  skeleton: {
     id: 'skeleton',
-    kind: 'monster',
     name: 'Skeleton Archer',
     icon: '\uD83C\uDFF9',
-    baseHp: 18,
-    hpPerLevel: 4,
-    baseAtk: 5,
-    atkPerLevel: 1,
-    baseDef: 0,
-    desc: 'Steady ranged chip. Weak to gap-closers.',
-    tags: ['ranged', 'undead']
-  },
-  {
-    id: 'goblin',
     kind: 'monster',
+    type: 'ranged',
+    tags: ['undead', 'ranged'],
+    desc: 'Steady ranged chip. Weak to gap-closers.',
+    baseHp: 30,
+    baseAtk: 9,
+    baseDef: 1,
+    hpPerLevel: 8,
+    atkPerLevel: 2,
+    cost: { gold: 0, souls: 0 }
+  },
+  goblin: {
+    id: 'goblin',
     name: 'Goblin Brute',
     icon: '\uD83D\uDC79',
-    baseHp: 22,
-    hpPerLevel: 5,
-    baseAtk: 8,
-    atkPerLevel: 2,
-    baseDef: 1,
+    kind: 'monster',
+    type: 'brute',
+    tags: ['physical', 'burst'],
     desc: 'High burst ATK, low HP.',
-    tags: ['physical', 'brute']
+    baseHp: 26,
+    baseAtk: 13,
+    baseDef: 0,
+    hpPerLevel: 7,
+    atkPerLevel: 3,
+    cost: { gold: 40, souls: 0 }
   },
-  {
+  ogre: {
     id: 'ogre',
-    kind: 'monster',
     name: 'Bone Ogre',
-    icon: '\uD83E\uDDCC',
-    baseHp: 40,
-    hpPerLevel: 8,
-    baseAtk: 7,
-    atkPerLevel: 1,
-    baseDef: 4,
+    icon: '\uD83E\uDDB4',
+    kind: 'monster',
+    type: 'tank',
+    tags: ['undead', 'tank', 'physical'],
     desc: 'High HP and DEF. Drains stamina.',
-    tags: ['physical', 'tank']
+    baseHp: 58,
+    baseAtk: 7,
+    baseDef: 4,
+    hpPerLevel: 12,
+    atkPerLevel: 2,
+    cost: { gold: 75, souls: 3 }
   },
-  {
+  slime: {
     id: 'slime',
-    kind: 'monster',
     name: 'Acid Slime',
-    icon: '\uD83D\uDC0A',
-    baseHp: 28,
-    hpPerLevel: 6,
-    baseAtk: 4,
-    atkPerLevel: 1,
-    baseDef: 2,
-    desc: 'Physical resist; weak to magic and fire.',
-    tags: ['physical', 'resist']
-  },
-  {
-    id: 'shade',
+    icon: '\uD83D\uDFE2',
     kind: 'monster',
+    type: 'resist',
+    tags: ['acid', 'resist'],
+    desc: 'Physical resist; weak to magic and fire.',
+    baseHp: 40,
+    baseAtk: 7,
+    baseDef: 5,
+    hpPerLevel: 10,
+    atkPerLevel: 2,
+    physicalResist: 0.3,
+    cost: { gold: 55, souls: 2 }
+  },
+  shade: {
+    id: 'shade',
     name: 'Shadow Wraith',
     icon: '\uD83D\uDC7B',
-    baseHp: 26,
-    hpPerLevel: 5,
-    baseAtk: 6,
-    atkPerLevel: 2,
-    baseDef: 1,
-    fearAura: true,
+    kind: 'monster',
+    type: 'ethereal',
+    tags: ['ethereal', 'fear'],
     desc: 'Ethereal with fear aura. Weak to holy/magic.',
-    tags: ['ethereal', 'fear']
+    baseHp: 34,
+    baseAtk: 10,
+    baseDef: 2,
+    hpPerLevel: 9,
+    atkPerLevel: 2,
+    fearAura: 1,
+    cost: { gold: 90, souls: 5 }
   }
-];
+};
 
 export const TREASURE: TreasureDef = {
   id: 'treasure',
-  kind: 'treasure',
   name: 'Treasure Vault',
   icon: '\uD83D\uDCB0',
+  kind: 'treasure',
   desc: 'If the hero reaches this room alive, they steal some of your reward.'
 };
