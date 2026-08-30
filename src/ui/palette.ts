@@ -1,4 +1,4 @@
-// The "Gudang Dungeon" side panel: lists unlocked traps/monsters/treasure
+// The Armory side panel: lists unlocked traps/monsters/treasure
 // and lets the player pick one to place into an empty dungeon slot.
 import { state } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
@@ -30,7 +30,7 @@ export function renderPalette(): void {
 
   if (unlockedTraps.length === 0) {
     trapWrap.innerHTML =
-      '<div class="empty-state">Belum ada trap terbuka.<br>Buka di panel Peningkatan.</div>';
+      '<div class="empty-state">No traps unlocked yet.<br>Unlock them in Upgrades.</div>';
   } else {
     unlockedTraps.forEach(function (item) {
       renderPaletteItem(item, trapWrap);
@@ -39,7 +39,7 @@ export function renderPalette(): void {
 
   if (unlockedMonsters.length === 0) {
     monsterWrap.innerHTML =
-      '<div class="empty-state">Belum ada monster terbuka.<br>Buka di panel Peningkatan.</div>';
+      '<div class="empty-state">No monsters unlocked yet.<br>Unlock them in Upgrades.</div>';
   } else {
     unlockedMonsters.forEach(function (item) {
       renderPaletteItem(item, monsterWrap);
@@ -76,7 +76,7 @@ function renderPaletteItem(item: CatalogItem, wrap: HTMLElement, alwaysUnlocked?
     item.name +
     '</div>' +
     '<div class="palette-item-desc">' +
-    (unlocked ? item.desc : 'Terkunci — buka di panel Peningkatan') +
+    (unlocked ? item.desc : 'Locked — unlock in Upgrades') +
     '</div></div>' +
     (unlocked ? levelTag : '');
 
@@ -89,7 +89,7 @@ function renderPaletteItem(item: CatalogItem, wrap: HTMLElement, alwaysUnlocked?
       renderPalette();
       if (runtime.selectedPaletteItem) {
         closeAllOverlays();
-        showToast(item.name + ' dipilih — klik slot kosong', 'info');
+        showToast(item.name + ' selected — tap an empty slot', 'info');
       }
     };
     div.addEventListener('click', selectItem);
