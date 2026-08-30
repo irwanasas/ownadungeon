@@ -1,5 +1,4 @@
-// The "Selagi Kau Pergi..." modal shown on load when offline progress
-// was simulated.
+// Offline progress modal shown on load when idle gains were simulated.
 import type { OfflineProgressSummary } from '../types';
 
 export function showOfflineModal(summary: OfflineProgressSummary): void {
@@ -7,19 +6,19 @@ export function showOfflineModal(summary: OfflineProgressSummary): void {
   var body = document.getElementById('offline-summary');
   if (!modal || !body) return;
   body.innerHTML =
-    '<p>Kamu pergi selama ~' +
+    '<p>You were away for ~' +
     summary.hours +
-    ' jam.</p>' +
-    '<p>Simulasi offline: <strong>' +
+    ' hours.</p>' +
+    '<p>Offline simulation: <strong>' +
     summary.raids +
-    '</strong> raid.</p>' +
-    '<p>Dungeon menang: <strong>' +
+    '</strong> raids.</p>' +
+    '<p>Dungeon wins: <strong>' +
     summary.wins +
     '</strong></p>' +
-    '<p>Gold didapat: <strong>+' +
+    '<p>Gold earned: <strong>+' +
     summary.gold +
     '</strong></p>' +
-    '<p>Souls didapat: <strong>+' +
+    '<p>Souls earned: <strong>+' +
     summary.souls +
     '</strong></p>';
   modal.classList.remove('modal-overlay--hidden');
