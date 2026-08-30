@@ -2,6 +2,7 @@
 //   (default / --intro)  — Musuh Terdeteksi: invading hero is known BEFORE
 //                          PLAY so the player can counter-place traps/monsters.
 //   .room-preview--battle — compact live card once Room 1 starts (HP/reaction).
+// After raid ends, intro is restored with the next pending invader.
 import { state } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
 import { catalogFor } from '../data/catalog';
@@ -136,8 +137,8 @@ function heroIntroHtml(hero: Hero, hint: string): string {
 export function renderRoomPreview(): void {
   var wrap = document.getElementById('room-preview');
   if (!wrap) return;
+  // Only skip while a raid is actively running (battle card owns the panel).
   if (runtime.raidInProgress) return;
-  if (wrap.classList.contains('room-preview--battle')) return;
 
   var hero = ensurePendingHero();
   resetWrapModifiers(wrap);
