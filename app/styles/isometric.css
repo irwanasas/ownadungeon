@@ -34,7 +34,8 @@
 }
 
 .iso-tile-img {
-  image-rendering: pixelated;
+  opacity: 0.72;
+  mix-blend-mode: soft-light;
 }
 
 /* Real floor texture is now the fill (see roomStage.ts's buildIsoFloorSvg
@@ -42,17 +43,17 @@
    drawn on top, keeping the existing checker/throne-glow stroke look. */
 .iso-tile {
   fill: none;
-  stroke: rgba(216, 170, 77, 0.22);
+  stroke: rgba(140, 170, 200, 0.28);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
 .iso-tile--alt {
-  stroke: rgba(216, 170, 77, 0.32);
+  stroke: rgba(100, 130, 160, 0.22);
 }
 
 .room-chamber.is-throne .iso-tile {
-  stroke: rgba(216, 170, 77, 0.4);
+  stroke: rgba(216, 170, 77, 0.35);
 }
 
 /* Encounter marker (trap/monster/treasure/King icon) — anchored so its
@@ -163,7 +164,7 @@
    width, so a monster is always sized relative to the actual tile grid
    instead of an arbitrary pixel count — this is what keeps monsters from
    reading as "tiny" next to the real tile textures regardless of
-   viewport. Tiers roughly track the Slime -> Goblin Troop/Shaman ->
+   viewport. Tiers roughly track the Spime -> Goblin Troop/Shaman ->
    Goblin Elite -> Orc progression (see monsterSprites.ts) so later,
    tougher monsters visibly look bigger. */
 .monster-token {
