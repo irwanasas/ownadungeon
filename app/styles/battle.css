@@ -26,14 +26,6 @@
   min-height: 0;
 }
 
-/* Vertical space priority during a raid, top to bottom (simpler now that
-   the raid log is gone — it used to reserve a guaranteed floor here that
-   competed with the room chamber for space):
-   1. #room-preview (battle card) — fixed, compact, never shrinks.
-   2. .dungeon-runway (room chamber) — takes essentially all the rest, so
-      the room reads as a real, spacious dungeon space rather than a
-      cramped strip above a text log. */
-
 .app.battle-active #room-preview.room-preview--battle {
   flex-shrink: 0;
   margin-bottom: 6px;
@@ -44,10 +36,6 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* Room-stage below is now a fixed (clamped) height, not a flex-grow
-     child, so any extra vertical space this runway picks up (a very tall
-     viewport, or a short raid-status line) distributes evenly above/below
-     the room instead of stretching it. */
   justify-content: center;
   margin-bottom: 2px;
 }
@@ -58,23 +46,13 @@
   margin-bottom: 4px;
 }
 
-/* Sized to grow noticeably from the pre-expansion clamp(90px, 22vh, 220px)
-   without overshooting the room-floor's own logical aspect ratio (~1.9:1,
-   see isoGrid.ts's derived VIEW_W/VIEW_H) — the floor's *width* is capped
-   by the panel's fixed mobile-first column width regardless of how much
-   vertical space is free. `height` (not min-height) makes the clamp an
-   actual ceiling as well as a floor: room-chamber/room-floor no longer
-   sit on flex:1 (which would grow them to fill all freed space and
-   stretch the diamond tiles into visibly distorted kite shapes), so the
-   isometric look stays proportioned the same way it did pre-expansion,
-   just bigger. */
 .app.battle-active .room-chamber {
   flex: 0 0 auto;
-  height: clamp(195px, 30vh, 260px);
+  height: clamp(260px, 42vh, 380px);
 }
 
 .app.battle-active .room-floor {
-  height: clamp(180px, 28vh, 240px);
+  height: clamp(240px, 40vh, 360px);
 }
 
 .app.battle-active .room-content-icon {
@@ -107,16 +85,13 @@
   }
 }
 
-/* Short viewports (landscape phones, small windows): the chamber still
-   gets the bulk of available height, just scaled down proportionally
-   since there's less of it overall. */
 @media (max-height: 640px) {
   .app.battle-active .room-chamber {
-    height: clamp(140px, 26vh, 210px);
+    height: clamp(200px, 36vh, 280px);
   }
 
   .app.battle-active .room-floor {
-    height: clamp(125px, 24vh, 190px);
+    height: clamp(185px, 34vh, 260px);
   }
 
   .app.battle-active .room-content-icon {
