@@ -144,14 +144,6 @@ export default function GameApp() {
           <div className="stage-controls">
             <span id="raid-status" className="raid-status"></span>
           </div>
-
-          <div className="raid-stage">
-            <div id="raid-log" className="raid-log">
-              <p className="raid-log-placeholder">
-                Check Enemy Detected, place traps and monsters in the Armory, then Raid.
-              </p>
-            </div>
-          </div>
         </section>
       </main>
 

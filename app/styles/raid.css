@@ -40,7 +40,12 @@
 
 .dungeon-runway {
   position: relative;
-  flex-shrink: 0;
+  /* flex:1 (not flex-shrink:0) so this fills whatever vertical space is
+     left in .stage-panel — previously .raid-stage did that job even in
+     the idle (pre-raid) state; now that it's gone, this is the only
+     remaining flexible child, in both idle and battle-active layouts. */
+  flex: 1;
+  min-height: 0;
   margin-bottom: 4px;
 }
 

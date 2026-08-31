@@ -10,13 +10,18 @@
 export const TILE_WIDTH = 64;
 export const TILE_HEIGHT = 32;
 
-// A small, deliberately non-square room grid: wider on Y than X so the
-// Entrance corner (max X, max Y) reads toward the lower-LEFT of the
-// diamond rather than dead-center-bottom, and the walk back to Exit (0,0)
-// reads as moving up and to the right — matching the spec's "door at
-// lower-left" / "progression toward upper-right" framing.
-export const GRID_W = 3; // tileX: 0..GRID_W-1
-export const GRID_H = 4; // tileY: 0..GRID_H-1
+// A deliberately non-square room grid: wider on Y than X so the Entrance
+// corner (max X, max Y) reads toward the lower-LEFT of the diamond rather
+// than dead-center-bottom, and the walk back to Exit (0,0) reads as
+// moving up and to the right — matching the spec's "door at lower-left" /
+// "progression toward upper-right" framing. Bumped from the original 3x4
+// to 4x5 (12 -> 20 tiles) to make the raid room read as a genuinely
+// bigger, more spacious dungeon space instead of a cramped strip — see
+// app/styles/battle.css's room-chamber/room-floor sizing, which was
+// expanded to match now that the raid log no longer reserves a
+// competing chunk of vertical space.
+export const GRID_W = 4; // tileX: 0..GRID_W-1
+export const GRID_H = 5; // tileY: 0..GRID_H-1
 
 export interface Tile {
   x: number;
@@ -32,10 +37,25 @@ export const ENCOUNTER_TILE: Tile = { x: 1, y: Math.floor(GRID_H / 2), z: 0 };
 // floor both work in this space, so the isometric room scales cleanly to
 // any on-screen chamber size via the SVG's own viewBox scaling — no need
 // to measure real pixel dimensions in JS.
-export const VIEW_W = 300;
-export const VIEW_H = 150;
-export const ORIGIN_X = 150;
-export const ORIGIN_Y = 18;
+//
+// Derived from GRID_W/GRID_H (rather than hand-picked magic numbers) so
+// the viewBox always exactly bounds the diamond for whatever grid size is
+// configured above, with PAD_X/PAD_Y of breathing room on each edge for
+// the door sprite and standee entities that extend past a tile's own
+// footprint. See the corner-math in the isoGrid module comment above:
+// with hw = TILE_WIDTH/2 and hh = TILE_HEIGHT/2, the diamond's leftmost/
+// topmost point is at originX - GRID_H*hw / originY - hh, and its
+// rightmost/bottommost point is at originX + GRID_W*hw / originY +
+// (GRID_W+GRID_H-1)*hh — solving both edges for a symmetric PAD gives
+// the formulas below.
+const PAD_X = 24;
+const PAD_Y = 16;
+const HW = TILE_WIDTH / 2;
+const HH = TILE_HEIGHT / 2;
+export const ORIGIN_X = PAD_X + GRID_H * HW;
+export const ORIGIN_Y = PAD_Y + HH;
+export const VIEW_W = 2 * PAD_X + (GRID_W + GRID_H) * HW;
+export const VIEW_H = 2 * PAD_Y + (GRID_W + GRID_H) * HH;
 
 export interface ScreenPoint {
   x: number;

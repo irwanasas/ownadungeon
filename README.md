@@ -112,15 +112,15 @@ Panel berganti mode lewat class modifier di elemen yang sama:
 
 Setelah raid selesai, panel otomatis kembali ke mode Enemy Detected lewat `renderRoomPreview()`, sekaligus me-roll pending hero berikutnya.
 
-### Raid log: selalu terlihat, tidak pernah ketutup
+### Room/chamber: diperbesar, tanpa raid log
 
-Layout `.raid-stage` selama battle sekarang cuma berisi `#raid-log` (dulu berbagi ruang dengan `#hero-card`). Prioritas ruang vertikal saat raid berlangsung (`app/styles/battle.css`):
+Raid log (narasi teks per-beat) sudah **dihapus total** — dari markup (`#raid-log`/`.raid-stage`), dari `src/ui/raidLog.ts` (dihapus), dan dari setiap `logLine()` call di `src/combat/raid.ts`. Kombat sekarang murni visual: sprite hero/monster, HP bar di battle card (`#room-preview`), dan reaksi kontekstual (PANIK/RAGE/dll., lihat bagian di atas) — tidak ada lagi feed teks.
 
-1. `#room-preview` (battle card) — ukuran tetap, kecil, tidak pernah menyusut.
-2. `.raid-stage` / `#raid-log` — **punya `min-height` sebagai lantai keras** (140px normal, turun bertahap ke 100px di viewport pendek), dijamin selalu dapat ruang.
-3. `.dungeon-runway` (room chamber) — satu-satunya elemen yang boleh menyusut duluan lewat `flex-shrink` saat viewport sempit.
+Ruang vertikal yang dulu dipakai raid log sekarang dipakai buat memperbesar room chamber itu sendiri:
 
-Karena `min-height` di flexbox tidak bisa dilanggar oleh `flex-shrink`, log dijamin tidak pernah terpotong — yang mengalah adalah chamber ruang di atasnya. Ditambah breakpoint `@media (max-height: 640px)` dan `(max-height: 520px)` untuk viewport pendek (mis. landscape phone), serta `position: relative; z-index: 1` di `.raid-log` supaya tidak ada elemen lain yang bisa menimpanya.
+- Grid isometrik naik dari 3×4 (12 tile) ke **4×5 (20 tile)** — `GRID_W`/`GRID_H` di `src/animation/isoGrid.ts`. `VIEW_W`/`VIEW_H`/`ORIGIN_X`/`ORIGIN_Y` sekarang **diturunkan dari rumus** (bukan angka hardcode), jadi ukuran grid bisa diubah lagi ke depannya tanpa perlu re-tuning manual.
+- `.room-chamber`/`.room-floor` (`app/styles/battle.css`) pakai `height: clamp(...)` (bukan `min-height`) supaya benar-benar dibatasi, bukan cuma dikasih lantai — dipertahankan mendekati rasio aspek asli grid (~1.9:1) supaya diamond tile-nya tidak melar jadi bentuk layang-layang saat ruang vertikal ekstra tersedia.
+- `--tile-w-pct` di `app/styles/isometric.css` (dipakai monster-token buat scaling proporsional ke ukuran tile) ikut disesuaikan ke rasio `TILE_WIDTH / VIEW_W` yang baru.
 
 ---
 

@@ -12,11 +12,6 @@ export function resetGame(): void {
   clearPendingHero();
   renderAll();
 
-  var log = document.getElementById('raid-log');
-  if (log) {
-    log.innerHTML =
-      '<p class="raid-log-placeholder">Check Enemy Detected, set traps and monsters, then start the Raid.</p>';
-  }
   var status = document.getElementById('raid-status');
   if (status) status.textContent = '';
 

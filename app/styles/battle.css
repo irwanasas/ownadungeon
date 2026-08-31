@@ -26,13 +26,13 @@
   min-height: 0;
 }
 
-/* Vertical space priority during a raid, top to bottom:
+/* Vertical space priority during a raid, top to bottom (simpler now that
+   the raid log is gone — it used to reserve a guaranteed floor here that
+   competed with the room chamber for space):
    1. #room-preview (battle card) — fixed, compact, never shrinks.
-   2. .raid-stage / .raid-log — GUARANTEED a minimum height (flex-shrink
-      still applies below that floor is disallowed by min-height), so the
-      log is always visible, never clipped or covered.
-   3. .dungeon-runway (room chamber) — takes whatever's left and is the
-      first thing to shrink on short viewports. */
+   2. .dungeon-runway (room chamber) — takes essentially all the rest, so
+      the room reads as a real, spacious dungeon space rather than a
+      cramped strip above a text log. */
 
 .app.battle-active #room-preview.room-preview--battle {
   flex-shrink: 0;
@@ -44,23 +44,37 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Room-stage below is now a fixed (clamped) height, not a flex-grow
+     child, so any extra vertical space this runway picks up (a very tall
+     viewport, or a short raid-status line) distributes evenly above/below
+     the room instead of stretching it. */
+  justify-content: center;
   margin-bottom: 2px;
 }
 
 .app.battle-active .room-stage {
   display: flex;
-  flex: 1 1 auto;
-  min-height: 90px;
+  flex: 0 0 auto;
   margin-bottom: 4px;
 }
 
+/* Sized to grow noticeably from the pre-expansion clamp(90px, 22vh, 220px)
+   without overshooting the room-floor's own logical aspect ratio (~1.9:1,
+   see isoGrid.ts's derived VIEW_W/VIEW_H) — the floor's *width* is capped
+   by the panel's fixed mobile-first column width regardless of how much
+   vertical space is free. `height` (not min-height) makes the clamp an
+   actual ceiling as well as a floor: room-chamber/room-floor no longer
+   sit on flex:1 (which would grow them to fill all freed space and
+   stretch the diamond tiles into visibly distorted kite shapes), so the
+   isometric look stays proportioned the same way it did pre-expansion,
+   just bigger. */
 .app.battle-active .room-chamber {
-  flex: 1;
-  min-height: clamp(90px, 22vh, 220px);
+  flex: 0 0 auto;
+  height: clamp(195px, 30vh, 260px);
 }
 
 .app.battle-active .room-floor {
-  min-height: clamp(80px, 20vh, 200px);
+  height: clamp(180px, 28vh, 240px);
 }
 
 .app.battle-active .room-content-icon {
@@ -72,21 +86,6 @@
   opacity: 0.35;
   margin: 0;
   padding-top: 0;
-}
-
-.app.battle-active .raid-stage {
-  flex: 1 1 140px;
-  min-height: 140px;
-  flex-shrink: 0;
-  gap: 4px;
-}
-
-.app.battle-active .raid-log {
-  flex: 1 1 auto;
-  min-height: 120px;
-  padding: 6px 8px;
-  font-size: 11px;
-  line-height: 1.4;
 }
 
 .app.battle-active .play-fab {
@@ -103,44 +102,24 @@
 }
 
 @media (max-width: 400px) {
-  .app.battle-active .raid-log {
-    font-size: 10px;
-  }
-
   .app.battle-active #room-preview.room-preview--battle {
     padding: 5px 8px;
   }
 }
 
-/* Short viewports (landscape phones, small windows): shrink the room
-   chamber further so the raid log's min-height floor never has to give.
-   The log's own min-height (set above, unchanged here) is what actually
-   guarantees it stays visible — this rule just gives it more room to win
-   that trade-off against the chamber. */
+/* Short viewports (landscape phones, small windows): the chamber still
+   gets the bulk of available height, just scaled down proportionally
+   since there's less of it overall. */
 @media (max-height: 640px) {
-  .app.battle-active .room-stage {
-    min-height: 64px;
-  }
-
   .app.battle-active .room-chamber {
-    min-height: clamp(64px, 16vh, 160px);
+    height: clamp(140px, 26vh, 210px);
   }
 
   .app.battle-active .room-floor {
-    min-height: clamp(56px, 14vh, 140px);
+    height: clamp(125px, 24vh, 190px);
   }
 
   .app.battle-active .room-content-icon {
     font-size: clamp(22px, 6vw, 34px);
-  }
-}
-
-@media (max-height: 520px) {
-  .app.battle-active .raid-stage {
-    min-height: 100px;
-  }
-
-  .app.battle-active .raid-log {
-    min-height: 84px;
   }
 }

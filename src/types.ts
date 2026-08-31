@@ -245,7 +245,6 @@ export interface OfflineProgressSummary {
 }
 
 export type ToastType = 'info' | 'success' | 'warning';
-export type RaidLogType = 'info' | 'warning' | 'danger' | 'success' | 'ember' | '';
 
 // Contextual battle reactions shown on the merged hero battle card once a
 // raid is underway. Deliberately emotional/tactical ("PANIK", "TAKUT")

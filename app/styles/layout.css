@@ -347,59 +347,6 @@ body {
   color: var(--muted);
 }
 
-.raid-stage {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden;
-}
-
-.raid-log {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.2);
-  font-size: 12px;
-  line-height: 1.55;
-  /* Always its own stacking context so nothing can ever paint over it. */
-  position: relative;
-  z-index: 1;
-}
-
-.raid-log p {
-  margin-bottom: 4px;
-}
-
-.raid-log-placeholder {
-  color: var(--muted-dim);
-}
-
-.log-info {
-  color: var(--muted);
-}
-
-.log-warning {
-  color: var(--gold);
-}
-
-.log-danger {
-  color: var(--ember-bright);
-}
-
-.log-success {
-  color: var(--poison-bright);
-}
-
-.log-ember {
-  color: var(--ember-bright);
-  font-weight: 600;
-}
-
 .btn-active {
   border-color: var(--ember);
   color: var(--ember-bright);
