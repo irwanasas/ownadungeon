@@ -12,11 +12,11 @@ export const DEFAULT_STATE: GameState = {
     net: 1,
     fire: 1,
     frost: 1,
-    skeleton: 1,
-    goblin: 1,
-    ogre: 1,
     slime: 1,
-    shade: 1
+    goblin_troop: 1,
+    goblin_shaman: 1,
+    goblin_elite: 1,
+    orc: 1
   },
   unlocked: {
     spike: true,
@@ -24,11 +24,11 @@ export const DEFAULT_STATE: GameState = {
     net: false,
     fire: false,
     frost: false,
-    skeleton: true,
-    goblin: false,
-    ogre: false,
-    slime: false,
-    shade: false,
+    slime: true,
+    goblin_troop: false,
+    goblin_shaman: false,
+    goblin_elite: false,
+    orc: false,
     slot4: false,
     slot5: false
   },

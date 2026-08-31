@@ -183,6 +183,7 @@ export function presentEntrance(): void {
   e.content.innerHTML =
     '<span class="room-content-icon">🚪</span>' +
     '<span class="room-content-label">Dungeon Mouth</span>';
+  e.content.classList.remove('has-sprite');
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
   hideMonsterToken();
   setDoorOpen(false);
@@ -212,6 +213,7 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
     e.content.innerHTML =
       '<span class="room-content-icon">·</span>' +
       '<span class="room-content-label">Empty Room</span>';
+    e.content.classList.remove('has-sprite');
     placeAtTile(e.content, ENCOUNTER_TILE, 50);
     hideMonsterToken();
     return;
@@ -232,6 +234,7 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
     '<span class="room-content-sub">Lv.' +
     level +
     '</span>';
+  e.content.classList.toggle('has-sprite', hasSprite);
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
   if (hasSprite) {
     showMonsterToken(slot.catalogId);
@@ -262,6 +265,7 @@ export function presentThrone(): void {
     ' · HP ' +
     k.maxHp +
     '</span>';
+  e.content.classList.remove('has-sprite');
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
   hideMonsterToken();
 }

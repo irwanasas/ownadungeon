@@ -3,11 +3,19 @@
 // heroToken.ts. Only monster ids with an entry in MONSTER_SPRITES get a
 // real animated token; roomStage.ts falls back to the existing emoji icon
 // for everything else, so partial asset coverage never breaks a room.
-import { MONSTER_SPRITES } from '../data/monsterSprites';
+import { MONSTER_SPRITES, type MonsterSizeTier } from '../data/monsterSprites';
 import { startSpriteLoop } from './spriteAnimator';
 import { ENCOUNTER_TILE, VIEW_W, VIEW_H, toScreenCoords, depthKey } from './isoGrid';
 
 const TOKEN_Z_BASE = 50; // matches #room-content's zBase — same tile, same layer
+const SIZE_TIER_CLASSES: MonsterSizeTier[] = ['sm', 'md', 'lg', 'xl'];
+
+function setSizeTierClass(token: HTMLElement, tier: MonsterSizeTier): void {
+  SIZE_TIER_CLASSES.forEach(function (t) {
+    token.classList.remove('monster-token--' + t);
+  });
+  token.classList.add('monster-token--' + tier);
+}
 
 let stopLoop: (() => void) | null = null;
 let currentMonsterId: string | null = null;
@@ -39,6 +47,7 @@ export function showMonsterToken(monsterId: string): void {
   token.style.left = (p.x / VIEW_W) * 100 + '%';
   token.style.top = (p.y / VIEW_H) * 100 + '%';
   token.style.zIndex = String(TOKEN_Z_BASE + depthKey(ENCOUNTER_TILE.x, ENCOUNTER_TILE.y));
+  setSizeTierClass(token, set.sizeTier);
   token.classList.add('is-visible');
   currentMonsterId = monsterId;
 

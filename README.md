@@ -34,19 +34,21 @@ Bukan sekadar HP/ATK lebih besar. Tiap room adalah puzzle **Hero × Monster × T
 
 | Class | Role | Kekuatan | Kelemahan |
 |-------|------|----------|-----------|
-| Warrior | Frontline | Tahan spike, solid vs brute | Racun, ethereal |
-| Rogue | Skirmisher | Evasion trap, kuat vs Archer | DEF tinggi, Net |
-| Berserker | Brawler | Fear-immune, RAGE | Net menunda RAGE, DOT |
-| Mage | Caster | Magic (partial DEF ignore), vs Slime/Shade | HP tipis, Spike/Brute |
-| Paladin | Support-tank | Holy vs undead/shade, tahan fear | Poison, tempo lambat |
+| Warrior | Frontline | Tahan spike, solid vs Goblin Elite | Racun, Slime |
+| Rogue | Skirmisher | Evasion trap, kuat vs Goblin Shaman | Goblin Elite, Net |
+| Berserker | Brawler | Fear-immune, RAGE, kuat vs Goblin Elite | Net menunda RAGE, DOT |
+| Mage | Caster | Magic (partial DEF ignore), vs Slime | HP tipis, Goblin Troop, Orc |
+| Paladin | Support-tank | Kuat vs Orc, tahan physical trap | Poison, tempo lambat |
 
-**5 Monster Types**
+**5 Monster Types** — real sprite art dari `public/assets/monsters/`, progresi
+Slime → Goblin Troop → Goblin Shaman → Goblin Elite → Orc (lihat
+`src/data/monsterSprites.ts` untuk detail sheet/scale per monster):
 
-- Skeleton Archer (ranged undead)
-- Goblin Brute (burst)
-- Bone Ogre (tank undead)
-- Acid Slime (physical resist)
-- Shadow Wraith (fear aura, ethereal)
+- Slime (physical resist, selalu tersedia — starter monster gratis)
+- Goblin Troop (burst, DEF tipis)
+- Goblin Shaman (ranged/caster, chip damage)
+- Goblin Elite (armored tank)
+- Orc (endgame heavy hitter — HP & ATK terbesar)
 
 **5 Traps**
 
@@ -102,7 +104,7 @@ Panel berganti mode lewat class modifier di elemen yang sama:
 - **PANIK** — HP hero ≤35% (kecuali sedang RAGE).
 - **RAGE** — Berserker memicu RAGE-nya.
 - **KABUR** — hero mundur karena gap level terlalu jauh.
-- **TAKUT** — aura takut Shadow Wraith berhasil menggoyahkan hero non-fear-immune.
+- **TAKUT** — dipicu monster dengan `fearAura` terhadap hero non-fear-immune. Mekanisme masih ada di kode (`src/combat/raid.ts`), tapi tidak ada monster di roster saat ini yang memakainya (lihat `src/data/monsters.ts`) — siap dipakai kalau monster fear-aura ditambahkan lagi.
 - **SAKIT!** — hero baru kena hit (trap, monster, atau King) yang tidak memicu reaksi lain.
 - **TERKEJUT** — ancaman ruang baru saja terungkap (trap berkilau, bayangan monster bergerak, Raja bangkit dari singgasana).
 
@@ -130,31 +132,31 @@ Stage 1–50 tidak lagi berupa kurva stat (`data/stages.ts` menggantikan sistem 
 
 ### Tutorial (Stage 1–5)
 
-Hanya toolkit awal — **Spike Trap + Skeleton Archer** — dan hero yang menyerang dibatasi ke kelas yang memang rentan terhadap keduanya:
+Hanya toolkit awal — **Spike Trap + Slime** (Slime selalu ter-unlock, gratis) — dan hero yang menyerang dibatasi ke kelas yang memang rentan terhadap keduanya:
 
 - **Mage** — sangat rentan Spike Trap (×1.30) dan lemah lawan apa pun yang mengandalkan trap fisik instan.
-- **Berserker** — matchup terburuknya justru chip damage konsisten seperti Skeleton Archer (×1.05, angka terendah di seluruh tabel monster).
+- **Berserker** — matchup terburuknya justru chip damage konsisten seperti Slime (×0.9, salah satu angka terendah di tabel monster).
 
-Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terlalu tahan terhadap Spike+Skeleton sehingga tutorial jadi mustahil dimenangkan tanpa unlock lain.
+Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terlalu tahan terhadap Spike+Slime sehingga tutorial jadi mustahil dimenangkan tanpa unlock lain.
 
 - Stage 1 — hanya Mage.
 - Stage 2 — hanya Berserker.
-- Stage 3 — Mage + Berserker bergantian. **Clear → buka Poison Trap + Goblin Brute.**
-- Stage 4 — sama, tapi kombinasikan urutan ruang Spike vs Skeleton.
+- Stage 3 — Mage + Berserker bergantian. **Clear → buka Poison Trap + Goblin Troop.**
+- Stage 4 — sama, tapi kombinasikan urutan ruang Spike vs Slime.
 - Stage 5 — ujian akhir tutorial. **Clear → buka Ruang ke-4.**
 
 ### Jadwal unlock progresif
 
 | Stage | Unlock | Kenapa di sini |
 |---|---|---|
-| 3 | Poison Trap + Goblin Brute | Poison adalah satu-satunya penawar Warrior (×1.28) & Paladin (×1.22); Goblin Brute matchup terburuk Mage (×0.8) |
+| 3 | Poison Trap + Goblin Troop | Poison adalah satu-satunya penawar Warrior (×1.28) & Paladin (×1.22); Goblin Troop matchup terburuk Mage (×0.8) |
 | 5 | Ruang ke-4 | Penutup tutorial, dungeon mulai lebih lega |
 | 8 | Net Trap | Dibuat khusus menjerat Rogue (×1.22), kelas paling evasive terhadap trap fisik lain |
 | 12 | Fire Trap | DOT bakar susulan — jawaban untuk hero yang bertahan lama |
-| 14 | Acid Slime | Dinding physical-resist untuk meredam hero non-magic |
+| 14 | Goblin Shaman | Ranged caster chip — Rogue paling efektif melawannya (×1.25, first-strike bonus) |
 | 17 | Frost Trap | Mengurangi DEF hero — combo starter untuk ruang monster sesudahnya |
-| 21 | Bone Ogre | Tank yang jadi matchup terburuk Rogue (×0.8), pelengkap Net Trap |
-| 26 | Shadow Wraith | Aura takut — efektif ke semua kelas kecuali Berserker & Paladin (fear-immune) |
+| 21 | Goblin Elite | Armored tank yang jadi matchup terburuk Rogue (×0.8), pelengkap Net Trap |
+| 26 | Orc | Endgame heavy hitter — hanya Paladin yang punya matchup unggul (×1.25) |
 | 32 | Ruang ke-5 | Perluasan dungeon terakhir, membuka layout 5-ruang penuh |
 
 Setiap stage unlock (3, 8, 12, 14, 17, 21, 26, 32) hanya membuka **kesempatan membeli** item itu di panel Upgrades (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.

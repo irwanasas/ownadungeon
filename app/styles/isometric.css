@@ -64,6 +64,16 @@
   transition: left 0.4s ease, top 0.4s ease;
 }
 
+/* When a real monster sprite is showing (roomStage.ts omits the emoji
+   icon and adds this class instead — see presentRoom()), the name/level
+   caption moves below the tile point rather than sharing the icon's
+   above-the-tile anchor: the sprite (.monster-token) already occupies
+   that space and, at the larger size tiers, would otherwise sit behind
+   or overlap the text. */
+.room-content.has-sprite {
+  transform: translate(-50%, 10px);
+}
+
 /* Door: a small parallelogram laid flat on the floor plane, rotated to
    align with the isometric grid's down-right edge direction
    (atan2(TILE_HEIGHT/2, TILE_WIDTH/2) ≈ 26.565deg), sitting at the
@@ -139,11 +149,24 @@
    fallback (see roomStage.ts's presentRoom() — only one of the two ever
    shows for a given room). Same tile space, same "standee" anchoring as
    the hero token; monsterToken.ts sizes the sprite off this box's own
-   rendered width, so this is the single place controlling display scale. */
+   *rendered* width (see spriteAnimator.ts), so sizing the box here via
+   `width` alone is the single global place controlling display scale —
+   no per-monster JS math, no fixed px guesses.
+
+   Sizing is tile-relative, not a fixed px: --tile-w-pct is one tile's
+   width as a percentage of .room-floor (TILE_WIDTH=64 / VIEW_W=300, see
+   isoGrid.ts — both values are load-bearing constants there, so if they
+   ever change this constant needs updating too). Each size tier is a
+   multiple of that one tile width, so a monster is always sized relative
+   to the actual tile grid instead of an arbitrary pixel count — this is
+   what keeps monsters from reading as "tiny" next to the real tile
+   textures regardless of viewport. Tiers roughly track the
+   Slime -> Goblin Troop/Shaman -> Goblin Elite -> Orc progression (see
+   monsterSprites.ts) so later, tougher monsters visibly look bigger. */
 .monster-token {
+  --tile-w-pct: 21.333%;
   position: absolute;
-  width: 36px;
-  height: 36px;
+  aspect-ratio: 1;
   transform: translate(-50%, -100%);
   pointer-events: none;
   opacity: 0;
@@ -152,6 +175,22 @@
 
 .monster-token.is-visible {
   opacity: 1;
+}
+
+.monster-token--sm {
+  width: calc(var(--tile-w-pct) * 0.85);
+}
+
+.monster-token--md {
+  width: calc(var(--tile-w-pct) * 1.15);
+}
+
+.monster-token--lg {
+  width: calc(var(--tile-w-pct) * 1.4);
+}
+
+.monster-token--xl {
+  width: calc(var(--tile-w-pct) * 1.65);
 }
 
 .monster-token-sprite {
@@ -164,11 +203,6 @@
   .hero-token {
     width: 28px;
     height: 28px;
-  }
-
-  .monster-token {
-    width: 30px;
-    height: 30px;
   }
 
   .room-door {

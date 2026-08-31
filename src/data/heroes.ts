@@ -17,7 +17,7 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     trapEvasion: 0.05,
     tags: ['physical', 'tank'],
     strengths: 'Resists spikes and brute force',
-    weaknesses: 'Weak to poison and ethereal foes'
+    weaknesses: 'Weak to poison and slime'
   },
   {
     id: 'rogue',
@@ -34,8 +34,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     canRage: false,
     trapEvasion: 0.45,
     tags: ['physical', 'agile'],
-    strengths: 'Evades traps; shreds archers',
-    weaknesses: 'Struggles vs high DEF and nets'
+    strengths: 'Evades traps; shreds casters',
+    weaknesses: 'Struggles vs armored foes and nets'
   },
   {
     id: 'berserker',
@@ -55,7 +55,7 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     rageHealFraction: 0.12,
     trapEvasion: 0,
     tags: ['physical', 'rage'],
-    strengths: 'Fear-immune; smashes tanks',
+    strengths: 'Fear-immune; smashes armored foes',
     weaknesses: 'Nets delay RAGE; vulnerable to DoT'
   },
   {
@@ -74,8 +74,8 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     trapEvasion: 0.1,
     magicAtk: true,
     tags: ['magic', 'ranged'],
-    strengths: 'Ignores some DEF; strong vs slime/shade',
-    weaknesses: 'Fragile HP; weak to spikes and brutes'
+    strengths: 'Ignores some DEF; melts slime with magic',
+    weaknesses: 'Fragile HP; weak to goblin bursts and orcs'
   },
   {
     id: 'paladin',
@@ -93,7 +93,7 @@ export const HERO_ARCHETYPES: HeroArchetype[] = [
     trapEvasion: 0.08,
     holy: true,
     tags: ['physical', 'holy', 'tank'],
-    strengths: 'Holy vs undead/shade; resists fear',
+    strengths: 'Outlasts orcs; resists fear',
     weaknesses: 'Slow vs agile foes; residual poison'
   }
 ];

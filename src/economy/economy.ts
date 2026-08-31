@@ -5,7 +5,7 @@ import { kingUpgradeCost } from '../data/king';
 import type { Cost } from '../types';
 
 export function isUnlocked(id: string): boolean {
-  if (id === 'spike' || id === 'skeleton' || id === 'treasure') return true;
+  if (id === 'spike' || id === 'slime' || id === 'treasure') return true;
   return !!state.unlocked[id];
 }
 

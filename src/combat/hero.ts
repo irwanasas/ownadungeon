@@ -19,7 +19,7 @@ export function buildHero(): Hero {
   const arch = roster[Math.floor(Math.random() * roster.length)];
   const name = NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)];
   const unlockedLevels = Object.keys(state.levels).filter(function (id) {
-    return isUnlocked(id) || id === 'spike' || id === 'skeleton';
+    return isUnlocked(id) || id === 'spike' || id === 'slime';
   });
   const vals = unlockedLevels.map(function (id) {
     return state.levels[id] || 1;

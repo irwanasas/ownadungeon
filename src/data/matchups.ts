@@ -5,12 +5,20 @@ var WEAK = 0.8;
 
 export type MatchupLabel = 'strong' | 'weak' | 'neutral';
 
+// Each hero has exactly one clear STRONG monster matchup and one clear
+// WEAK one (Warrior is the deliberate exception — its strength is vs
+// Spike Trap in HERO_VS_TRAP below, not vs any monster). Thematic pairing:
+// Rogue (skirmisher) closes gaps on the ranged Goblin Shaman; Berserker
+// (brawler) shreds the armored Goblin Elite; Mage (caster) melts the
+// resist-type Slime with magic but gets burst down by Goblin Troop before
+// its DEF-ignore matters; Paladin (support-tank) is built to outlast the
+// endgame Orc's raw damage.
 export const HERO_VS_MONSTER: Record<string, Record<string, number>> = {
-  warrior: { skeleton: STRONG, goblin: 1.1, ogre: 1.15, slime: WEAK, shade: WEAK },
-  rogue: { skeleton: STRONG, goblin: 0.95, ogre: WEAK, slime: 0.85, shade: 1.05 },
-  berserker: { skeleton: 1.05, goblin: 1.1, ogre: STRONG, slime: 0.9, shade: 0.85 },
-  mage: { skeleton: 1.1, goblin: WEAK, ogre: 1.05, slime: STRONG, shade: STRONG },
-  paladin: { skeleton: STRONG, goblin: 0.95, ogre: 1.1, slime: 0.9, shade: STRONG }
+  warrior: { slime: WEAK, goblin_troop: 1.1, goblin_shaman: 1.05, goblin_elite: 1.15, orc: 0.95 },
+  rogue: { slime: 0.85, goblin_troop: 0.95, goblin_shaman: STRONG, goblin_elite: WEAK, orc: 0.9 },
+  berserker: { slime: 0.9, goblin_troop: 1.1, goblin_shaman: 1.05, goblin_elite: STRONG, orc: 1.0 },
+  mage: { slime: STRONG, goblin_troop: WEAK, goblin_shaman: 1.1, goblin_elite: 1.05, orc: WEAK },
+  paladin: { slime: 0.9, goblin_troop: 0.95, goblin_shaman: 1.1, goblin_elite: 1.1, orc: STRONG }
 };
 
 export const HERO_VS_TRAP: Record<string, Record<string, number>> = {
@@ -74,15 +82,22 @@ export function applySpecialOnMonsterHit(
     dmg = Math.round(dmg * (1 - monster.physicalResist));
     note = 'physical_resist';
   }
-  if (hero.magicAtk && (monster.id === 'slime' || monster.id === 'shade')) {
+  // Magic bypasses a resist-type monster's physical mitigation (currently
+  // just Slime — tag/type-driven so future resist-type monsters pick this
+  // up automatically instead of needing another hardcoded id check).
+  if (hero.magicAtk && monster.type === 'resist') {
     dmg = Math.round(dmg * 1.08);
     note = 'magic_bonus';
   }
-  if (hero.holy && (monster.id === 'skeleton' || monster.id === 'ogre' || monster.id === 'shade')) {
+  // Holy damage bonus vs undead — tag-driven rather than a hardcoded id
+  // list. The current roster (Slime/Goblins/Orc) has no undead entries,
+  // so this simply doesn't trigger yet; it's ready for whenever undead
+  // content is added rather than needing this file touched again.
+  if (hero.holy && monster.tags.indexOf('undead') !== -1) {
     dmg = Math.round(dmg * 1.12);
     note = 'holy_bonus';
   }
-  if (hero.classId === 'rogue' && monster.id === 'skeleton' && !hero._firstStrikeUsed) {
+  if (hero.classId === 'rogue' && monster.type === 'ranged' && !hero._firstStrikeUsed) {
     dmg = Math.round(dmg * 1.2);
     hero._firstStrikeUsed = true;
     note = 'first_strike';
