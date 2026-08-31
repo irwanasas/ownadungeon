@@ -14,8 +14,8 @@ export const TILE_HEIGHT = 32;
 // GRID is 4x4 to match the white floor grid painted in
 // public/assets/ui/bg/IMG_4394.jpeg — entities walk on that art, not a
 // second synthetic tile layer.
-export const GRID_W = 4; // tileX: 0..GRID_W-1
-export const GRID_H = 4; // tileY: 0..GRID_H-1
+export const GRID_W = 4;
+export const GRID_H = 4;
 
 export interface Tile {
   x: number;
@@ -27,23 +27,10 @@ export const ENTRANCE_TILE: Tile = { x: GRID_W - 1, y: GRID_H - 1, z: 0 };
 export const EXIT_TILE: Tile = { x: 0, y: 0, z: 0 };
 export const ENCOUNTER_TILE: Tile = { x: 1, y: Math.floor(GRID_H / 2), z: 0 };
 
-// Logical viewBox the floor grid is drawn in; toScreenCoords() and the SVG
-// floor both work in this space, so the isometric room scales cleanly to
-// any on-screen chamber size via the SVG's own viewBox scaling — no need
-// to measure real pixel dimensions in JS.
-//
-// Derived from GRID_W/GRID_H (rather than hand-picked magic numbers) so
-// the viewBox always exactly bounds the diamond for whatever grid size is
-// configured above, with PAD_X/PAD_Y of breathing room on each edge for
-// the door sprite and standee entities that extend past a tile's own
-// footprint. See the corner-math in the isoGrid module comment above:
-// with hw = TILE_WIDTH/2 and hh = TILE_HEIGHT/2, the diamond's leftmost/
-// topmost point is at originX - GRID_H*hw / originY - hh, and its
-// rightmost/bottommost point is at originX + GRID_W*hw / originY +
-// (GRID_W+GRID_H-1)*hh — solving both edges for a symmetric PAD gives
-// these formulas.
-const PAD_X = 24;
-const PAD_Y = 16;
+// PAD 0 so VIEW tightly matches the painted diamond (no empty margin that
+// would offset tokens relative to the art grid).
+const PAD_X = 0;
+const PAD_Y = 0;
 const HW = TILE_WIDTH / 2;
 const HH = TILE_HEIGHT / 2;
 export const ORIGIN_X = PAD_X + GRID_H * HW;

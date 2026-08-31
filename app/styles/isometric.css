@@ -3,15 +3,15 @@
    a second synthetic tile layer. */
 
 .room-floor {
-  /* Sit on top of the painted 4x4 white grid in IMG_4394.jpeg.
-     Percentages tuned to the art's lower-center diamond when the chamber
-     uses background-size: cover and background-position: center 38%. */
+  /* Bounding box of painted white 4x4 diamond in IMG_4394.jpeg
+     (700x925 art: x 156..549, y 552..789 → 22.3%/56.1% × 59.7%/25.6%).
+     Chamber bg must use background-size: 100% 100% so UV = chamber %. */
   position: absolute;
   z-index: 2;
-  left: 11%;
-  width: 78%;
-  top: 48%;
-  height: 36%;
+  left: 22.3%;
+  width: 56.1%;
+  top: 59.7%;
+  height: 25.6%;
   overflow: visible;
   pointer-events: none;
 }
@@ -122,7 +122,7 @@
 }
 
 .monster-token {
-  --tile-w-pct: 21.053%; /* 64 / 304 (VIEW_W at GRID_W=4, GRID_H=4) */
+  --tile-w-pct: 25%;
   position: absolute;
   aspect-ratio: 1;
   transform: translate(-50%, -100%);
