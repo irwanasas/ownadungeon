@@ -1,23 +1,19 @@
-/* Isometric raid battlefield presentation (MVP): diamond tile grid, an
-   iso-oriented door, and percentage-positioned entities — all sharing the
-   0..VIEW_W / 0..VIEW_H logical space defined in src/animation/isoGrid.ts
-   (derived from GRID_W/GRID_H there, not a fixed number). No art assets
-   beyond the floor/monster sprites, no 3D: CSS/SVG geometric placement. */
+/* Isometric raid battlefield: entities share VIEW_W/VIEW_H logical space.
+   Floor art + white 4x4 grid come from the chamber background (IMG_4394), not
+   a second synthetic tile layer. */
 
-/* Deliberately no fixed aspect-ratio here: .room-chamber sizes .room-floor
-   via the clamp()'d `height` rules in battle.css, tuned to stay close to
-   VIEW_W:VIEW_H's own ~1.9:1 ratio so the diamond grid doesn't visibly
-   distort. The SVG floor uses preserveAspectRatio="none" and every entity
-   is positioned as a percentage of this exact same box, so alignment
-   holds regardless of the box's actual aspect ratio — only the tiles'
-   diamond shape gets slightly stretched/squished if that ratio drifts,
-   which is a cosmetic MVP tradeoff, not a functional one. */
 .room-floor {
-  position: relative;
+  /* Sit on top of the painted 4x4 white grid in IMG_4394.jpeg.
+     Percentages tuned to the art's lower-center diamond when the chamber
+     uses background-size: cover and background-position: center 38%. */
+  position: absolute;
   z-index: 2;
-  width: 100%;
-  height: 100%;
+  left: 11%;
+  width: 78%;
+  top: 48%;
+  height: 36%;
   overflow: visible;
+  pointer-events: none;
 }
 
 .room-iso-floor {
@@ -34,30 +30,22 @@
 }
 
 .iso-tile-img {
-  opacity: 0.72;
-  mix-blend-mode: soft-light;
+  display: none;
 }
 
-/* Real floor texture is now the fill (see roomStage.ts's buildIsoFloorSvg
-   affine <image> mapping) — this outline is stroke-only edge definition
-   drawn on top, keeping the existing checker/throne-glow stroke look. */
 .iso-tile {
   fill: none;
-  stroke: rgba(140, 170, 200, 0.28);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
+  stroke: transparent;
 }
 
 .iso-tile--alt {
-  stroke: rgba(100, 130, 160, 0.22);
+  stroke: transparent;
 }
 
 .room-chamber.is-throne .iso-tile {
-  stroke: rgba(216, 170, 77, 0.35);
+  stroke: transparent;
 }
 
-/* Encounter marker (trap/monster/treasure/King icon) — anchored so its
-   base sits on the tile point, like a standee. */
 .room-content {
   position: absolute;
   transform: translate(-50%, -100%);
@@ -67,21 +55,10 @@
   transition: left 0.4s ease, top 0.4s ease;
 }
 
-/* When a real monster sprite is showing (roomStage.ts omits the emoji
-   icon and adds this class instead — see presentRoom()), the name/level
-   caption moves below the tile point rather than sharing the icon's
-   above-the-tile anchor: the sprite (.monster-token) already occupies
-   that space and, at the larger size tiers, would otherwise sit behind
-   or overlap the text. */
 .room-content.has-sprite {
   transform: translate(-50%, 10px);
 }
 
-/* Door: a small parallelogram laid flat on the floor plane, rotated to
-   align with the isometric grid's down-right edge direction
-   (atan2(TILE_HEIGHT/2, TILE_WIDTH/2) ≈ 26.565deg), sitting at the
-   Entrance tile. Opens by collapsing along its own length rather than the
-   old flat rotateY() swing. */
 .room-door {
   position: absolute;
   width: 46px;
@@ -107,10 +84,6 @@
   opacity: 0.3;
 }
 
-/* Hero token: lives in the same tile space as the floor/door/content.
-   heroToken.ts sets left/top as percentages of this space per tile hop;
-   the transition below is what makes each hop read as a smooth step
-   rather than a teleport. */
 .hero-token {
   position: absolute;
   z-index: 100;
@@ -148,27 +121,8 @@
   100% { transform: translateY(0); }
 }
 
-/* Monster token: the real-sprite counterpart to .room-content-icon's emoji
-   fallback (see roomStage.ts's presentRoom() — only one of the two ever
-   shows for a given room). Same tile space, same "standee" anchoring as
-   the hero token; monsterToken.ts sizes the sprite off this box's own
-   *rendered* width (see spriteAnimator.ts), so sizing the box here via
-   `width` alone is the single global place controlling display scale —
-   no per-monster JS math, no fixed px guesses.
-
-   Sizing is tile-relative, not a fixed px: --tile-w-pct is one tile's
-   width as a percentage of .room-floor (TILE_WIDTH=64 / VIEW_W, see
-   isoGrid.ts — VIEW_W is itself derived from GRID_W/GRID_H there, so if
-   the grid size ever changes, recompute this as 64 / VIEW_W * 100 and
-   update it here too). Each size tier is a multiple of that one tile
-   width, so a monster is always sized relative to the actual tile grid
-   instead of an arbitrary pixel count — this is what keeps monsters from
-   reading as "tiny" next to the real tile textures regardless of
-   viewport. Tiers roughly track the Spime -> Goblin Troop/Shaman ->
-   Goblin Elite -> Orc progression (see monsterSprites.ts) so later,
-   tougher monsters visibly look bigger. */
 .monster-token {
-  --tile-w-pct: 19.048%; /* 64 / 336 (VIEW_W at GRID_W=4, GRID_H=5) */
+  --tile-w-pct: 21.053%; /* 64 / 304 (VIEW_W at GRID_W=4, GRID_H=4) */
   position: absolute;
   aspect-ratio: 1;
   transform: translate(-50%, -100%);
