@@ -10,18 +10,12 @@
 export const TILE_WIDTH = 64;
 export const TILE_HEIGHT = 32;
 
-// A deliberately non-square room grid: wider on Y than X so the Entrance
-// corner (max X, max Y) reads toward the lower-LEFT of the diamond rather
-// than dead-center-bottom, and the walk back to Exit (0,0) reads as
-// moving up and to the right — matching the spec's "door at lower-left" /
-// "progression toward upper-right" framing. Bumped from the original 3x4
-// to 4x5 (12 -> 20 tiles) to make the raid room read as a genuinely
-// bigger, more spacious dungeon space instead of a cramped strip — see
-// app/styles/battle.css's room-chamber/room-floor sizing, which was
-// expanded to match now that the raid log no longer reserves a
-// competing chunk of vertical space.
+// Entrance (max X, max Y) reads lower-left; Exit (0,0) upper area.
+// GRID is 4x4 to match the white floor grid painted in
+// public/assets/ui/bg/IMG_4394.jpeg — entities walk on that art, not a
+// second synthetic tile layer.
 export const GRID_W = 4; // tileX: 0..GRID_W-1
-export const GRID_H = 5; // tileY: 0..GRID_H-1
+export const GRID_H = 4; // tileY: 0..GRID_H-1
 
 export interface Tile {
   x: number;
@@ -47,7 +41,7 @@ export const ENCOUNTER_TILE: Tile = { x: 1, y: Math.floor(GRID_H / 2), z: 0 };
 // topmost point is at originX - GRID_H*hw / originY - hh, and its
 // rightmost/bottommost point is at originX + GRID_W*hw / originY +
 // (GRID_W+GRID_H-1)*hh — solving both edges for a symmetric PAD gives
-// the formulas below.
+// these formulas.
 const PAD_X = 24;
 const PAD_Y = 16;
 const HW = TILE_WIDTH / 2;
@@ -75,10 +69,6 @@ export function toScreenCoords(
   };
 }
 
-// Simple isometric depth key: tiles/entities further down-screen (higher
-// x+y) draw on top of ones further up-screen. Good enough for the MVP —
-// no overlapping-entity occlusion logic needed with one hero + static
-// floor + one encounter marker.
 export function depthKey(tileX: number, tileY: number): number {
   return tileX + tileY;
 }
@@ -91,10 +81,6 @@ export function lerpTile(a: Tile, b: Tile, t: number): Tile {
   };
 }
 
-// Waypoints (inclusive of both ends) for a tile-by-tile walk from `a` to
-// `b` in `steps` hops. Sub-tile interpolation is fine visually — it still
-// reads as discrete stepping once each waypoint gets its own CSS
-// transition leg.
 export function tilePath(a: Tile, b: Tile, steps: number): Tile[] {
   var pts: Tile[] = [];
   for (var i = 0; i <= steps; i++) {

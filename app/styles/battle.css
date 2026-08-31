@@ -16,9 +16,11 @@
 }
 
 .app.battle-active .panel.stage-panel {
-  padding: 8px 8px 6px;
-  gap: 6px;
+  padding: 0;
+  gap: 0;
   overflow: hidden;
+  border: none;
+  background: transparent;
 }
 
 .app.battle-active .layout {
@@ -28,7 +30,7 @@
 
 .app.battle-active #room-preview.room-preview--battle {
   flex-shrink: 0;
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 
 .app.battle-active .dungeon-runway {
@@ -36,23 +38,29 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-bottom: 2px;
+  justify-content: stretch;
+  margin-bottom: 0;
 }
 
 .app.battle-active .room-stage {
   display: flex;
-  flex: 0 0 auto;
-  margin-bottom: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0;
+  position: relative;
 }
 
 .app.battle-active .room-chamber {
-  flex: 0 0 auto;
-  height: clamp(260px, 42vh, 380px);
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
 }
 
 .app.battle-active .room-floor {
-  height: clamp(240px, 40vh, 360px);
+  height: auto;
 }
 
 .app.battle-active .room-content-icon {
@@ -60,15 +68,13 @@
 }
 
 .app.battle-active .dungeon-runway.is-room-mode .dungeon-slots {
-  max-height: 48px;
-  opacity: 0.35;
-  margin: 0;
-  padding-top: 0;
+  display: none;
 }
 
 .app.battle-active .play-fab {
-  opacity: 0.4;
+  visibility: hidden;
   pointer-events: none;
+  opacity: 0;
 }
 
 .app.battle-active .player-progress {
@@ -76,7 +82,9 @@
 }
 
 .app.battle-active .bottom-nav {
-  opacity: 0.55;
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
 }
 
 @media (max-width: 400px) {
@@ -86,15 +94,43 @@
 }
 
 @media (max-height: 640px) {
-  .app.battle-active .room-chamber {
-    height: clamp(200px, 36vh, 280px);
-  }
-
-  .app.battle-active .room-floor {
-    height: clamp(185px, 34vh, 260px);
-  }
-
   .app.battle-active .room-content-icon {
     font-size: clamp(22px, 6vw, 34px);
   }
+}
+
+/* Reclaim bottom nav + FAB space so the chamber can run nearly full-screen */
+.app.battle-active {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.app.battle-active .stage-controls {
+  display: none;
+}
+
+.app.battle-active .room-depth {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.app.battle-active #room-preview.room-preview--battle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  margin: 0;
+  border-radius: 0;
+  background: rgba(12, 10, 8, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.app.battle-active .layout,
+.app.battle-active .panel.stage-panel {
+  position: relative;
 }
