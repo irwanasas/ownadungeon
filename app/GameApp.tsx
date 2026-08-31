@@ -1,6 +1,23 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { CSSProperties } from 'react';
+
+const ASSET_BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+function assetUrl(path: string): string {
+  return `url(${ASSET_BASE}/assets/ui/cropped/${path})`;
+}
+
+// UI-pack sprite crops, exposed as CSS custom properties so plain CSS
+// (which Next doesn't rewrite for basePath) can reference them.
+const uiAssetVars = {
+  '--img-panel-parchment': assetUrl('panel-parchment.png'),
+  '--img-pill-idle': assetUrl('pill-button.png'),
+  '--img-pill-hover': assetUrl('pill-button-hover.png'),
+  '--img-icon-gold': assetUrl('icon-gold.png'),
+  '--img-icon-soul': assetUrl('icon-soul.png')
+} as CSSProperties;
 
 export default function GameApp() {
   useEffect(() => {
@@ -16,7 +33,7 @@ export default function GameApp() {
   }, []);
 
   return (
-    <div className="app">
+    <div className="app" style={uiAssetVars}>
       <header className="player-hud" aria-label="Player status">
         <div className="player-hud-left">
           <div className="player-avatar" aria-hidden="true">

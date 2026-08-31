@@ -36,6 +36,42 @@
   outline: none;
 }
 
+/* Settings overlay only: reskin the panel with the uploaded parchment/wood
+   sprite. Stretched to the panel's real (content-driven) height, with the
+   panel's existing dark background left in place behind it so the sprite's
+   transparent wood-grain gaps read as decorative seams instead of holes. */
+#settings-overlay .side-panel {
+  background-color: #1b1610;
+  background-image: var(--img-panel-parchment);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: none;
+  image-rendering: pixelated;
+  padding: 34px 20px 22px;
+}
+
+#settings-overlay .panel-title,
+#settings-overlay .settings-section-title,
+#settings-overlay .settings-field-label {
+  color: #3b2a17;
+}
+
+#settings-overlay .panel-hint,
+#settings-overlay .settings-note {
+  color: #6b5334;
+}
+
+#settings-overlay .overlay-close {
+  color: #3b2a17;
+  border-color: #6b4a2a;
+}
+
+#settings-overlay .overlay-close:hover {
+  color: #1b1610;
+  border-color: #3b2a17;
+  background: rgba(59, 42, 23, 0.12);
+}
+
 .side-overlay-left .side-panel {
   left: 0;
   transform: translateX(-105%);
