@@ -132,7 +132,7 @@ export function presentEntrance(): void {
   }
   if (e.depth) e.depth.textContent = 'Entrance';
   e.content.innerHTML =
-    '<span class="room-content-icon">\uD83D\uDEAA</span>' +
+    '<span class="room-content-icon">🚪</span>' +
     '<span class="room-content-label">Dungeon Mouth</span>';
   e.content.classList.remove('has-sprite');
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
@@ -206,7 +206,7 @@ export function presentThrone(): void {
   if (e.token) e.token.classList.remove('is-entering');
   placeHeroAtEntrance();
   e.content.innerHTML =
-    '<span class="room-content-icon">\uD83D\uDC51</span>' +
+    '<span class="room-content-icon">👑</span>' +
     '<span class="room-content-label">Throne</span>' +
     '<span class="room-content-sub">King Lv.' +
     kingLv +
