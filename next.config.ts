@@ -22,7 +22,12 @@ const nextConfig: NextConfig = {
   // unless URLs end in a trailing slash.
   trailingSlash: true,
   basePath,
-  assetPrefix
+  assetPrefix,
+  // CSS url()/background-image references to public/ assets aren't rewritten
+  // by Next's basePath handling, so expose it for manual prefixing.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath
+  }
 };
 
 export default nextConfig;
