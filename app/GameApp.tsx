@@ -116,24 +116,20 @@ export default function GameApp() {
                 Entrance
               </div>
               <div id="room-chamber" className="room-chamber">
+                <div id="room-door" className="room-door" aria-hidden="true">
+                  <div className="room-door-panel"></div>
+                  <div className="room-door-frame"></div>
+                </div>
                 <div className="room-floor">
-                  {/* Isometric diamond tile grid (src/animation/roomStage.ts)
-                      is injected here at runtime as #room-iso-floor, so
-                      every entity below shares one coordinate space
-                      (src/animation/isoGrid.ts). */}
-                  <div id="room-door" className="room-door" aria-hidden="true">
-                    <div className="room-door-panel"></div>
-                    <div className="room-door-frame"></div>
-                  </div>
                   <div id="room-content" className="room-content">
                     <span className="room-content-icon">🚪</span>
                     <span className="room-content-label">Dungeon Mouth</span>
                   </div>
-                  <div id="monster-token" className="monster-token" aria-hidden="true">
-                    <div className="monster-token-sprite"></div>
-                  </div>
                   <div id="hero-token" className="hero-token" aria-hidden="true">
                     <span className="hero-token-face">⚔</span>
+                  </div>
+                  <div id="monster-token" className="monster-token" aria-hidden="true">
+                    <span className="monster-token-sprite"></span>
                   </div>
                 </div>
               </div>
@@ -235,28 +231,28 @@ export default function GameApp() {
           <div className="side-panel-header">
             <div>
               <h2 className="panel-title">Settings</h2>
-              <p className="panel-hint">Language and account options.</p>
+              <p className="panel-hint">Preferences and data</p>
             </div>
             <button id="btn-close-settings" className="overlay-close" type="button" aria-label="Close">×</button>
           </div>
           <div className="settings-body">
-            <div className="settings-section">
-              <h3 className="settings-section-title">Language</h3>
+            <section className="settings-section" aria-labelledby="settings-lang-title">
+              <h3 id="settings-lang-title" className="settings-section-title">Language</h3>
               <label className="settings-field" htmlFor="setting-language">
                 <span className="settings-field-label">Display language</span>
-                <select id="setting-language" className="settings-select" defaultValue="en">
+                <select id="setting-language" className="settings-select" defaultValue="en" aria-describedby="settings-lang-note">
                   <option value="en">English</option>
                 </select>
               </label>
-              <p className="settings-note">More languages may be added later. The game currently runs in English only.</p>
-            </div>
-            <div className="settings-section settings-section--danger">
-              <h3 className="settings-section-title">Danger Zone</h3>
-              <p className="settings-note">Wipe all progress and return to a fresh dungeon.</p>
-              <button id="btn-reset-game" className="btn btn-danger" type="button">
-                Reset Game
+              <p id="settings-lang-note" className="settings-note">English only for now. More languages later.</p>
+            </section>
+            <section className="settings-section settings-section--danger" aria-labelledby="settings-danger-title">
+              <h3 id="settings-danger-title" className="settings-section-title">Danger zone</h3>
+              <p className="settings-note">Deletes gold, souls, upgrades, unlocks, layout, and stats. Cannot be undone.</p>
+              <button id="btn-reset-game" className="btn btn-danger settings-reset-btn" type="button">
+                Reset game
               </button>
-            </div>
+            </section>
           </div>
         </aside>
       </div>
