@@ -15,6 +15,7 @@ import {
   hideHeroToken,
   walkHeroToExit
 } from '../animation/heroToken';
+import { hideMonsterToken } from '../animation/monsterToken';
 import {
   enterRaidRoomMode,
   exitRaidRoomMode,
@@ -484,5 +485,6 @@ export async function runRaid(): Promise<void> {
   renderAll();
   setTimeout(function () {
     hideHeroToken();
+    hideMonsterToken();
   }, 1400);
 }

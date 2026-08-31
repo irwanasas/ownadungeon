@@ -16,8 +16,11 @@ import {
   type Tile
 } from './isoGrid';
 import { placeHeroAtEntrance, walkHeroToEncounter } from './heroToken';
+import { hasMonsterSprite, showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
+import { tileAssetUrl } from './assetPaths';
+import { FLOOR_TILE_A, FLOOR_TILE_B } from '../data/tileSprites';
+import { beatMs, type BeatKey } from './beatTiming';
 import type { DungeonSlotData } from '../types';
-import type { BeatKey } from './beatTiming';
 
 interface StageEls {
   runway: HTMLElement | null;
@@ -68,26 +71,47 @@ function placeAtTile(el: HTMLElement | null, tile: Tile, zBase: number): void {
 // Diamond-tile floor grid, built once per raid (the grid shape never
 // changes between rooms — only what sits on it does) and left in the DOM
 // for the whole battle-active session.
+//
+// Each tile is a real cropped floor texture (FLOOR_TILE_A/B, from the
+// uploaded top-down tileset) mapped onto the isometric diamond footprint
+// via an affine <image> transform — the exact same (tileX - tileY) /
+// (tileX + tileY) relationship toScreenCoords() uses, just applied
+// per-pixel across a tile's local unit square instead of at one point.
+// Concretely: a tile's local offset (lx, ly) in [-0.5, 0.5] maps to
+// screen offset ((lx - ly) * hw, (lx + ly) * hh) — so the source image's
+// four corners (0,0)/(1,0)/(1,1)/(0,1) land exactly on the diamond's
+// top/right/bottom/left tips. That's `matrix(hw, hh, -hw, hh, c.x, c.y-hh)`
+// applied to a 1x1 unit-square <image>. A thin stroke-only polygon is
+// still drawn per tile for edge definition (no fill — the image is now
+// the fill), preserving the existing checker/throne-glow stroke classes.
 function buildIsoFloorSvg(): string {
-  var polys = '';
+  var hw = TILE_WIDTH / 2;
+  var hh = TILE_HEIGHT / 2;
+  var images = '';
+  var outlines = '';
   for (var ty = 0; ty < GRID_H; ty++) {
     for (var tx = 0; tx < GRID_W; tx++) {
       var c = toScreenCoords(tx, ty, 0);
-      var hw = TILE_WIDTH / 2;
-      var hh = TILE_HEIGHT / 2;
       var points =
         c.x + ',' + (c.y - hh) + ' ' +
         (c.x + hw) + ',' + c.y + ' ' +
         c.x + ',' + (c.y + hh) + ' ' +
         (c.x - hw) + ',' + c.y;
       var checker = (tx + ty) % 2 === 0;
-      polys +=
+      var href = tileAssetUrl(checker ? FLOOR_TILE_A : FLOOR_TILE_B);
+      var matrix = 'matrix(' + hw + ' ' + hh + ' ' + (-hw) + ' ' + hh + ' ' + c.x + ' ' + (c.y - hh) + ')';
+      images +=
+        '<image href="' + href + '" x="0" y="0" width="1" height="1" ' +
+        'preserveAspectRatio="none" transform="' + matrix + '" ' +
+        'class="iso-tile-img" image-rendering="pixelated"></image>';
+      outlines +=
         '<polygon points="' + points + '" class="iso-tile' + (checker ? ' iso-tile--alt' : '') + '"></polygon>';
     }
   }
   return (
     '<svg class="iso-floor-svg" viewBox="0 0 ' + VIEW_W + ' ' + VIEW_H + '" preserveAspectRatio="none" aria-hidden="true">' +
-    polys +
+    images +
+    outlines +
     '</svg>'
   );
 }
@@ -160,6 +184,7 @@ export function presentEntrance(): void {
     '<span class="room-content-icon">🚪</span>' +
     '<span class="room-content-label">Dungeon Mouth</span>';
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
+  hideMonsterToken();
   setDoorOpen(false);
   if (e.token) e.token.classList.remove('is-entering');
   if (e.chamber) e.chamber.classList.remove('hero-inside');
@@ -188,16 +213,19 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
       '<span class="room-content-icon">·</span>' +
       '<span class="room-content-label">Empty Room</span>';
     placeAtTile(e.content, ENCOUNTER_TILE, 50);
+    hideMonsterToken();
     return;
   }
 
   if (e.chamber) e.chamber.classList.remove('is-empty');
   var cat = catalogFor(slot.catalogId, slot.kind);
   var level = getItemLevel(slot.catalogId);
+  // A real sprite (see monsterSprites.ts) replaces the emoji icon so the
+  // two never render stacked on top of each other; the name/level label
+  // stays either way.
+  var hasSprite = slot.kind === 'monster' && hasMonsterSprite(slot.catalogId);
   e.content.innerHTML =
-    '<span class="room-content-icon">' +
-    (cat && cat.icon ? cat.icon : '·') +
-    '</span>' +
+    (hasSprite ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
     '<span class="room-content-label">' +
     (cat && cat.name ? cat.name : 'Room') +
     '</span>' +
@@ -205,6 +233,11 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
     level +
     '</span>';
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
+  if (hasSprite) {
+    showMonsterToken(slot.catalogId);
+  } else {
+    hideMonsterToken();
+  }
 }
 
 export function presentThrone(): void {
@@ -230,6 +263,7 @@ export function presentThrone(): void {
     k.maxHp +
     '</span>';
   placeAtTile(e.content, ENCOUNTER_TILE, 50);
+  hideMonsterToken();
 }
 
 export function heroEnterRoom(): void {
@@ -245,6 +279,9 @@ export function heroEnterRoom(): void {
   // so the animation and the raid's own pacing stay in sync without
   // raid.ts (or this function) needing to await it directly.
   walkHeroToEncounter();
+  // Same fire-and-forget budget for the monster's brief walk-in flourish
+  // (no-op if this room has no sprite-backed monster).
+  playMonsterWalkFlourish(beatMs('arriveRoom'));
 }
 
 export async function playDoorEnterSequence(waitBeat: (key: BeatKey) => Promise<void>): Promise<void> {

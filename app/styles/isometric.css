@@ -31,15 +31,22 @@
   height: 100%;
 }
 
+.iso-tile-img {
+  image-rendering: pixelated;
+}
+
+/* Real floor texture is now the fill (see roomStage.ts's buildIsoFloorSvg
+   affine <image> mapping) — this outline is stroke-only edge definition
+   drawn on top, keeping the existing checker/throne-glow stroke look. */
 .iso-tile {
-  fill: rgba(60, 49, 34, 0.4);
+  fill: none;
   stroke: rgba(216, 170, 77, 0.22);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
 .iso-tile--alt {
-  fill: rgba(60, 49, 34, 0.58);
+  stroke: rgba(216, 170, 77, 0.32);
 }
 
 .room-chamber.is-throne .iso-tile {
@@ -128,10 +135,40 @@
   100% { transform: translateY(0); }
 }
 
+/* Monster token: the real-sprite counterpart to .room-content-icon's emoji
+   fallback (see roomStage.ts's presentRoom() — only one of the two ever
+   shows for a given room). Same tile space, same "standee" anchoring as
+   the hero token; monsterToken.ts sizes the sprite off this box's own
+   rendered width, so this is the single place controlling display scale. */
+.monster-token {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.monster-token.is-visible {
+  opacity: 1;
+}
+
+.monster-token-sprite {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
 @media (max-width: 400px) {
   .hero-token {
     width: 28px;
     height: 28px;
+  }
+
+  .monster-token {
+    width: 30px;
+    height: 30px;
   }
 
   .room-door {

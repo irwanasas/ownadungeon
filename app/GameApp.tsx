@@ -129,6 +129,9 @@ export default function GameApp() {
                     <span className="room-content-icon">🚪</span>
                     <span className="room-content-label">Dungeon Mouth</span>
                   </div>
+                  <div id="monster-token" className="monster-token" aria-hidden="true">
+                    <div className="monster-token-sprite"></div>
+                  </div>
                   <div id="hero-token" className="hero-token" aria-hidden="true">
                     <span className="hero-token-face">⚔</span>
                   </div>
