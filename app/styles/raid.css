@@ -40,10 +40,6 @@
 
 .dungeon-runway {
   position: relative;
-  /* flex:1 (not flex-shrink:0) so this fills whatever vertical space is
-     left in .stage-panel — previously .raid-stage did that job even in
-     the idle (pre-raid) state; now that it's gone, this is the only
-     remaining flexible child, in both idle and battle-active layouts. */
   flex: 1;
   min-height: 0;
   margin-bottom: 4px;
@@ -137,21 +133,28 @@
 .room-chamber {
   position: relative;
   flex: 1;
-  min-height: 120px;
-  border: 1px solid var(--border-bright);
-  border-radius: 8px;
-  background:
-    radial-gradient(ellipse at 50% 100%, rgba(60, 49, 34, 0.45), transparent 55%),
-    linear-gradient(180deg, rgba(18, 14, 11, 0.95), rgba(27, 22, 16, 0.98));
+  min-height: 160px;
+  border: 1px solid rgba(80, 110, 140, 0.35);
+  border-radius: 10px;
+  background-color: #0c1218;
+  background-image:
+    linear-gradient(180deg, rgba(8, 12, 18, 0.35) 0%, rgba(8, 12, 18, 0.15) 40%, rgba(12, 8, 10, 0.45) 100%),
+    var(--img-room-bg);
+  background-size: cover, cover;
+  background-position: center, center 42%;
+  background-repeat: no-repeat;
   overflow: hidden;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    inset 0 0 32px rgba(0, 0, 0, 0.55),
+    inset 0 -20px 40px rgba(120, 20, 10, 0.12);
 }
 
 .room-chamber.is-throne {
-  border-color: var(--gold);
+  border-color: rgba(216, 170, 77, 0.55);
   box-shadow:
-    inset 0 0 28px rgba(216, 170, 77, 0.12),
-    0 0 12px rgba(216, 170, 77, 0.2);
+    inset 0 0 36px rgba(216, 170, 77, 0.14),
+    inset 0 -24px 48px rgba(180, 40, 20, 0.18),
+    0 0 14px rgba(216, 170, 77, 0.22);
 }
 
 .room-content {
@@ -217,7 +220,7 @@
 
 @media (max-width: 400px) {
   .room-chamber {
-    min-height: 110px;
+    min-height: 140px;
   }
 
   .room-content-icon {
