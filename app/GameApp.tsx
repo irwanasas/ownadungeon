@@ -9,14 +9,19 @@ function assetUrl(path: string): string {
   return `url(${ASSET_BASE}/assets/ui/cropped/${path})`;
 }
 
-// UI-pack sprite crops, exposed as CSS custom properties so plain CSS
-// (which Next doesn't rewrite for basePath) can reference them.
+function uiBgUrl(path: string): string {
+  return `url(${ASSET_BASE}/assets/ui/bg/${path})`;
+}
+
+// UI-pack sprite crops + room backdrop, exposed as CSS custom properties
+// so plain CSS (which Next doesn't rewrite for basePath) can reference them.
 const uiAssetVars = {
   '--img-panel-parchment': assetUrl('panel-parchment.png'),
   '--img-pill-idle': assetUrl('pill-button.png'),
   '--img-pill-hover': assetUrl('pill-button-hover.png'),
   '--img-icon-gold': assetUrl('icon-gold.png'),
-  '--img-icon-soul': assetUrl('icon-soul.png')
+  '--img-icon-soul': assetUrl('icon-soul.png'),
+  '--img-room-bg': uiBgUrl('IMG_4394.jpeg')
 } as CSSProperties;
 
 export default function GameApp() {
