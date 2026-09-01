@@ -154,6 +154,12 @@
 }
 
 .monster-token-sprite {
+  /* Must be block (or inline-block/flex) — a bare <span> is display:inline
+     by default, and inline elements ignore width/height entirely. Without
+     this, spriteAnimator.ts reads getBoundingClientRect().width as 0,
+     scales the frame to 0px, and the sprite silently renders invisible
+     even though the image itself loads fine. */
+  display: block;
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
