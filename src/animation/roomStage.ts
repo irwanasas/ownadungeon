@@ -1,182 +1,66 @@
-// Presents each dungeon room on the sidescrolling raid stage: door open,
-// hero walk-in, monster walk-in, room label/content. Replaces the
-// isometric-tile version — see /backup/isometric/src/animation/roomStage.ts
-// for the previous version.
-//
-// Public API is unchanged on purpose so combat/raid.ts doesn't need to
-// change at all: enterRaidRoomMode, exitRaidRoomMode, setDoorOpen,
-// presentEntrance, presentRoom, presentThrone, heroEnterRoom,
-// playDoorEnterSequence.
+import { MonsterTokenState, updateMonsterToken, renderMonsterToken } from './monsterToken';
+import { getCachedImage } from './spriteAnimator';
 
-import { catalogFor } from '../data/catalog';
-import { getItemLevel } from '../economy/economy';
-import { state } from '../state/gameState';
-import { getKingStats } from '../data/king';
-import { placeHeroAtEntrance, walkHeroToEncounter } from './heroToken';
-import { showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
-import { beatMs, type BeatKey } from './beatTiming';
-import type { DungeonSlotData } from '../types';
-
-interface StageEls {
-  runway: HTMLElement | null;
-  stage: HTMLElement | null;
-  door: HTMLElement | null;
-  chamber: HTMLElement | null;
-  content: HTMLElement | null;
-  depth: HTMLElement | null;
-  token: HTMLElement | null;
+export interface StageLanes {
+  laneCount: number;
+  laneHeight: number;
+  startY: number;
 }
 
-function els(): StageEls {
-  return {
-    runway: document.getElementById('dungeon-runway'),
-    stage: document.getElementById('room-stage'),
-    door: document.getElementById('room-door'),
-    chamber: document.getElementById('room-chamber'),
-    content: document.getElementById('room-content'),
-    depth: document.getElementById('room-depth'),
-    token: document.getElementById('hero-token')
-  };
-}
+export class SideScrollStage {
+  private ctx: CanvasRenderingContext2D;
+  private backgroundSrc: string;
+  private tokens: MonsterTokenState[] = [];
+  private lanes: StageLanes;
 
-export function enterRaidRoomMode(): void {
-  var e = els();
-  if (e.runway) e.runway.classList.add('is-raiding', 'is-room-mode');
-  if (e.stage) {
-    e.stage.classList.remove('is-hidden');
-    e.stage.setAttribute('aria-hidden', 'false');
-  }
-  var app = document.querySelector('.app');
-  if (app) app.classList.add('battle-active');
-  document.body.classList.add('battle-active');
-}
-
-export function exitRaidRoomMode(): void {
-  var e = els();
-  if (e.runway) e.runway.classList.remove('is-raiding', 'is-room-mode');
-  if (e.stage) {
-    e.stage.classList.add('is-hidden');
-    e.stage.setAttribute('aria-hidden', 'true');
-  }
-  if (e.door) e.door.classList.remove('is-open', 'is-opening');
-  if (e.chamber) e.chamber.classList.remove('is-throne', 'is-empty', 'hero-inside');
-  if (e.token) e.token.classList.remove('is-entering');
-  var app = document.querySelector('.app');
-  if (app) app.classList.remove('battle-active');
-  document.body.classList.remove('battle-active');
-}
-
-// The door sits at a fixed CSS position now (left edge) — no per-call tile
-// math needed, just toggle the open/close visual state.
-export function setDoorOpen(open: boolean): void {
-  var e = els();
-  if (!e.door) return;
-  if (open) {
-    e.door.classList.add('is-opening');
-    requestAnimationFrame(function () {
-      if (e.door) e.door.classList.add('is-open');
-    });
-  } else {
-    e.door.classList.remove('is-open', 'is-opening');
-  }
-}
-
-export function presentEntrance(): void {
-  var e = els();
-  if (!e.content) return;
-  if (e.chamber) {
-    e.chamber.classList.remove('is-throne');
-    e.chamber.classList.add('is-empty');
-  }
-  if (e.depth) e.depth.textContent = 'Entrance';
-  e.content.innerHTML =
-    '<span class="room-content-icon">🚪</span>' +
-    '<span class="room-content-label">Dungeon Mouth</span>';
-  e.content.classList.remove('has-sprite');
-  hideMonsterToken();
-  setDoorOpen(false);
-  if (e.token) e.token.classList.remove('is-entering');
-  if (e.chamber) e.chamber.classList.remove('hero-inside');
-  placeHeroAtEntrance();
-}
-
-export function presentRoom(index: number, slot: DungeonSlotData | null): void {
-  var e = els();
-  if (!e.content) return;
-
-  var total = state.slotCount || 1;
-  if (e.depth) e.depth.textContent = 'Room ' + (index + 1) + ' / ' + total;
-  if (e.chamber) e.chamber.classList.remove('is-throne', 'hero-inside');
-  setDoorOpen(false);
-  if (e.token) e.token.classList.remove('is-entering');
-  placeHeroAtEntrance();
-
-  if (!slot) {
-    if (e.chamber) e.chamber.classList.add('is-empty');
-    e.content.innerHTML =
-      '<span class="room-content-icon">·</span>' +
-      '<span class="room-content-label">Empty Room</span>';
-    e.content.classList.remove('has-sprite');
-    hideMonsterToken();
-    return;
+  constructor(ctx: CanvasRenderingContext2D, backgroundSrc: string = '/assets/ui/bg/IMG_4394.jpeg') {
+    this.ctx = ctx;
+    this.backgroundSrc = backgroundSrc;
+    this.lanes = {
+      laneCount: 3,
+      laneHeight: 80,
+      startY: 120,
+    };
   }
 
-  if (e.chamber) e.chamber.classList.remove('is-empty');
-  var cat = catalogFor(slot.catalogId, slot.kind);
-  var level = getItemLevel(slot.catalogId);
-  var isMonster = slot.kind === 'monster';
-
-  // Monsters get their own walking token (revealed off-screen right, then
-  // walked in once the door opens) instead of a static content icon.
-  // Traps/treasure stay as the static room-content label the hero walks
-  // up to — "the trap doesn't move, only the hero approaches it."
-  e.content.innerHTML =
-    (isMonster ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
-    '<span class="room-content-label">' + (cat && cat.name ? cat.name : 'Room') + '</span>' +
-    '<span class="room-content-sub">Lv.' + level + '</span>';
-  e.content.classList.toggle('has-sprite', isMonster);
-
-  if (isMonster) {
-    showMonsterToken(cat && cat.icon ? cat.icon : '👹');
-  } else {
-    hideMonsterToken();
+  public addToken(token: MonsterTokenState): void {
+    this.tokens.push(token);
   }
-}
 
-export function presentThrone(): void {
-  var e = els();
-  if (!e.content) return;
-  var kingLv = (state.king && state.king.level) || 1;
-  var k = getKingStats(kingLv);
-  if (e.depth) e.depth.textContent = 'Throne Room';
-  if (e.chamber) {
-    e.chamber.classList.add('is-throne');
-    e.chamber.classList.remove('is-empty', 'hero-inside');
+  public update(deltaTimeMs: number): void {
+    this.tokens = this.tokens.map((token) => updateMonsterToken(token, deltaTimeMs));
   }
-  setDoorOpen(false);
-  if (e.token) e.token.classList.remove('is-entering');
-  placeHeroAtEntrance();
-  e.content.innerHTML =
-    '<span class="room-content-icon">👑</span>' +
-    '<span class="room-content-label">Throne</span>' +
-    '<span class="room-content-sub">King Lv.' + kingLv + ' · HP ' + k.maxHp + '</span>';
-  e.content.classList.remove('has-sprite');
-  hideMonsterToken();
-}
 
-export function heroEnterRoom(): void {
-  var e = els();
-  if (e.token) e.token.classList.add('is-entering');
-  if (e.chamber) e.chamber.classList.add('hero-inside');
-  walkHeroToEncounter();
-  playMonsterWalkFlourish(beatMs('arriveRoom'));
-}
+  public render(canvasWidth: number, canvasHeight: number): void {
+    this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-export async function playDoorEnterSequence(waitBeat: (key: BeatKey) => Promise<void>): Promise<void> {
-  setDoorOpen(false);
-  await waitBeat('doorClosed');
-  setDoorOpen(true);
-  await waitBeat('doorOpen');
-  heroEnterRoom();
-  await waitBeat('arriveRoom');
+    // 1. Render Background Image / Parallax
+    const bgImg = getCachedImage(this.backgroundSrc);
+    if (bgImg.complete && bgImg.naturalWidth > 0) {
+      this.ctx.drawImage(bgImg, 0, 0, canvasWidth, canvasHeight);
+    } else {
+      this.ctx.fillStyle = '#1e1e24';
+      this.ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    // 2. Render Garis Pembatas Lane / Lantai Arena
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    this.ctx.lineWidth = 2;
+
+    for (let i = 0; i < this.lanes.laneCount; i++) {
+      const laneY = this.lanes.startY + i * this.lanes.laneHeight;
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, laneY);
+      this.ctx.lineTo(canvasWidth, laneY);
+      this.ctx.stroke();
+    }
+
+    // 3. Sort token berdasarkan posisi Y (Depth sorting sederhana)
+    const sortedTokens = [...this.tokens].sort((a, b) => a.y - b.y);
+
+    // 4. Render seluruh Token di dalam Lane
+    for (const token of sortedTokens) {
+      renderMonsterToken(this.ctx, token);
+    }
+  }
 }
