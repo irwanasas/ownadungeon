@@ -1,1 +1,267 @@
-PLACEHOLDER
+.room-preview {
+  border: 1px solid rgba(59, 42, 23, 0.3);
+  border-radius: 8px;
+  background-color: #1b1610;
+  background-image: var(--img-panel-parchment);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  padding: 10px 12px;
+  color: #3b2a17;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.preview-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a5a18;
+}
+
+.preview-hero-blurb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.preview-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(59, 42, 23, 0.25);
+  color: #4a3520;
+}
+
+.preview-tag--good {
+  color: #4a6a28;
+  border-color: rgba(122, 149, 86, 0.45);
+}
+
+.preview-tag--bad {
+  color: #a33a22;
+  border-color: rgba(192, 71, 43, 0.4);
+}
+
+.preview-matchup {
+  margin-top: 4px;
+  font-size: 9px;
+  text-align: center;
+  color: #6b5334;
+}
+
+.preview-matchup--strong {
+  color: #4a6a28;
+}
+
+.preview-matchup--weak {
+  color: #a33a22;
+}
+
+.preview-hint {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #6b5334;
+  line-height: 1.35;
+}
+
+.preview-layout-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.preview-layout-hints .preview-matchup {
+  margin-top: 0;
+  font-size: 9px;
+}
+
+.app.battle-active .room-preview:not(.room-preview--battle) {
+  display: none;
+}
+
+.room-preview--intro {
+  max-height: none;
+}
+
+.hero-intro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.hero-intro-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hero-intro-main {
+  min-width: 0;
+}
+
+.hero-intro-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #3b2a17;
+}
+
+.hero-intro-class {
+  font-weight: 500;
+  color: #8a5a18;
+  font-size: 12px;
+}
+
+.hero-intro-stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #6b5334;
+  margin-top: 2px;
+}
+
+.hero-intro-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.hero-trait-chip {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(59, 42, 23, 0.28);
+  color: #4a5a8a;
+}
+
+#room-preview.room-preview--intro {
+  border-color: rgba(138, 90, 42, 0.45);
+}
+
+#room-preview.room-preview--battle {
+  max-height: none;
+  padding: 6px 8px;
+  background-image: none;
+  background: rgba(12, 10, 8, 0.88);
+  border-color: rgba(138, 90, 42, 0.45);
+  color: var(--bone);
+  image-rendering: auto;
+}
+
+.battle-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.battle-card-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.battle-card-name {
+  font-weight: 700;
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-card-class {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.battle-card-hp-bar {
+  margin-top: 6px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.battle-card-hp-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--poison), var(--poison-bright));
+  transition: width 0.3s ease;
+}
+
+.battle-card-hp-fill.low {
+  background: linear-gradient(90deg, var(--ember), var(--ember-bright));
+}
+
+.battle-card-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.battle-card-reaction {
+  margin-top: 4px;
+  min-height: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.battle-card-reaction.is-panic,
+.battle-card-reaction.is-rage {
+  color: var(--ember-bright);
+}
+
+.battle-card-reaction.is-flee,
+.battle-card-reaction.is-fear {
+  color: var(--soul);
+}
+
+.battle-card-reaction.is-pain {
+  color: var(--ember);
+}
+
+.battle-card-reaction.is-surprise {
+  color: var(--gold);
+}
+
+#room-preview.is-panic {
+  border-color: rgba(230, 122, 74, 0.5);
+}
+
+#room-preview.is-rage {
+  border-color: rgba(192, 71, 43, 0.55);
+}
+
+#room-preview.is-flee {
+  animation: flee-out 0.75s ease-in forwards;
+}
+
+#room-preview.is-dead {
+  border-color: var(--muted-dim);
+  opacity: 0.72;
+  filter: grayscale(0.35);
+  animation: none;
+}
+
+#room-preview.is-dead .battle-card-reaction {
+  color: var(--muted);
+  animation: none;
+}
