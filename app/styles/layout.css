@@ -12,8 +12,20 @@ body {
   line-height: 1.45;
 }
 .app {
+  position: relative;
   height: 100dvh;
   max-height: 100dvh;
+  /* Mobile-first game, locked to a phone-portrait column even on wide
+     screens: max-width + auto margins center it, and the bare <body>
+     background (var(--bg)) shows through as letterboxing on the sides.
+     No-op on an actual phone (viewport is already narrower than this).
+     Every "position: fixed" overlay (bottom-nav, play-fab, side-overlay,
+     modal-overlay, toast-container) is anchored to this box via
+     position: absolute instead, so they stay inside the frame rather
+     than centering/spanning the full browser window. */
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   padding: 8px 10px;
@@ -148,7 +160,7 @@ body {
 .status-chip-val { font-size: 12px; font-weight: 600; color: var(--bone); }
 .status-chip--king .status-chip-val { color: var(--gold); font-size: 11px; }
 .play-fab {
-  position: fixed; left: 50%;
+  position: absolute; left: 50%;
   bottom: calc(var(--bottom-nav-h) + 10px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%); z-index: 150; width: 64px; height: 64px;
   border-radius: 50%; border: 2px solid var(--ember-bright);
@@ -169,7 +181,7 @@ body {
   text-transform: uppercase; line-height: 1.1;
 }
 .bottom-nav {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 140;
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 140;
   height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
   padding: 0 4px env(safe-area-inset-bottom, 0px);
   display: flex; align-items: stretch; justify-content: space-around;

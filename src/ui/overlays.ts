@@ -54,11 +54,11 @@ function trapFocus(e: KeyboardEvent): void {
     if (e.shiftKey) {
       if (document.activeElement === first) {
         e.preventDefault();
-        last.focus();
+        last.focus({ preventScroll: true });
       }
     } else if (document.activeElement === last) {
       e.preventDefault();
-      first.focus();
+      first.focus({ preventScroll: true });
     }
   }
 }
@@ -81,8 +81,8 @@ export function openOverlay(which: OverlayKey): void {
     var panel = el.querySelector('.side-panel');
     if (panel) {
       var focusable = getFocusable(panel);
-      if (focusable.length) focusable[0].focus();
-      else (panel as HTMLElement).focus();
+      if (focusable.length) focusable[0].focus({ preventScroll: true });
+      else (panel as HTMLElement).focus({ preventScroll: true });
     }
   });
 }
@@ -99,7 +99,7 @@ export function closeAllOverlays(): void {
     lastFocusedBeforeOverlay &&
     typeof (lastFocusedBeforeOverlay as HTMLElement).focus === 'function'
   ) {
-    (lastFocusedBeforeOverlay as HTMLElement).focus();
+    (lastFocusedBeforeOverlay as HTMLElement).focus({ preventScroll: true });
   }
   lastFocusedBeforeOverlay = null;
 }
