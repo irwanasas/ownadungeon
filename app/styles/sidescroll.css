@@ -1,0 +1,136 @@
+/* Sidescrolling raid battlefield: hero enters from the left (entrance),
+   monster enters from the right, they meet and fight in the center.
+   No background art required — positions are plain percentages of
+   `.room-floor`. Replaces isometric.css — see
+   /backup/isometric/app/styles/isometric.css for the previous version. */
+
+.room-floor {
+  position: absolute;
+  z-index: 2;
+  inset: 12% 6% 10%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.room-content {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  transition: left 0.4s ease, top 0.4s ease;
+}
+
+.room-content.has-sprite {
+  top: 22%;
+}
+
+.room-door {
+  position: absolute;
+  left: 8%;
+  bottom: 22%;
+  width: 22px;
+  height: 46px;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+}
+
+.room-door-panel {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--gold);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(216, 170, 77, 0.55), rgba(192, 71, 43, 0.5));
+  box-shadow: 0 0 8px rgba(216, 170, 77, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+  transform-origin: bottom center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.room-door.is-open .room-door-panel {
+  transform: scaleY(0.08);
+  opacity: 0.3;
+}
+
+.hero-token {
+  position: absolute;
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.hero-token.no-motion {
+  transition: opacity 0.25s ease;
+}
+
+.hero-token.is-visible {
+  opacity: 1;
+}
+
+.hero-token.is-flee {
+  opacity: 0;
+  transition: left 0.5s ease, top 0.5s ease, opacity 0.5s ease;
+}
+
+.hero-token.is-entering .hero-token-face {
+  animation: hero-step-bounce 0.4s ease;
+}
+
+@keyframes hero-step-bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+.monster-token {
+  position: absolute;
+  z-index: 90;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.monster-token.no-motion {
+  transition: opacity 0.25s ease;
+}
+
+.monster-token.is-visible {
+  opacity: 1;
+}
+
+.monster-token-face {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--muted-dim);
+  background: var(--panel-raised);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+  font-size: 18px;
+}
+
+@media (max-width: 400px) {
+  .hero-token,
+  .monster-token {
+    width: 28px;
+    height: 28px;
+  }
+
+  .room-door {
+    width: 18px;
+    height: 38px;
+  }
+}

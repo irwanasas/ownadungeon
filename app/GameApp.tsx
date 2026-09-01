@@ -134,7 +134,7 @@ export default function GameApp() {
                     <span className="hero-token-face">⚔</span>
                   </div>
                   <div id="monster-token" className="monster-token" aria-hidden="true">
-                    <span className="monster-token-sprite"></span>
+                    <span className="monster-token-face"></span>
                   </div>
                 </div>
               </div>

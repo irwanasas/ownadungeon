@@ -38,29 +38,38 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
+  /* Center, not stretch: the room-stage below is a bounded height (see
+     .room-chamber), not a flex-grow child, so on tall portrait phones any
+     leftover vertical space is neutral padding above/below the stage
+     instead of the sidescroll "ground band" (laneLayout.ts's FLOOR_Y=78%)
+     getting stranded in a mostly-empty full-screen void. */
+  justify-content: center;
   margin-bottom: 0;
 }
 
 .app.battle-active .room-stage {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  width: 100%;
   min-height: 0;
   margin-bottom: 0;
   position: relative;
 }
 
+/* Bounded, not flex:1-to-fill-the-screen: a sidescroll stage only needs
+   enough height for the ground band + door + standing tokens, not the
+   whole viewport. Capped relative to viewport height so it stays
+   proportionate on both short and tall phones — mobile is the priority
+   here, and a tall narrow screen is exactly where an unbounded height
+   reads worst (tiny icons floating in a huge empty "sky"). */
 .app.battle-active .room-chamber {
-  flex: 1 1 auto;
-  height: auto;
+  flex: 0 0 auto;
+  width: 100%;
+  height: clamp(220px, 46vh, 420px);
   min-height: 0;
   border-radius: 0;
   border-left: none;
   border-right: none;
-}
-
-.app.battle-active .room-floor {
-  height: auto;
 }
 
 .app.battle-active .room-content-icon {
@@ -97,9 +106,14 @@
   .app.battle-active .room-content-icon {
     font-size: clamp(22px, 6vw, 34px);
   }
+
+  .app.battle-active .room-chamber {
+    height: clamp(180px, 42vh, 320px);
+  }
 }
 
-/* Reclaim bottom nav + FAB space so the chamber can run nearly full-screen */
+/* Bottom nav + FAB are hidden during battle (not just visually reclaimed)
+   so the centered stage above has clean, uncluttered space around it. */
 .app.battle-active {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }

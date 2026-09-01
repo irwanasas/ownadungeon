@@ -6,7 +6,7 @@ import './styles/components.css';
 import './styles/raid.css';
 import './styles/battle.css';
 import './styles/preview.css';
-import './styles/isometric.css';
+import './styles/sidescroll.css';
 import './styles/ui-skin.css';
 
 export const metadata: Metadata = {

@@ -1,19 +1,22 @@
-// Presents each dungeon room on the sidescrolling raid stage: door open,
-// hero walk-in, monster walk-in, room label/content. Replaces the
-// isometric-tile version — see /backup/isometric/src/animation/roomStage.ts
-// for the previous version.
-//
-// Public API is unchanged on purpose so combat/raid.ts doesn't need to
-// change at all: enterRaidRoomMode, exitRaidRoomMode, setDoorOpen,
-// presentEntrance, presentRoom, presentThrone, heroEnterRoom,
-// playDoorEnterSequence.
-
 import { catalogFor } from '../data/catalog';
 import { getItemLevel } from '../economy/economy';
 import { state } from '../state/gameState';
 import { getKingStats } from '../data/king';
+import {
+  GRID_W,
+  GRID_H,
+  VIEW_W,
+  VIEW_H,
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  ENTRANCE_TILE,
+  ENCOUNTER_TILE,
+  toScreenCoords,
+  depthKey,
+  type Tile
+} from './isoGrid';
 import { placeHeroAtEntrance, walkHeroToEncounter } from './heroToken';
-import { showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
+import { hasMonsterSprite, showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
 import { beatMs, type BeatKey } from './beatTiming';
 import type { DungeonSlotData } from '../types';
 
@@ -25,6 +28,7 @@ interface StageEls {
   content: HTMLElement | null;
   depth: HTMLElement | null;
   token: HTMLElement | null;
+  isoFloor: HTMLElement | null;
 }
 
 function els(): StageEls {
@@ -35,12 +39,49 @@ function els(): StageEls {
     chamber: document.getElementById('room-chamber'),
     content: document.getElementById('room-content'),
     depth: document.getElementById('room-depth'),
-    token: document.getElementById('hero-token')
+    token: document.getElementById('hero-token'),
+    isoFloor: document.getElementById('room-iso-floor')
   };
+}
+
+export function tileToPercent(tile: Tile): { left: string; top: string; z: number } {
+  var p = toScreenCoords(tile.x, tile.y, tile.z || 0);
+  return {
+    left: (p.x / VIEW_W) * 100 + '%',
+    top: (p.y / VIEW_H) * 100 + '%',
+    z: depthKey(tile.x, tile.y)
+  };
+}
+
+function placeAtTile(el: HTMLElement | null, tile: Tile, zBase: number): void {
+  if (!el) return;
+  var pos = tileToPercent(tile);
+  el.style.left = pos.left;
+  el.style.top = pos.top;
+  el.style.zIndex = String(zBase + pos.z);
+}
+
+function buildIsoFloorSvg(): string {
+  return (
+    '<svg class="iso-floor-svg" viewBox="0 0 ' + VIEW_W + ' ' + VIEW_H + '" preserveAspectRatio="none" aria-hidden="true"></svg>'
+  );
+}
+
+function ensureIsoFloor(e: StageEls): void {
+  if (!e.chamber) return;
+  if (e.isoFloor) return;
+  var floor = document.createElement('div');
+  floor.id = 'room-iso-floor';
+  floor.className = 'room-iso-floor';
+  floor.setAttribute('aria-hidden', 'true');
+  floor.innerHTML = buildIsoFloorSvg();
+  var roomFloor = e.chamber.querySelector('.room-floor');
+  if (roomFloor) roomFloor.insertBefore(floor, roomFloor.firstChild);
 }
 
 export function enterRaidRoomMode(): void {
   var e = els();
+  ensureIsoFloor(e);
   if (e.runway) e.runway.classList.add('is-raiding', 'is-room-mode');
   if (e.stage) {
     e.stage.classList.remove('is-hidden');
@@ -66,23 +107,24 @@ export function exitRaidRoomMode(): void {
   document.body.classList.remove('battle-active');
 }
 
-// The door sits at a fixed CSS position now (left edge) — no per-call tile
-// math needed, just toggle the open/close visual state.
 export function setDoorOpen(open: boolean): void {
-  var e = els();
-  if (!e.door) return;
+  const e = els();
+  const door = e.door;
+  if (!door) return;
+  placeAtTile(door, ENTRANCE_TILE, 200);
   if (open) {
-    e.door.classList.add('is-opening');
+    door.classList.add('is-opening');
     requestAnimationFrame(function () {
-      if (e.door) e.door.classList.add('is-open');
+      door.classList.add('is-open');
     });
   } else {
-    e.door.classList.remove('is-open', 'is-opening');
+    door.classList.remove('is-open', 'is-opening');
   }
 }
 
 export function presentEntrance(): void {
   var e = els();
+  ensureIsoFloor(e);
   if (!e.content) return;
   if (e.chamber) {
     e.chamber.classList.remove('is-throne');
@@ -93,6 +135,7 @@ export function presentEntrance(): void {
     '<span class="room-content-icon">🚪</span>' +
     '<span class="room-content-label">Dungeon Mouth</span>';
   e.content.classList.remove('has-sprite');
+  placeAtTile(e.content, ENCOUNTER_TILE, 50);
   hideMonsterToken();
   setDoorOpen(false);
   if (e.token) e.token.classList.remove('is-entering');
@@ -102,11 +145,16 @@ export function presentEntrance(): void {
 
 export function presentRoom(index: number, slot: DungeonSlotData | null): void {
   var e = els();
+  ensureIsoFloor(e);
   if (!e.content) return;
 
   var total = state.slotCount || 1;
-  if (e.depth) e.depth.textContent = 'Room ' + (index + 1) + ' / ' + total;
-  if (e.chamber) e.chamber.classList.remove('is-throne', 'hero-inside');
+  if (e.depth) {
+    e.depth.textContent = 'Room ' + (index + 1) + ' / ' + total;
+  }
+  if (e.chamber) {
+    e.chamber.classList.remove('is-throne', 'hero-inside');
+  }
   setDoorOpen(false);
   if (e.token) e.token.classList.remove('is-entering');
   placeHeroAtEntrance();
@@ -117,6 +165,7 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
       '<span class="room-content-icon">·</span>' +
       '<span class="room-content-label">Empty Room</span>';
     e.content.classList.remove('has-sprite');
+    placeAtTile(e.content, ENCOUNTER_TILE, 50);
     hideMonsterToken();
     return;
   }
@@ -124,20 +173,19 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
   if (e.chamber) e.chamber.classList.remove('is-empty');
   var cat = catalogFor(slot.catalogId, slot.kind);
   var level = getItemLevel(slot.catalogId);
-  var isMonster = slot.kind === 'monster';
-
-  // Monsters get their own walking token (revealed off-screen right, then
-  // walked in once the door opens) instead of a static content icon.
-  // Traps/treasure stay as the static room-content label the hero walks
-  // up to — "the trap doesn't move, only the hero approaches it."
+  var hasSprite = slot.kind === 'monster' && hasMonsterSprite(slot.catalogId);
   e.content.innerHTML =
-    (isMonster ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
-    '<span class="room-content-label">' + (cat && cat.name ? cat.name : 'Room') + '</span>' +
-    '<span class="room-content-sub">Lv.' + level + '</span>';
-  e.content.classList.toggle('has-sprite', isMonster);
-
-  if (isMonster) {
-    showMonsterToken(cat && cat.icon ? cat.icon : '👹');
+    (hasSprite ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
+    '<span class="room-content-label">' +
+    (cat && cat.name ? cat.name : 'Room') +
+    '</span>' +
+    '<span class="room-content-sub">Lv.' +
+    level +
+    '</span>';
+  e.content.classList.toggle('has-sprite', hasSprite);
+  placeAtTile(e.content, ENCOUNTER_TILE, 50);
+  if (hasSprite) {
+    showMonsterToken(slot.catalogId);
   } else {
     hideMonsterToken();
   }
@@ -145,6 +193,7 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
 
 export function presentThrone(): void {
   var e = els();
+  ensureIsoFloor(e);
   if (!e.content) return;
   var kingLv = (state.king && state.king.level) || 1;
   var k = getKingStats(kingLv);
@@ -159,15 +208,24 @@ export function presentThrone(): void {
   e.content.innerHTML =
     '<span class="room-content-icon">👑</span>' +
     '<span class="room-content-label">Throne</span>' +
-    '<span class="room-content-sub">King Lv.' + kingLv + ' · HP ' + k.maxHp + '</span>';
+    '<span class="room-content-sub">King Lv.' +
+    kingLv +
+    ' · HP ' +
+    k.maxHp +
+    '</span>';
   e.content.classList.remove('has-sprite');
+  placeAtTile(e.content, ENCOUNTER_TILE, 50);
   hideMonsterToken();
 }
 
 export function heroEnterRoom(): void {
   var e = els();
-  if (e.token) e.token.classList.add('is-entering');
-  if (e.chamber) e.chamber.classList.add('hero-inside');
+  if (e.token) {
+    e.token.classList.add('is-entering');
+  }
+  if (e.chamber) {
+    e.chamber.classList.add('hero-inside');
+  }
   walkHeroToEncounter();
   playMonsterWalkFlourish(beatMs('arriveRoom'));
 }

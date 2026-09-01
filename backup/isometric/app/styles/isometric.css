@@ -1,0 +1,178 @@
+/* Isometric raid battlefield: entities share VIEW_W/VIEW_H logical space.
+   Floor art + white 4x4 grid come from the chamber background (IMG_4394), not
+   a second synthetic tile layer. */
+
+.room-floor {
+  /* Bounding box of painted white 4x4 diamond in IMG_4394.jpeg, measured
+     directly from the source image via pixel thresholding (700x925 art).
+     Chamber bg uses background-size: 100% 100% (no crop), so image-pixel
+     percentages map 1:1 onto this container regardless of its rendered
+     aspect ratio. */
+  position: absolute;
+  z-index: 2;
+  left: 22.3%;
+  width: 58%;
+  top: 62.1%;
+  height: 23.4%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.room-iso-floor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.iso-floor-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.iso-tile-img {
+  display: none;
+}
+
+.iso-tile {
+  fill: none;
+  stroke: transparent;
+}
+
+.iso-tile--alt {
+  stroke: transparent;
+}
+
+.room-chamber.is-throne .iso-tile {
+  stroke: transparent;
+}
+
+.room-content {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+  transition: left 0.4s ease, top 0.4s ease;
+}
+
+.room-content.has-sprite {
+  transform: translate(-50%, 10px);
+}
+
+.room-door {
+  position: absolute;
+  width: 46px;
+  height: 13px;
+  transform: translate(-50%, -50%) rotate(-26.565deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.room-door-panel {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--gold);
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(216, 170, 77, 0.55), rgba(192, 71, 43, 0.5));
+  box-shadow: 0 0 8px rgba(216, 170, 77, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.room-door.is-open .room-door-panel {
+  transform: scaleX(0.08);
+  opacity: 0.3;
+}
+
+.hero-token {
+  position: absolute;
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.hero-token.no-motion {
+  transition: opacity 0.25s ease;
+}
+
+.hero-token.is-visible {
+  opacity: 1;
+}
+
+.hero-token.is-flee {
+  opacity: 0;
+  transition: left 0.5s ease, top 0.5s ease, opacity 0.5s ease;
+}
+
+.hero-token.is-entering .hero-token-face {
+  animation: hero-step-bounce 0.4s ease;
+}
+
+@keyframes hero-step-bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+.monster-token {
+  --tile-w-pct: 25%;
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.monster-token.is-visible {
+  opacity: 1;
+}
+
+.monster-token--sm {
+  width: calc(var(--tile-w-pct) * 0.85);
+}
+
+.monster-token--md {
+  width: calc(var(--tile-w-pct) * 1.15);
+}
+
+.monster-token--lg {
+  width: calc(var(--tile-w-pct) * 1.4);
+}
+
+.monster-token--xl {
+  width: calc(var(--tile-w-pct) * 1.65);
+}
+
+.monster-token-sprite {
+  /* Must be block (or inline-block/flex) — a bare <span> is display:inline
+     by default, and inline elements ignore width/height entirely. Without
+     this, spriteAnimator.ts reads getBoundingClientRect().width as 0,
+     scales the frame to 0px, and the sprite silently renders invisible
+     even though the image itself loads fine. */
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+@media (max-width: 400px) {
+  .hero-token {
+    width: 28px;
+    height: 28px;
+  }
+
+  .room-door {
+    width: 38px;
+    height: 11px;
+  }
+}
