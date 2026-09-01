@@ -3,15 +3,17 @@
    a second synthetic tile layer. */
 
 .room-floor {
-  /* Bounding box of painted white 4x4 diamond in IMG_4394.jpeg
-     (700x925 art: x 156..549, y 552..789 → 22.3%/56.1% × 59.7%/25.6%).
-     Chamber bg must use background-size: 100% 100% so UV = chamber %. */
+  /* Bounding box of painted white 4x4 diamond in IMG_4394.jpeg, measured
+     directly from the source image via pixel thresholding (700x925 art).
+     Chamber bg uses background-size: 100% 100% (no crop), so image-pixel
+     percentages map 1:1 onto this container regardless of its rendered
+     aspect ratio. */
   position: absolute;
   z-index: 2;
   left: 22.3%;
-  width: 56.1%;
-  top: 59.7%;
-  height: 25.6%;
+  width: 58%;
+  top: 62.1%;
+  height: 23.4%;
   overflow: visible;
   pointer-events: none;
 }
