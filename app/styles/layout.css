@@ -127,13 +127,23 @@ body {
 .slot-label { font-size: 10px; text-align: center; color: var(--bone); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .slot-sub { font-size: 9px; color: var(--muted); }
 .slot-connector { flex: 0 0 12px; height: 2px; background: var(--border); align-self: center; }
+/* Mode & Progress chips duplicate the mode-toggle + mode-stage-label directly
+   above them (same text, same data). Kept in the DOM (JS still writes to
+   #status-mode / #status-progress) but visually hidden so screen readers
+   with aria-live still get the announcement without the redundant card. */
 .status-strip { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
-.status-chip {
-  display: flex; flex-direction: column; gap: 2px; padding: 6px 10px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--panel-raised); min-width: 0; flex: 1 1 120px;
+.status-chip--mode,
+.status-chip--progress {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
-.status-chip--king { border-color: rgba(216, 170, 77, 0.45); flex: 2 1 180px; }
+/* King combat stats are NOT shown anywhere else, so this one stays visible —
+   restyled as a slim inline line instead of a full status-card to match its
+   secondary importance. */
+.status-chip--king {
+  display: flex; align-items: baseline; gap: 6px; flex: 1 1 100%;
+  padding: 4px 2px 2px; border: none; background: none;
+}
 .status-chip-key { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
 .status-chip-val { font-size: 12px; font-weight: 600; color: var(--bone); }
 .status-chip--king .status-chip-val { color: var(--gold); font-size: 11px; }

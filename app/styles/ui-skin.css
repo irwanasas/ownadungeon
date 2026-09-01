@@ -34,19 +34,12 @@
 .currency:last-child { color: #4a5a8a; }
 .currency-label { color: #6b5334; }
 
-.status-chip {
-  border: 1px solid rgba(59, 42, 23, 0.28);
-  border-radius: 6px;
-  background-color: #1b1610;
-  background-image: var(--img-panel-parchment);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
-}
-
-.status-chip--king { border-color: rgba(138, 90, 42, 0.55); }
-.status-chip-key { color: #6b5334 !important; }
-.status-chip-val { color: #3b2a17 !important; }
+/* Parchment-panel skin intentionally NOT applied to .status-chip--king —
+   it's a slim inline stat line now (see layout.css), sitting directly on the
+   dark app background, so it keeps the light bone/gold text colors from
+   layout.css instead of the dark parchment-only colors below. */
+.status-chip:not(.status-chip--king) .status-chip-key { color: #6b5334 !important; }
+.status-chip:not(.status-chip--king) .status-chip-val { color: #3b2a17 !important; }
 
 .panel {
   border: 1px solid rgba(90, 70, 40, 0.45);
