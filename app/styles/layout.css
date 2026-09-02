@@ -197,6 +197,15 @@ body {
   -webkit-tap-highlight-color: transparent; position: relative; min-height: 48px;
 }
 .bottom-nav-icon { font-size: 16px; line-height: 1; }
+.icon-armory, .icon-upgrade, .icon-settings, .icon-play {
+  width: 16px; height: 16px; display: inline-block;
+  background-repeat: no-repeat; background-size: contain; background-position: center;
+  image-rendering: pixelated;
+}
+.icon-armory { background-image: var(--img-icon-armory); }
+.icon-upgrade { background-image: var(--img-icon-upgrade); }
+.icon-settings { background-image: var(--img-icon-settings); }
+.icon-play { background-image: var(--img-icon-play); }
 .bottom-nav-label {
   font-size: 9px; font-weight: 600; letter-spacing: 0.02em;
   text-transform: uppercase; white-space: nowrap; overflow: hidden;

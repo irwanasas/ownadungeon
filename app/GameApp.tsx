@@ -21,6 +21,10 @@ const uiAssetVars = {
   '--img-pill-hover': assetUrl('pill-button-hover.png'),
   '--img-icon-gold': assetUrl('icon-gold.png'),
   '--img-icon-soul': assetUrl('icon-soul.png'),
+  '--img-icon-armory': assetUrl('icon-armory.png'),
+  '--img-icon-upgrade': assetUrl('icon-upgrade.png'),
+  '--img-icon-settings': assetUrl('icon-settings.png'),
+  '--img-icon-play': assetUrl('icon-play.png'),
   '--img-room-bg': uiBgUrl('IMG_4394.jpeg')
 } as CSSProperties;
 
@@ -154,19 +158,17 @@ export default function GameApp() {
         type="button"
         aria-label="Start Raid"
       >
-        <span className="play-fab-icon" aria-hidden="true">
-          ▶
-        </span>
+        <span className="play-fab-icon icon-play" aria-hidden="true"></span>
         <span className="play-fab-label">Raid</span>
       </button>
 
       <nav className="bottom-nav" aria-label="Main">
         <button type="button" id="btn-open-palette" className="bottom-nav-item" aria-expanded="false" data-nav="palette">
-          <span className="bottom-nav-icon" aria-hidden="true">🗡</span>
+          <span className="bottom-nav-icon icon-armory" aria-hidden="true"></span>
           <span className="bottom-nav-label">Armory</span>
         </button>
         <button type="button" id="btn-open-upgrades" className="bottom-nav-item" aria-expanded="false" data-nav="upgrades">
-          <span className="bottom-nav-icon" aria-hidden="true">⬆</span>
+          <span className="bottom-nav-icon icon-upgrade" aria-hidden="true"></span>
           <span className="bottom-nav-label">Upgrade</span>
         </button>
         <button type="button" id="btn-nav-home" className="bottom-nav-item bottom-nav-item--center active" data-nav="home" aria-current="page">
@@ -178,7 +180,7 @@ export default function GameApp() {
           <span className="bottom-nav-label">Stats</span>
         </button>
         <button type="button" id="btn-open-settings" className="bottom-nav-item" aria-expanded="false" data-nav="settings">
-          <span className="bottom-nav-icon" aria-hidden="true">⚙</span>
+          <span className="bottom-nav-icon icon-settings" aria-hidden="true"></span>
           <span className="bottom-nav-label">Settings</span>
         </button>
       </nav>
