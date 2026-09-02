@@ -136,9 +136,7 @@
   min-height: 160px;
   border: 1px solid rgba(80, 110, 140, 0.35);
   border-radius: 10px;
-  /* No background art for now (see /backup/isometric for the old
-     IMG_4394-based chamber background). --img-room-bg is left wired up
-     in GameApp.tsx, unused, in case per-room backgrounds come back later. */
+
   background-color: #171310;
   background-image: linear-gradient(180deg, rgba(40, 30, 22, 0.5) 0%, rgba(12, 9, 7, 0.85) 100%);
   background-size: 100% 100%;

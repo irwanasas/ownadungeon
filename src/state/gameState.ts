@@ -1,4 +1,3 @@
-// Persisted game state: load/save/reset against localStorage.
 import { DEFAULT_STATE } from '../data/defaultState';
 import { STAGE_MAX } from '../data/difficulty';
 import type { GameState } from '../types';

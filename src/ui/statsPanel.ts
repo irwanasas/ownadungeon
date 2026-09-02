@@ -1,5 +1,3 @@
-// The "Statistik" side panel: resources, mode/progress, king, and raid
-// outcome counters.
 import { state } from '../state/gameState';
 import { getKingStats } from '../data/king';
 import { STAGE_MAX } from '../data/difficulty';

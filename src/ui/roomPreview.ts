@@ -1,8 +1,3 @@
-// #room-preview has two live modes + one idle mode:
-//   (default / --intro)  — Enemy Detected: invading hero is known BEFORE
-//                          PLAY so the player can counter-place traps/monsters.
-//   .room-preview--battle — compact live card once Room 1 starts (HP/reaction).
-// After raid ends, intro is restored with the next pending invader.
 import { state } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
 import { catalogFor } from '../data/catalog';

@@ -1,4 +1,3 @@
-// HUD: currencies, mode/stage labels, king strip, and mode switching.
 import { state, saveState } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
 import { STAGE_MAX } from '../data/difficulty';

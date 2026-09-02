@@ -1,5 +1,3 @@
-// Renders the dungeon layout (entrance → item slots → throne room) and
-// wires up placing/removing items in each slot.
 import { state } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
 import { saveState } from '../state/gameState';

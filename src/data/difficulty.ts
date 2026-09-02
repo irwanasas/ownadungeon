@@ -3,14 +3,6 @@ import { getStageDef } from './stages';
 
 export const STAGE_MAX = 50;
 
-// Stage difficulty deliberately does NOT scale trap/monster HP or ATK with
-// stage number — that would be a stat-check power curve, exactly what this
-// puzzle-first redesign avoids. Every stage uses the same base trap and
-// monster numbers (see data/traps.ts / data/monsters.ts); what changes
-// stage-to-stage is which hero classes can invade (data/stages.ts) and
-// which counters the player has unlocked (data/upgrades.ts). The only
-// growth left here is the gold/soul reward curve, which is pure economy
-// pacing, not combat power.
 export function getStageDiff(stage?: number): StageDifficulty {
   const s = Math.max(1, Math.min(STAGE_MAX, stage || 1));
   const band = s <= 5 ? 0 : s <= 20 ? 1 : s <= 35 ? 2 : 3;

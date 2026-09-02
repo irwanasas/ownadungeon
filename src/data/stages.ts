@@ -1,33 +1,5 @@
 import type { StageDef } from '../types';
 
-// Stage 1-50 as a handcrafted puzzle progression instead of a stat-scaling
-// gauntlet. Each stage hardcodes which hero classes can invade
-// (`heroPool`) so the puzzle the player has to solve is deterministic and
-// always solvable with whatever traps/monsters they've unlocked by then —
-// never a class they have no counter for yet. Difficulty comes from which
-// heroes appear, in what combination, and what's newly unlocked — not from
-// HP/ATK/DEF inflation (see data/difficulty.ts).
-//
-// Vulnerability reasoning (see data/matchups.ts):
-// - Mage is the trap-side glass cannon: high vs Spike (x1.30) and Poison,
-//   and Goblin Troop's burst is its worst monster matchup (x0.8).
-// - Berserker resists fear but is the best-countered class by the
-//   always-available Slime's resist chip (x0.9) and still takes real
-//   Spike/Poison damage.
-// - Warrior shrugs off Spike (x0.72) but Poison undoes that resistance
-//   (x1.28, its single worst matchup).
-// - Paladin resists physical trap types but is nearly as poison-vulnerable
-//   as Warrior (x1.22); it's built to outlast the endgame Orc instead
-//   (x1.25, its one monster strength).
-// - Rogue evades traps generally but Net Trap is built specifically to
-//   catch it (x1.22), and the armored Goblin Elite is its worst monster
-//   matchup (x0.8).
-//
-// Stages 1-5 only ever send Mage/Berserker — the two classes already
-// vulnerable to the starting Spike Trap + Slime loadout — so the tutorial
-// is always winnable with zero unlocks. From Stage 6 the roster opens up
-// one class at a time, always after (or in lockstep with) the unlock that
-// specifically counters it.
 const TUTORIAL: string[] = ['mage', 'berserker'];
 const OPEN_WARRIOR: string[] = ['mage', 'berserker', 'warrior'];
 const OPEN_PALADIN: string[] = ['mage', 'berserker', 'warrior', 'paladin'];

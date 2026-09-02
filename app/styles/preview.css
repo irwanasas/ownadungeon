@@ -6,8 +6,7 @@
   background-size: 100% 100%;
   background-repeat: no-repeat;
   image-rendering: pixelated;
-  /* Extra top padding so the title clears the parchment's baked-in green
-     banner instead of sitting right at its edge. */
+
   padding: 20px 12px 12px;
   color: #3b2a17;
 }

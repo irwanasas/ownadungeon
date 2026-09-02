@@ -1,11 +1,3 @@
-// Moves the hero token left-to-right across the sidescrolling raid stage
-// and keeps its visual reaction state (idle/panic/rage/flee/dead) in sync.
-// Replaces the isometric-tile version — see
-// /backup/isometric/src/animation/heroToken.ts for the previous version.
-//
-// Public API is unchanged on purpose so combat/raid.ts and
-// ui/battleReaction.ts don't need to change at all.
-
 import { getHeroIcon } from '../ui/heroIcon';
 import { ENTRANCE_X, ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
 import { beatMs } from './beatTiming';
@@ -63,7 +55,6 @@ export function syncHeroTokenVisual(hero: Hero | null): void {
   if (face) face.textContent = getHeroIcon(hero);
 }
 
-/** Instant reset to the entrance (left edge) — called at the start of every room. */
 export function placeHeroAtEntrance(): void {
   var token = getToken();
   if (!token) return;
@@ -75,12 +66,10 @@ export function placeHeroAtEntrance(): void {
   });
 }
 
-/** Entrance -> center, where the fight/trap happens. */
 export function walkHeroToEncounter(): void {
   setTokenX(ENCOUNTER_X, beatMs('arriveRoom'));
 }
 
-/** Center -> exit (right edge), toward the next room. */
 export function walkHeroToExit(): void {
   setTokenX(EXIT_X, beatMs('betweenRooms'));
 }

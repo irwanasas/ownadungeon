@@ -1,7 +1,3 @@
-// Next.js client entry point: same boot sequence as the vanilla game.js
-// orchestrator, but exported as a function so a React effect can call it
-// once the DOM (rendered by GameApp.js) is mounted, instead of listening
-// for DOMContentLoaded (which React's mount effect already guarantees).
 import { saveState } from './src/state/gameState';
 import { runtime } from './src/state/runtimeState';
 import { simulateOfflineProgress } from './src/core/offlineProgress';

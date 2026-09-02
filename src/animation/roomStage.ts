@@ -1,13 +1,3 @@
-// Presents each dungeon room on the sidescrolling raid stage: door open,
-// hero walk-in, monster walk-in, room label/content. Replaces the
-// isometric-tile version — see /backup/isometric/src/animation/roomStage.ts
-// for the previous version.
-//
-// Public API is unchanged on purpose so combat/raid.ts doesn't need to
-// change at all: enterRaidRoomMode, exitRaidRoomMode, setDoorOpen,
-// presentEntrance, presentRoom, presentThrone, heroEnterRoom,
-// playDoorEnterSequence.
-
 import { catalogFor } from '../data/catalog';
 import { getItemLevel } from '../economy/economy';
 import { state } from '../state/gameState';
@@ -66,8 +56,6 @@ export function exitRaidRoomMode(): void {
   document.body.classList.remove('battle-active');
 }
 
-// The door sits at a fixed CSS position now (left edge) — no per-call tile
-// math needed, just toggle the open/close visual state.
 export function setDoorOpen(open: boolean): void {
   var e = els();
   if (!e.door) return;
@@ -126,10 +114,6 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
   var level = getItemLevel(slot.catalogId);
   var isMonster = slot.kind === 'monster';
 
-  // Monsters get their own walking token (revealed off-screen right, then
-  // walked in once the door opens) instead of a static content icon.
-  // Traps/treasure stay as the static room-content label the hero walks
-  // up to — "the trap doesn't move, only the hero approaches it."
   e.content.innerHTML =
     (isMonster ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
     '<span class="room-content-label">' + (cat && cat.name ? cat.name : 'Room') + '</span>' +

@@ -1,5 +1,3 @@
-// Slide-in side panels (Armory / Upgrades / Statistics / Settings): open,
-// close, focus trapping, and swipe-to-close gestures.
 type OverlayKey = 'palette' | 'upgrades' | 'stats' | 'settings';
 
 let currentOverlay: OverlayKey | null = null;

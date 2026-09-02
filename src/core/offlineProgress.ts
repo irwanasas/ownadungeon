@@ -1,5 +1,3 @@
-// Simulates raids that "happened" while the tab was closed, based on
-// elapsed real time since the last save.
 import { state, saveState } from '../state/gameState';
 import type { OfflineProgressSummary } from '../types';
 

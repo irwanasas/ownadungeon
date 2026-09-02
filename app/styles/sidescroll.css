@@ -1,9 +1,3 @@
-/* Sidescrolling raid battlefield: hero enters from the left (entrance),
-   monster enters from the right, they meet and fight in the center.
-   No background art required — positions are plain percentages of
-   `.room-floor`. Replaces isometric.css — see
-   /backup/isometric/app/styles/isometric.css for the previous version. */
-
 .room-floor {
   position: absolute;
   z-index: 2;

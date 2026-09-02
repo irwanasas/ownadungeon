@@ -1,5 +1,3 @@
-// Currency, cost, and per-item-level bookkeeping shared by the raid
-// simulation and the upgrades panel.
 import { state, saveState } from '../state/gameState';
 import { kingUpgradeCost } from '../data/king';
 import type { Cost } from '../types';

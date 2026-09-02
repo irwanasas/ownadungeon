@@ -1,4 +1,3 @@
-// Offline progress modal shown on load when idle gains were simulated.
 import type { OfflineProgressSummary } from '../types';
 
 export function showOfflineModal(summary: OfflineProgressSummary): void {

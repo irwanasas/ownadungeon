@@ -1,4 +1,3 @@
-// Generic lookup across the dungeon-item catalogs (traps, monsters, treasure).
 import { TRAPS } from './traps';
 import { MONSTERS, TREASURE } from './monsters';
 import type { CatalogItem, ItemKind } from '../types';

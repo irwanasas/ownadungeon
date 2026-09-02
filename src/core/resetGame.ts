@@ -1,5 +1,3 @@
-// "Reset Game" orchestration: wipes persisted state and puts every part
-// of the UI back to a fresh first-run look.
 import { resetState } from '../state/gameState';
 import { clearPendingHero } from '../combat/hero';
 import { renderAll } from '../ui/renderBus';

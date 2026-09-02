@@ -1,14 +1,5 @@
 import type { MonsterDef, TreasureDef } from '../types';
 
-// Monster roster. Rendered as icon tokens on the sidescroll stage (see
-// src/animation/monsterToken.ts) — the sprite-sheet pipeline that used to
-// back these on the isometric stage is retired, see
-// /backup/isometric/src/data/monsterSprites.ts. Progression is
-// deliberately Slime -> Goblin Troop -> Goblin Shaman -> Goblin Elite ->
-// Orc: HP, ATK, and unlock cost all climb monotonically, DEF mostly
-// climbs too (Goblin Troop dips DEF for its burst-brute role — an
-// intentional glass-cannon dip in an otherwise-rising curve, not a break
-// in the progression).
 export const MONSTERS: Record<string, MonsterDef> = {
   slime: {
     id: 'slime',

@@ -1,4 +1,3 @@
-// King stat scaling and king-upgrade cost formulas (pure functions of level).
 import type { KingBase, KingStats, KingUpgradeDef, Cost } from '../types';
 
 export const KING_BASE: KingBase = {

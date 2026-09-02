@@ -1,4 +1,3 @@
-// Transient toast notifications shown in the bottom toast stack.
 import type { ToastType } from '../types';
 
 export function showToast(message: string, type?: ToastType): void {

@@ -1,5 +1,3 @@
-// The Armory side panel: lists unlocked traps/monsters/treasure
-// and lets the player pick one to place into an empty dungeon slot.
 import { state } from '../state/gameState';
 import { runtime } from '../state/runtimeState';
 import { TRAPS } from '../data/traps';

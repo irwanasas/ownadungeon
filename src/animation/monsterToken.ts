@@ -1,21 +1,6 @@
-// Positions and reveals the monster's icon token on the sidescrolling raid
-// stage — the entity-side counterpart to heroToken.ts. No sprite art is
-// used for now (per the move away from isometric assets), so monsters
-// render as an icon token, same family as the hero token: it appears at
-// the right/exit edge and walks in to meet the hero at center.
-// Replaces the isometric sprite version — see
-// /backup/isometric/src/animation/monsterToken.ts for the previous version.
-//
-// Public API kept intentionally small and stable: showMonsterToken /
-// hideMonsterToken / playMonsterWalkFlourish, same as before.
-
 import { ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
 import { MONSTER_SPRITE_MANIFEST } from '../data/monsterSprites';
 
-// CSS url()/background-image references to public/ assets aren't rewritten
-// by Next's basePath handling, so prefix manually (same pattern as
-// app/GameApp.tsx's ASSET_BASE) — otherwise sprites 404 on GitHub Pages,
-// where the app is served under /<repo-name>/.
 const ASSET_BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 function getToken(): HTMLElement | null {
@@ -37,7 +22,6 @@ function setTokenX(xPct: number, ms?: number): void {
   token.style.top = FLOOR_Y + '%';
 }
 
-/** Reveals the monster token at the right/exit edge, ready to walk in. */
 export function showMonsterToken(icon: string, monsterId?: string): void {
   var token = getToken();
   var face = getFace();
@@ -70,10 +54,6 @@ export function hideMonsterToken(): void {
   token.style.top = '';
 }
 
-/**
- * Walks the monster from the right edge in to meet the hero at center.
- * No-op if no monster token is currently shown (trap/empty/treasure rooms).
- */
 export function playMonsterWalkFlourish(ms: number): void {
   var token = getToken();
   if (!token || !token.classList.contains('is-visible')) return;

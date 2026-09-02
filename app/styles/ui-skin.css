@@ -1,5 +1,3 @@
-/* Global parchment / wood reskin layered on base layout + components */
-
 .player-hud {
   border: none;
   border-radius: 6px;
@@ -34,10 +32,6 @@
 .currency:last-child { color: #4a5a8a; }
 .currency-label { color: #6b5334; }
 
-/* Parchment-panel skin intentionally NOT applied to .status-chip--king —
-   it's a slim inline stat line now (see layout.css), sitting directly on the
-   dark app background, so it keeps the light bone/gold text colors from
-   layout.css instead of the dark parchment-only colors below. */
 .status-chip:not(.status-chip--king) .status-chip-key { color: #6b5334 !important; }
 .status-chip:not(.status-chip--king) .status-chip-val { color: #3b2a17 !important; }
 

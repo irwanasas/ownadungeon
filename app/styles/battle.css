@@ -1,4 +1,3 @@
-/* Active raid presentation: expanded room field, compact status */
 .app.battle-active .stage-header,
 .app.battle-active #status-strip {
   display: none !important;
@@ -38,11 +37,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* Center, not stretch: the room-stage below is a bounded height (see
-     .room-chamber), not a flex-grow child, so on tall portrait phones any
-     leftover vertical space is neutral padding above/below the stage
-     instead of the sidescroll "ground band" (laneLayout.ts's FLOOR_Y=78%)
-     getting stranded in a mostly-empty full-screen void. */
+
   justify-content: center;
   margin-bottom: 0;
 }
@@ -56,12 +51,6 @@
   position: relative;
 }
 
-/* Bounded, not flex:1-to-fill-the-screen: a sidescroll stage only needs
-   enough height for the ground band + door + standing tokens, not the
-   whole viewport. Capped relative to viewport height so it stays
-   proportionate on both short and tall phones — mobile is the priority
-   here, and a tall narrow screen is exactly where an unbounded height
-   reads worst (tiny icons floating in a huge empty "sky"). */
 .app.battle-active .room-chamber {
   flex: 0 0 auto;
   width: 100%;
@@ -112,8 +101,6 @@
   }
 }
 
-/* Bottom nav + FAB are hidden during battle (not just visually reclaimed)
-   so the centered stage above has clean, uncluttered space around it. */
 .app.battle-active {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
