@@ -12,6 +12,12 @@
 import { ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
 import { MONSTER_SPRITE_MANIFEST } from '../data/monsterSprites';
 
+// CSS url()/background-image references to public/ assets aren't rewritten
+// by Next's basePath handling, so prefix manually (same pattern as
+// app/GameApp.tsx's ASSET_BASE) — otherwise sprites 404 on GitHub Pages,
+// where the app is served under /<repo-name>/.
+const ASSET_BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 function getToken(): HTMLElement | null {
   return document.getElementById('monster-token');
 }
@@ -40,7 +46,7 @@ export function showMonsterToken(icon: string, monsterId?: string): void {
   var sprite = monsterId ? MONSTER_SPRITE_MANIFEST[monsterId]?.idle : undefined;
   if (sprite) {
     face.textContent = '';
-    face.style.backgroundImage = 'url(' + sprite.path + ')';
+    face.style.backgroundImage = 'url(' + ASSET_BASE + sprite.path + ')';
     face.style.backgroundSize = (sprite.frameCount * 100) + '% 100%';
     face.classList.add('has-sprite');
   } else {
