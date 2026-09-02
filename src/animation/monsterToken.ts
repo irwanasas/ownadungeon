@@ -1,105 +1,75 @@
-import { MONSTER_SPRITE_MANIFEST, MonsterAnimState } from '../data/monsterSprites';
-import { renderSideSprite, updateSpriteAnimation, SpritePlayback } from './spriteAnimator';
+// Positions and reveals the monster's icon token on the sidescrolling raid
+// stage — the entity-side counterpart to heroToken.ts. No sprite art is
+// used for now (per the move away from isometric assets), so monsters
+// render as an icon token, same family as the hero token: it appears at
+// the right/exit edge and walks in to meet the hero at center.
+// Replaces the isometric sprite version — see
+// /backup/isometric/src/animation/monsterToken.ts for the previous version.
+//
+// Public API kept intentionally small and stable: showMonsterToken /
+// hideMonsterToken / playMonsterWalkFlourish, same as before.
 
-export interface MonsterTokenState {
-  id: string;
-  type: string;
-  laneIndex: number;
-  x: number;
-  y: number;
-  animState: MonsterAnimState;
-  playback: SpritePlayback;
-  hp: number;
-  maxHp: number;
-  isEnemy: boolean;
+import { ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
+import { MONSTER_SPRITE_MANIFEST } from '../data/monsterSprites';
+
+function getToken(): HTMLElement | null {
+  return document.getElementById('monster-token');
 }
 
-export function createMonsterToken(
-  id: string,
-  type: string,
-  laneIndex: number,
-  x: number,
-  y: number,
-  isEnemy: boolean = true
-): MonsterTokenState {
-  return {
-    id,
-    type,
-    laneIndex,
-    x,
-    y,
-    animState: 'idle',
-    playback: { currentFrame: 0, elapsedMs: 0, isFinished: false },
-    hp: 100,
-    maxHp: 100,
-    isEnemy,
-  };
+function getFace(): HTMLElement | null {
+  var token = getToken();
+  return token ? (token.querySelector('.monster-token-face') as HTMLElement | null) : null;
 }
 
-export function updateMonsterToken(
-  token: MonsterTokenState,
-  deltaTimeMs: number
-): MonsterTokenState {
-  const manifest = MONSTER_SPRITE_MANIFEST[token.type];
-  const animMeta = manifest?.[token.animState];
-
-  if (!animMeta) return token;
-
-  const updatedPlayback = updateSpriteAnimation(token.playback, animMeta, deltaTimeMs);
-
-  let nextState = token.animState;
-  if (updatedPlayback.isFinished && !animMeta.loop) {
-    nextState = 'idle';
+function setTokenX(xPct: number, ms?: number): void {
+  var token = getToken();
+  if (!token) return;
+  if (typeof ms === 'number') {
+    token.style.transitionDuration = ms + 'ms, ' + ms + 'ms, 0.25s';
   }
-
-  return {
-    ...token,
-    animState: nextState,
-    playback: nextState !== token.animState
-      ? { currentFrame: 0, elapsedMs: 0, isFinished: false }
-      : updatedPlayback,
-  };
+  token.style.left = xPct + '%';
+  token.style.top = FLOOR_Y + '%';
 }
 
-export function renderMonsterToken(
-  ctx: CanvasRenderingContext2D,
-  token: MonsterTokenState,
-  width: number = 64,
-  height: number = 64
-): void {
-  const manifest = MONSTER_SPRITE_MANIFEST[token.type];
-  const animMeta = manifest?.[token.animState];
-
-  if (manifest && animMeta) {
-    renderSideSprite(
-      ctx,
-      animMeta.path,
-      animMeta,
-      token.playback.currentFrame,
-      token.x - width / 2,
-      token.y - height / 2,
-      width,
-      height,
-      token.isEnemy
-    );
+/** Reveals the monster token at the right/exit edge, ready to walk in. */
+export function showMonsterToken(icon: string, monsterId?: string): void {
+  var token = getToken();
+  var face = getFace();
+  if (!token || !face) return;
+  var el = token;
+  var sprite = monsterId ? MONSTER_SPRITE_MANIFEST[monsterId]?.idle : undefined;
+  if (sprite) {
+    face.textContent = '';
+    face.style.backgroundImage = 'url(' + sprite.path + ')';
+    face.style.backgroundSize = (sprite.frameCount * 100) + '% 100%';
+    face.classList.add('has-sprite');
   } else {
-    // Fallback visual jika sprite belum ter-load/terdaftar
-    ctx.fillStyle = token.isEnemy ? '#e74c3c' : '#2ecc71';
-    ctx.fillRect(token.x - width / 2, token.y - height / 2, width, height);
+    face.textContent = icon;
+    face.style.backgroundImage = '';
+    face.classList.remove('has-sprite');
   }
+  el.classList.add('no-motion');
+  setTokenX(EXIT_X, 0);
+  el.classList.add('is-visible');
+  requestAnimationFrame(function () {
+    el.classList.remove('no-motion');
+  });
+}
 
-  // Health bar sederhana di atas unit
-  if (token.hp < token.maxHp) {
-    const barW = width;
-    const barH = 5;
-    const barX = token.x - width / 2;
-    const barY = token.y - height / 2 - 8;
+export function hideMonsterToken(): void {
+  var token = getToken();
+  if (!token) return;
+  token.classList.remove('is-visible');
+  token.style.left = '';
+  token.style.top = '';
+}
 
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(barX, barY, barW, barH);
-
-    const healthRatio = Math.max(0, token.hp / token.maxHp);
-    ctx.fillStyle = token.isEnemy ? '#e74c3c' : '#2ecc71';
-    ctx.fillRect(barX, barY, barW * healthRatio, barH);
-  }
+/**
+ * Walks the monster from the right edge in to meet the hero at center.
+ * No-op if no monster token is currently shown (trap/empty/treasure rooms).
+ */
+export function playMonsterWalkFlourish(ms: number): void {
+  var token = getToken();
+  if (!token || !token.classList.contains('is-visible')) return;
+  setTokenX(ENCOUNTER_X, ms);
 }

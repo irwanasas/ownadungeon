@@ -122,6 +122,13 @@
   font-size: 18px;
 }
 
+.monster-token-face.has-sprite {
+  font-size: 0;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  image-rendering: pixelated;
+}
+
 @media (max-width: 400px) {
   .hero-token,
   .monster-token {
