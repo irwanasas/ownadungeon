@@ -1,43 +1,41 @@
 # Game assets
 
-Drop art files here to replace the current CSS/SVG/emoji placeholders. Next.js
-serves everything under `public/` from the site root, so a file at
+Next.js serves everything under `public/` from the site root, so a file at
 `public/assets/traps/spike.png` is reachable at `/assets/traps/spike.png`
-(or `/ownadungeon/assets/traps/spike.png` on the deployed GitHub Pages build,
-handled automatically by `next.config.ts`'s `basePath`).
+(or `/ownadungeon/assets/traps/spike.png` on the deployed GitHub Pages build).
+A raw `/assets/...` string in TS/CSS does **not** get that `/ownadungeon`
+prefix automatically — Next's `basePath` rewrite only applies to its own
+routing, not to CSS `url()`/`background-image` or hardcoded strings, so any
+new asset path referenced outside a React component needs the
+`NEXT_PUBLIC_BASE_PATH` env var prefixed manually (see `app/assetVars.ts`
+and `src/animation/monsterToken.ts` for the existing pattern).
 
-Nothing in here is wired into the game yet — dropping a file into a folder
-does not change anything by itself. Once files are here, ask for them to be
-implemented and they'll get wired into the matching `src/data/*.ts` catalog
-entries and/or the isometric battlefield (`src/animation/isoGrid.ts`,
-`app/styles/isometric.css`).
+## What's actually wired in
 
-## Folders & expected filenames
+- **`monsters/`** — `goblin_troop`, `goblin_shaman`, `goblin_elite`, `orc`
+  each have a real sprite sheet (`S_Idle.png` etc.), looked up by monster id
+  in `src/data/monsterSprites.ts` and rendered as a static first-frame crop
+  on the monster token (`src/animation/monsterToken.ts`) — no frame
+  animation, no canvas. `slime` has no art yet and still renders as an
+  emoji fallback.
+- **`ui/cropped/`** — small, purpose-cropped icons actually used by the game
+  (currency icons, nav icons, the Raid button, panel/button chrome), wired
+  in via `app/assetVars.ts`'s CSS custom properties. New icons should be
+  cropped the same way from the raw sheets below and dropped here.
+- **`ui/*.png`** (the uncropped sheets — `Icons.png`, `Buttons.png`, etc.) —
+  source material for the crops above, not referenced directly by the game.
+  Pick a new icon from here, crop it, drop the crop in `ui/cropped/`.
+- **`ui/bg/`** — the room chamber backdrop image.
 
-Filenames should match the internal `id` used in `src/data/*.ts` so they can
-be looked up directly — no separate mapping table needed. Extension can be
-`.png`, `.webp`, or `.svg`.
+## Not wired in yet
 
-| Folder | Expected files (id → filename) | Used for |
-|---|---|---|
-| `traps/` | `spike`, `poison`, `net`, `fire`, `frost` | Trap icon in Armory, dungeon slots, room-content marker on the iso floor |
-| `monsters/` | `skeleton`, `goblin`, `ogre`, `slime`, `shade`, `treasure` | Monster/treasure icon, same spots as traps |
-| `heroes/` | `warrior`, `rogue`, `berserker`, `mage`, `paladin` | Hero token on the battlefield, Enemy Detected panel, battle card |
-| `king/` | e.g. `king.png` (one is enough — level is shown as text, not separate art per level) | Throne room content marker |
-| `tiles/` | e.g. `floor.png` (one diamond tile texture) or `floor.png` + `floor-alt.png` for the checker pattern | Isometric floor grid tiles (currently flat-color SVG polygons) |
-| `ui/` | door, buttons, panel chrome, whatever else | Misc UI chrome (already has a `.placeholder`) |
-
-## Sizing guidance
-
-- **Trap/monster/hero/king icons** — square, transparent background, roughly
-  128×128–256×256px. They're currently rendered as single emoji glyphs, so
-  a square icon is the easiest drop-in replacement.
-- **Floor tiles** — should match the isometric diamond's aspect ratio used
-  in `isoGrid.ts` (`TILE_WIDTH = 64`, `TILE_HEIGHT = 32`, i.e. 2:1), so a
-  128×64px or 256×128px diamond-shaped (transparent corners) image lines up
-  cleanly with the existing tile grid without stretching.
-- Keep individual files reasonably small (this is a client-side, static-export
-  game — everything ships to the browser on first load).
+- **`traps/`**, **`heroes/`**, **`king/`** — empty (aside from `.gitkeep`).
+  Traps and heroes currently render as emoji glyphs
+  (`TrapDef.icon`/`HeroArchetype.icon` in `src/data/*.ts`); the King avatar
+  in the HUD is also emoji. Drop a square, transparent-background icon
+  (roughly 128×128–256×256px) named after the trap/hero `id` from
+  `src/data/traps.ts`/`src/data/heroes.ts`, or `king.png` for the King, and
+  ask for it to be wired in the same way the monster sprites were.
 
 ## What to tell me when it's ready
 

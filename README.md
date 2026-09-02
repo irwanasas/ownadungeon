@@ -40,9 +40,12 @@ Bukan sekadar HP/ATK lebih besar. Tiap room adalah puzzle **Hero × Monster × T
 | Mage | Caster | Magic (partial DEF ignore), vs Slime | HP tipis, Goblin Troop, Orc |
 | Paladin | Support-tank | Kuat vs Orc, tahan physical trap | Poison, tempo lambat |
 
-**5 Monster Types** — real sprite art dari `public/assets/monsters/`, progresi
-Slime → Goblin Troop → Goblin Shaman → Goblin Elite → Orc (lihat
-`src/data/monsterSprites.ts` untuk detail sheet/scale per monster):
+**5 Monster Types** — progresi Slime → Goblin Troop → Goblin Shaman →
+Goblin Elite → Orc. 4 dari 5 sudah pakai real sprite art dari
+`public/assets/monsters/` (ditampilkan sebagai token statis, bukan
+frame-by-frame animation) — manifest path + frame count ada di
+`src/data/monsterSprites.ts`. Slime belum punya art, masih tampil sebagai
+emoji:
 
 - Slime (physical resist, selalu tersedia — starter monster gratis)
 - Goblin Troop (burst, DEF tipis)
@@ -80,7 +83,7 @@ Level King, upgrade, duel di ruang terakhir (Throne). King ikut bertarung sebaga
 - Satu layar (mobile-first), tanpa scroll utama.
 - Overlay: Armory, Upgrades, Stats, **Settings** (swipe / keyboard) — Settings menggantikan tombol Reset langsung di bottom nav; Reset Game sekarang ada di dalam Settings → Danger Zone.
 - Panel `#room-preview` gabungan (Enemy Detected pre-raid, battle card saat combat) — lihat [Battle UX: panel gabungan & reaksi kontekstual](#battle-ux-panel-gabungan--reaksi-kontekstual) di bawah.
-- Log naratif (hybrid cerita + angka, pacing ber-jitter) — selalu terlihat penuh selama raid, tidak pernah tertutup/terpotong UI lain.
+- Bottom nav (Armory/Upgrade/Settings) dan tombol Raid pakai real sprite icon (crop dari `public/assets/ui/Icons.png`, lihat `app/assetVars.ts`), bukan emoji lagi. King avatar, nav Battle, dan nav Stats masih emoji — belum ada asset yang cocok di UI pack.
 - Offline summary saat kembali ke game.
 
 ---
@@ -104,7 +107,7 @@ Panel berganti mode lewat class modifier di elemen yang sama:
 - **PANIK** — HP hero ≤35% (kecuali sedang RAGE).
 - **RAGE** — Berserker memicu RAGE-nya.
 - **KABUR** — hero mundur karena gap level terlalu jauh.
-- **TAKUT** — dipicu monster dengan `fearAura` terhadap hero non-fear-immune. Mekanisme masih ada di kode (`src/combat/raid.ts`), tapi tidak ada monster di roster saat ini yang memakainya (lihat `src/data/monsters.ts`) — siap dipakai kalau monster fear-aura ditambahkan lagi.
+- **TAKUT** — dipicu monster dengan `fearAura` terhadap hero non-fear-immune. Mekanisme masih ada di kode (`src/combat/monsterEncounter.ts`), tapi tidak ada monster di roster saat ini yang memakainya (lihat `src/data/monsters.ts`) — siap dipakai kalau monster fear-aura ditambahkan lagi.
 - **SAKIT!** — hero baru kena hit (trap, monster, atau King) yang tidak memicu reaksi lain.
 - **TERKEJUT** — ancaman ruang baru saja terungkap (trap berkilau, bayangan monster bergerak, Raja bangkit dari singgasana).
 
@@ -112,15 +115,16 @@ Panel berganti mode lewat class modifier di elemen yang sama:
 
 Setelah raid selesai, panel otomatis kembali ke mode Enemy Detected lewat `renderRoomPreview()`, sekaligus me-roll pending hero berikutnya.
 
-### Room/chamber: diperbesar, tanpa raid log
+### Room/chamber: sidescroll, tanpa raid log
 
-Raid log (narasi teks per-beat) sudah **dihapus total** — dari markup (`#raid-log`/`.raid-stage`), dari `src/ui/raidLog.ts` (dihapus), dan dari setiap `logLine()` call di `src/combat/raid.ts`. Kombat sekarang murni visual: sprite hero/monster, HP bar di battle card (`#room-preview`), dan reaksi kontekstual (PANIK/RAGE/dll., lihat bagian di atas) — tidak ada lagi feed teks.
+Raid log (narasi teks per-beat) sudah **dihapus total**. Kombat sekarang murni visual: hero/monster token, HP bar di battle card (`#room-preview`), dan reaksi kontekstual (PANIK/RAGE/dll., lihat bagian di atas) — tidak ada lagi feed teks.
 
-Ruang vertikal yang dulu dipakai raid log sekarang dipakai buat memperbesar room chamber itu sendiri:
+Battlefield-nya adalah panggung sidescroll DOM sederhana, bukan grid isometrik:
 
-- Grid isometrik naik dari 3×4 (12 tile) ke **4×5 (20 tile)** — `GRID_W`/`GRID_H` di `src/animation/isoGrid.ts`. `VIEW_W`/`VIEW_H`/`ORIGIN_X`/`ORIGIN_Y` sekarang **diturunkan dari rumus** (bukan angka hardcode), jadi ukuran grid bisa diubah lagi ke depannya tanpa perlu re-tuning manual.
-- `.room-chamber`/`.room-floor` (`app/styles/battle.css`) pakai `height: clamp(...)` (bukan `min-height`) supaya benar-benar dibatasi, bukan cuma dikasih lantai — dipertahankan mendekati rasio aspek asli grid (~1.9:1) supaya diamond tile-nya tidak melar jadi bentuk layang-layang saat ruang vertikal ekstra tersedia.
-- `--tile-w-pct` di `app/styles/isometric.css` (dipakai monster-token buat scaling proporsional ke ukuran tile) ikut disesuaikan ke rasio `TILE_WIDTH / VIEW_W` yang baru.
+- `src/animation/laneLayout.ts` mendefinisikan posisi tetap dalam persen dari `.room-floor`: `ENTRANCE_X` (kiri, tempat hero masuk), `ENCOUNTER_X` (tengah, tempat hero vs monster bertemu), `EXIT_X` (kanan, tempat hero keluar / monster muncul), `FLOOR_Y` (garis tanah). Tidak ada tile grid — hero-token dan monster-token cukup di-`left`/`top` lewat CSS transition antar tiga titik ini.
+- `src/animation/heroToken.ts` dan `src/animation/monsterToken.ts` masing-masing mengontrol elemen `#hero-token`/`#monster-token` sendiri (posisi, visual state, dan untuk monster: swap ke sprite art asli via `background-image` kalau tersedia di `MONSTER_SPRITE_MANIFEST`, fallback ke emoji kalau tidak).
+- `src/animation/roomStage.ts` yang mengorkestrasi tampilan tiap ruang (buka pintu, present room/throne, pindah mode battle-active) lewat elemen `#room-stage`/`#room-door`/`#room-chamber`/`#room-content`.
+- Styling ada di `app/styles/sidescroll.css` + `app/styles/battle.css`.
 
 ---
 
@@ -180,21 +184,24 @@ Detail lengkap 50 stage (`heroPool` + catatan desain per stage) ada di `src/data
 app/
   layout.tsx         # fonts + global CSS
   page.tsx           # dynamic GameApp (ssr: false)
-  GameApp.tsx         # shell JSX + startGame()
-  styles/            # tokens, layout, components, raid, battle, preview
+  GameApp.tsx        # shell JSX + startGame()
+  assetVars.ts       # asset-path helpers + CSS custom properties (basePath-aware)
+  styles/            # tokens, layout, components, raid, battle, preview, sidescroll, ui-skin
 game-client.ts       # bootstrap client
 src/
   types.ts           # shared type definitions (GameState, Hero, data model, dll.)
-  data/              # heroes, monsters, traps, matchups, difficulty, king, stages, …
+  data/              # heroes, monsters, traps, matchups, difficulty, king, stages, monsterSprites, …
   state/             # gameState, runtimeState
   economy/           # unlock, level cost, rewards
-  combat/            # hero, raid, difficultyResolver
-  animation/         # roomStage, heroToken, beatTiming
+  combat/            # hero, difficultyResolver, dan raid flow: raid.ts (orchestrator) +
+                      # trapEncounter/monsterEncounter/treasureEncounter/kingFight (per-encounter
+                      # resolvers) + raidRewards (tally akhir)
+  animation/         # roomStage, heroToken, monsterToken, laneLayout, beatTiming
   ui/                # overlays, palette, roomPreview, battleReaction, hud, …
   core/              # reset, offline, event wiring
 ```
 
-Prinsip: **migrate, don’t rewrite**. Logic game tetap DOM/vanilla; React hanya shell template sekali render.
+Prinsip: **migrate, don’t rewrite**. Logic game tetap DOM/vanilla; React hanya shell template sekali render. Tidak ada komentar kode di seluruh repo — nama identifier & struktur file yang menjelaskan diri sendiri, bukan komentar.
 
 ```bash
 npm install
@@ -215,7 +222,7 @@ Seluruh codebase (`src/`, `app/`, `game-client.ts`, `next.config.ts`) sudah dimi
 - Prioritas pengetikan mengikuti urutan: **data model → state → game logic (economy/combat) → utility (animation) → UI**, karena UI paling banyak bergantung pada bentuk data yang sudah stabil dari layer di bawahnya.
 - **Tanpa `any`/`@ts-ignore`/`as any`** di seluruh kode aplikasi — satu-satunya cast eksplisit adalah pada `catalogFor()` di `combat/raid.ts` (narrowing `TrapDef | MonsterDef | TreasureDef` ke variant yang sesuai `slot.kind`, yang tidak bisa disimpulkan otomatis oleh TypeScript dari relasi antar dua parameter runtime yang terpisah).
 - Import relatif antar-modul TypeScript ditulis **tanpa ekstensi file** (mis. `from '../state/gameState'`, bukan `.js`) — konvensi ini dibutuhkan Turbopack (bundler Next.js) untuk me-resolve modul `.ts`/`.tsx` lewat dynamic maupun static import.
-- `tsconfig.json` dan `next-env.d.ts` di-generate otomatis oleh Next.js (`next build`) mengikuti konvensi App Router, dengan `strict: true` diaktifkan manual.
+- `next-env.d.ts` di-generate otomatis oleh Next.js (`next build`/`next dev`) — jangan diedit manual. `tsconfig.json` di-commit seperti biasa, dengan `strict: true` diaktifkan manual.
 - `npm run type-check` menjalankan `tsc --noEmit` secara terpisah dari build untuk validasi cepat tanpa menghasilkan output.
 
 ---
@@ -235,8 +242,8 @@ Kandidat fase berikutnya **setelah** core loop terbukti fun di playtest orang la
 
 ## Validasi prototype
 
-1. Apakah fase tonton (door → fight → log) ingin diulang, atau langsung di-skip?
-2. Apakah matchup (advantage/disadvantage di log) terbaca dan memengaruhi keputusan layout?
+1. Apakah fase tonton (door → fight → reaksi kontekstual) ingin diulang, atau langsung di-skip?
+2. Apakah matchup (advantage/disadvantage, hint di panel Enemy Detected) terbaca dan memengaruhi keputusan layout?
 3. Apakah Stage vs Arcade terasa beda dan natural?
 
 Catat observasi playtest — itu yang menentukan lanjut tidaknya ke fase berikutnya.
