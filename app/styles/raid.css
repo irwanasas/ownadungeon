@@ -139,13 +139,37 @@
   border-radius: var(--radius);
 
   background-color: var(--bg);
-  background-image: linear-gradient(180deg, rgba(76, 127, 219, 0.1) 0%, rgba(5, 6, 10, 0.55) 100%), var(--img-room-bg);
-  background-size: 100% 100%, 100% 100%;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-  image-rendering: pixelated;
   overflow: hidden;
   box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.5);
+}
+
+.room-chamber::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(180deg, rgba(76, 127, 219, 0.1) 0%, rgba(5, 6, 10, 0.55) 100%);
+}
+
+.room-corridor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--img-room-corridor);
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  background-position: 0 center;
+  image-rendering: pixelated;
+  transition: background-position-x 0.5s ease;
+}
+
+.room-chamber.is-throne .room-corridor {
+  background-image: var(--img-room-throne);
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: center;
+  transition: none;
 }
 
 .room-torch {
@@ -183,11 +207,7 @@
 }
 
 .room-torch:nth-of-type(2) .room-torch-flame {
-  animation-delay: -0.24s;
-}
-
-.room-torch:nth-of-type(3) .room-torch-flame {
-  animation-delay: -0.48s;
+  animation-delay: -0.36s;
 }
 
 @media (max-width: 400px) {

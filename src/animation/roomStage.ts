@@ -5,6 +5,7 @@ import { getKingStats } from '../data/king';
 import { placeHeroAtEntrance, walkHeroToEncounter } from './heroToken';
 import { showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
 import { beatMs, type BeatKey } from './beatTiming';
+import { resetWorldScroll } from './worldScroll';
 import { entityIconHtml } from '../ui/entityIcon';
 import type { DungeonSlotData } from '../types';
 
@@ -77,6 +78,7 @@ export function presentEntrance(): void {
     e.chamber.classList.remove('is-throne');
     e.chamber.classList.add('is-empty');
   }
+  resetWorldScroll();
   if (e.depth) e.depth.textContent = 'Entrance';
   e.content.innerHTML =
     '<span class="room-content-icon icon-door"></span>' +

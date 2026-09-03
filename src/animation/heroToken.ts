@@ -1,6 +1,7 @@
 import { getHeroIcon } from '../ui/heroIcon';
 import { ENTRANCE_X, ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
 import { beatMs } from './beatTiming';
+import { advanceWorldScroll } from './worldScroll';
 import type { Hero } from '../types';
 
 function getToken(): HTMLElement | null {
@@ -67,11 +68,15 @@ export function placeHeroAtEntrance(): void {
 }
 
 export function walkHeroToEncounter(): void {
-  setTokenX(ENCOUNTER_X, beatMs('arriveRoom'));
+  var ms = beatMs('arriveRoom');
+  setTokenX(ENCOUNTER_X, ms);
+  advanceWorldScroll(0.5, ms);
 }
 
 export function walkHeroToExit(): void {
-  setTokenX(EXIT_X, beatMs('betweenRooms'));
+  var ms = beatMs('betweenRooms');
+  setTokenX(EXIT_X, ms);
+  advanceWorldScroll(0.5, ms);
 }
 
 export function resetStageView(): void {

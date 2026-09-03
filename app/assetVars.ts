@@ -43,7 +43,8 @@ export const uiAssetVars = {
   '--img-icon-stats': assetUrl('icon-stats.png'),
   '--img-icon-door': assetUrl('icon-door.png'),
   '--img-icon-king': kingUrl('icon-king.png'),
-  '--img-room-bg': roomUrl('room-bg.png'),
+  '--img-room-corridor': roomUrl('room-corridor.png'),
+  '--img-room-throne': roomUrl('room-throne.png'),
   '--img-torch': roomUrl('TorchAnimation.png'),
   ...entityVars
 } as CSSProperties;
