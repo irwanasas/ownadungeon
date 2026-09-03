@@ -299,16 +299,19 @@ def gen_panel_stone():
     s = 256
     im = new_canvas(s)
     d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, s, s], fill=PALETTE['stone_mid'])
+    base = PALETTE['stone_light']
+    seam = tuple(min(255, c + 10) for c in base)
+    d.rectangle([0, 0, s, s], fill=base)
     brick_w, brick_h = 64, 32
+    for row in range(s // brick_h + 1):
+        y = row * brick_h
+        d.line([(0, y), (s, y)], fill=seam, width=1)
     for row in range(s // brick_h):
         offset = (row % 2) * (brick_w // 2)
         y0 = row * brick_h
         for col in range(-1, s // brick_w + 1):
-            x0 = col * brick_w + offset
-            shade = PALETTE['stone_light'] if (row + col) % 2 == 0 else PALETTE['stone_dark']
-            d.rectangle([x0 + 2, y0 + 2, x0 + brick_w - 2, y0 + brick_h - 2], fill=shade)
-            d.rectangle([x0, y0, x0 + brick_w, y0 + brick_h], outline=PALETTE['outline'], width=2)
+            x = col * brick_w + offset
+            d.line([(x, y0), (x, y0 + brick_h)], fill=seam, width=1)
     save_icon(im, os.path.join(CROPPED, 'panel-stone.png'), 64)
 
 
