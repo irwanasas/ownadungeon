@@ -30,7 +30,7 @@ export const TRAPS: Record<string, TrapDef> = {
     icon: 'net',
     kind: 'trap',
     tags: ['control'],
-    desc: 'Turunkan ATK. Menunda RAGE Berserker.',
+    desc: 'Turunkan ATK. Menjerat kelas evasive dan menunda RAGE Berserker.',
     baseDamage: 4,
     dmgPerLevel: 2,
     atkReduction: 0.28,

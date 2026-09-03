@@ -67,12 +67,18 @@ export interface HeroArchetype {
   rageHpThreshold?: number;
   rageAtkMultiplier?: number;
   rageHealFraction?: number;
-  trapEvasion: number;
+  evasion: number;
+  damageReduction?: number;
+  regenPerRound?: number;
+  burstMultiplier?: number;
+  rampPerRound?: number;
+  rampCap?: number;
+  elementalAffinity?: boolean;
+  natureResist?: boolean;
   tags: string[];
   strengths: string;
   weaknesses: string;
   magicAtk?: boolean;
-  holy?: boolean;
 }
 
 export interface KingBase {
@@ -215,13 +221,19 @@ export interface Hero {
   def: number;
   fleeThreshold: number;
   fearImmune: boolean;
-  trapEvasion: number;
+  evasion: number;
+  damageReduction: number;
+  regenPerRound: number;
+  burstMultiplier: number;
+  rampPerRound: number;
+  rampCap: number;
+  elementalAffinity: boolean;
+  natureResist: boolean;
   canRage: boolean;
   rageHpThreshold: number;
   rageAtkMultiplier: number;
   rageHealFraction: number;
   magicAtk: boolean;
-  holy: boolean;
   tags: string[];
   strengths: string;
   weaknesses: string;

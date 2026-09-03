@@ -27,9 +27,12 @@ function traitChips(hero: Hero): string {
   var chips: string[] = [];
   if (hero.fearImmune) chips.push('Fear Immune');
   if (hero.canRage) chips.push('RAGE');
-  if (hero.trapEvasion >= 0.3) chips.push('Trap Evasion');
+  if (hero.evasion >= 0.3) chips.push('Evasion');
   if (hero.magicAtk) chips.push('Magic ATK');
-  if (hero.holy) chips.push('Holy');
+  if (hero.damageReduction) chips.push('Damage Reduction');
+  if (hero.regenPerRound) chips.push('Regen');
+  if (hero.burstMultiplier > 1) chips.push('Burst Opener');
+  if (hero.rampPerRound) chips.push('Terrain Ramp');
   if (!chips.length) return '';
   return (
     '<div class="hero-intro-traits">' +

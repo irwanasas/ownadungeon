@@ -171,19 +171,7 @@ def gen_orc():
     save_icon(im, os.path.join(CROPPED, 'icon-entity-orc.png'), 32)
 
 
-def gen_hero_warrior(color):
-    s = 128
-    im = new_canvas(s)
-    d = ImageDraw.Draw(im)
-    d.polygon([(28, 40), (54, 30), (54, 76), (40, 100), (28, 90)], fill=PALETTE['border_bright'], outline=PALETTE['outline'], width=5)
-    d.line([(41, 40), (41, 80)], fill=PALETTE['outline'], width=3)
-    d.rectangle([70, 20, 80, 78], fill=color, outline=PALETTE['outline'], width=4)
-    d.rectangle([58, 30, 92, 42], fill=PALETTE['muted'], outline=PALETTE['outline'], width=4)
-    d.rectangle([68, 78, 82, 92], fill=PALETTE['muted'], outline=PALETTE['outline'], width=3)
-    save_icon(im, os.path.join(CROPPED, 'icon-entity-warrior.png'), 32)
-
-
-def gen_hero_rogue(color):
+def gen_hero_trickster(color):
     s = 128
     im = new_canvas(s)
     d = ImageDraw.Draw(im)
@@ -193,7 +181,19 @@ def gen_hero_rogue(color):
     d.polygon([(34, 92), (20, 106), (32, 110), (42, 100)], fill=color, outline=PALETTE['outline'])
     d.line([(28, 30), (100, 100)], fill=PALETTE['outline'], width=3)
     d.line([(100, 30), (28, 100)], fill=PALETTE['outline'], width=3)
-    save_icon(im, os.path.join(CROPPED, 'icon-entity-rogue.png'), 32)
+    save_icon(im, os.path.join(CROPPED, 'icon-entity-trickster.png'), 32)
+
+
+def gen_hero_assassin(color):
+    s = 128
+    im = new_canvas(s)
+    d = ImageDraw.Draw(im)
+    d.ellipse([30, 70, 78, 100], fill=PALETTE['outline'])
+    d.line([(24, 24), (100, 100)], fill=color, width=12)
+    d.polygon([(94, 92), (110, 108), (96, 112), (84, 100)], fill=color, outline=PALETTE['outline'])
+    d.polygon([(18, 18), (34, 22), (24, 34)], fill=PALETTE['highlight'])
+    d.line([(24, 24), (100, 100)], fill=PALETTE['outline'], width=3)
+    save_icon(im, os.path.join(CROPPED, 'icon-entity-assassin.png'), 32)
 
 
 def gen_hero_berserker(color):
@@ -207,7 +207,7 @@ def gen_hero_berserker(color):
     save_icon(im, os.path.join(CROPPED, 'icon-entity-berserker.png'), 32)
 
 
-def gen_hero_mage(color):
+def gen_hero_elementalist(color):
     s = 128
     im = new_canvas(s)
     d = ImageDraw.Draw(im)
@@ -215,7 +215,19 @@ def gen_hero_mage(color):
     d.ellipse([68, 14, 90, 36], fill=color, outline=PALETTE['outline'], width=4)
     d.polygon([(30, 70), (38, 54), (46, 70), (38, 86)], fill=color, outline=PALETTE['outline'], width=3)
     d.polygon([(90, 50), (98, 34), (106, 50), (98, 66)], fill=color, outline=PALETTE['outline'], width=3)
-    save_icon(im, os.path.join(CROPPED, 'icon-entity-mage.png'), 32)
+    save_icon(im, os.path.join(CROPPED, 'icon-entity-elementalist.png'), 32)
+
+
+def gen_hero_druid(color):
+    s = 128
+    im = new_canvas(s)
+    d = ImageDraw.Draw(im)
+    d.line([(64, 108), (64, 34)], fill=PALETTE['muted'], width=8)
+    d.ellipse([44, 12, 84, 46], fill=color, outline=PALETTE['outline'], width=4)
+    d.polygon([(44, 30), (24, 20), (34, 44)], fill=color, outline=PALETTE['outline'], width=3)
+    d.polygon([(84, 30), (104, 20), (94, 44)], fill=color, outline=PALETTE['outline'], width=3)
+    d.ellipse([56, 22, 72, 38], fill=PALETTE['highlight'])
+    save_icon(im, os.path.join(CROPPED, 'icon-entity-druid.png'), 32)
 
 
 def gen_hero_paladin(color):
@@ -408,11 +420,12 @@ def main():
     gen_goblin('icon-entity-goblin_elite.png', lambda d: d.rectangle([40, 30, 88, 44], fill=PALETTE['border_bright'], outline=PALETTE['outline'], width=4))
     gen_orc()
 
-    gen_hero_warrior((232, 236, 245))
-    gen_hero_rogue((111, 184, 220))
-    gen_hero_berserker((240, 106, 82))
-    gen_hero_mage((111, 184, 220))
     gen_hero_paladin((224, 178, 74))
+    gen_hero_berserker((240, 106, 82))
+    gen_hero_trickster((111, 184, 220))
+    gen_hero_assassin((143, 111, 199))
+    gen_hero_druid((116, 192, 143))
+    gen_hero_elementalist((209, 72, 63))
 
     gen_treasure()
     gen_king()

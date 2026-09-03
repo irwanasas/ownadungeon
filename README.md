@@ -30,15 +30,18 @@ Mode: **Stage** (1–50) atau **Arcade** (wave tak terbatas).
 
 Bukan sekadar HP/ATK lebih besar. Tiap room adalah puzzle **Hero × Monster × Trap**.
 
-**5 Hero Classes**
+**6 Hero Classes** — dikelompokkan jadi 3 keluarga arketipe, masing-masing dua kelas yang saling melengkapi (DEF vs ATK):
 
-| Class | Role | Kekuatan | Kelemahan |
-|-------|------|----------|-----------|
-| Warrior | Frontline | Tahan spike, solid vs Goblin Elite | Racun, Slime |
-| Rogue | Skirmisher | Evasion trap, kuat vs Goblin Shaman | Goblin Elite, Net |
-| Berserker | Brawler | Fear-immune, RAGE, kuat vs Goblin Elite | Net menunda RAGE, DOT |
-| Mage | Caster | Magic (partial DEF ignore), vs Slime | HP tipis, Goblin Troop, Orc |
-| Paladin | Support-tank | Kuat vs Orc, tahan physical trap | Poison, tempo lambat |
+| Class | Family | Role | Mekanik inti | Kelemahan |
+|-------|--------|------|---------------|-----------|
+| Paladin | Warrior | Tank | Mitigasi tetap (`damageReduction`) di setiap hit, fear-immune | Burst rendah; DOT/attrition menembus mitigasi pelan-pelan |
+| Berserker | Warrior | Bruiser | RAGE comeback di HP rendah, fear-immune | Net menunda RAGE; mati sebelum RAGE kalau di-burst cepat |
+| Trickster | Rogue | Evasion | `evasion` tinggi, aktif di trap **dan** monster **dan** King | Tidak bisa evade DOT yang sudah kena; rapuh kalau dodge gagal |
+| Assassin | Rogue | Burst | `burstMultiplier` — hit pertama tiap encounter sangat besar | Nol sustain/mitigasi; melempem kalau fight molor |
+| Druid | Mage | Support | `regenPerRound` — heal tiap ronde di fight panjang, resist nature/DOT | Tidak bisa out-heal satu hit besar sekaligus |
+| Elementalist | Mage | Terrain | `rampPerRound` — makin kuat tiap ronde, magic ATK, resist trap elemen | Opener lemah; kill cepat / control trap membatalkan ramp-nya |
+
+Mekanik-mekanik ini (`evasion`, `damageReduction`, `regenPerRound`, `burstMultiplier`, `rampPerRound`, dll. — lihat `src/types.ts` field `Hero`) dicek generik di **ketiga** resolver combat (`trapEncounter.ts`, `monsterEncounter.ts`, `kingFight.ts`), bukan cuma tabel multiplier per-monster/per-trap — supaya counterplay antar arketipe muncul dari mekanik (timing, sustain, evasion, mitigasi), bukan sekadar angka damage yang lebih besar/kecil.
 
 **5 Monster Types** — progresi Slime → Goblin Troop → Goblin Shaman →
 Goblin Elite → Orc. 4 dari 5 sudah pakai real sprite art dari
@@ -57,7 +60,7 @@ emoji:
 
 - Spike · Poison · Net · Fire · Frost
 
-Matrix di `src/data/matchups.ts` (advantage ~×1.25, disadvantage ~×0.8, plus special: net-blocks-rage, frost DEF, holy/magic bonus, dll.). Tidak ada multiplier yang menumpuk sampai broken.
+Matrix di `src/data/matchups.ts` kini cuma lapisan flavor sekunder (advantage ~×1.12, disadvantage ~×0.9, plus special: net-blocks-rage, frost DEF, elemental/nature affinity, magic bonus, dll.) — counterplay utama datang dari mekanik hero generik di atas, bukan dari multiplier ini. Tidak ada yang menumpuk sampai broken.
 
 ### Room-by-room progression
 
@@ -99,7 +102,7 @@ Panel berganti mode lewat class modifier di elemen yang sama:
 
 | Mode | Kapan | Isi |
 |---|---|---|
-| `.room-preview--intro` | Idle (sebelum PLAY) **dan** saat entrance-beat awal raid | **Enemy Detected**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, trait/ability (Fear Immune, RAGE, Trap Evasion, Magic ATK, Holy), plus hint matchup ringkas per ruang (`R1`, `R2`, dst.) berdasarkan isi dungeon saat ini vs hero yang sudah diketahui |
+| `.room-preview--intro` | Idle (sebelum PLAY) **dan** saat entrance-beat awal raid | **Enemy Detected**: nama, class, level, HP/ATK/DEF, strengths, weaknesses, trait/ability (Fear Immune, RAGE, Evasion, Magic ATK, Damage Reduction, Regen, Burst Opener, Terrain Ramp), plus hint matchup ringkas per ruang (`R1`, `R2`, dst.) berdasarkan isi dungeon saat ini vs hero yang sudah diketahui |
 | `.room-preview--battle` | Sejak hero masuk Ruang 1 sampai raid selesai | Kartu compact: icon, nama, HP bar, dan **reaksi kontekstual** — **tidak ada** teks strengths/weaknesses lagi |
 
 **Kenapa dipisah begini:** strengths/weaknesses/traits/matchup-hint (jawaban puzzle-nya) selalu terlihat sebelum & saat entrance — sengaja, supaya player bisa menyusun ulang layout sebelum PLAY. Begitu combat benar-benar berjalan (Ruang 1+), panel beralih total ke reaksi — supaya combat tetap "readable" tanpa mengulang-ulang jawaban puzzle di tengah pertarungan (`ReactionKind` di `src/types.ts`):
@@ -138,14 +141,14 @@ Stage 1–50 tidak lagi berupa kurva stat (`data/stages.ts` menggantikan sistem 
 
 Hanya toolkit awal — **Spike Trap + Slime** (Slime selalu ter-unlock, gratis) — dan hero yang menyerang dibatasi ke kelas yang memang rentan terhadap keduanya:
 
-- **Mage** — sangat rentan Spike Trap (×1.30) dan lemah lawan apa pun yang mengandalkan trap fisik instan.
-- **Berserker** — matchup terburuknya justru chip damage konsisten seperti Slime (×0.9, salah satu angka terendah di tabel monster).
+- **Elementalist** — opener-nya lemah (belum sempat ramp), jadi Spike Trap yang instan langsung menjatuhkannya.
+- **Berserker** — matchup terburuknya justru chip damage konsisten seperti Slime, karena RAGE-nya butuh HP turun cukup dalam dulu.
 
-Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terlalu tahan terhadap Spike+Slime sehingga tutorial jadi mustahil dimenangkan tanpa unlock lain.
+Paladin/Trickster/Assassin/Druid **tidak pernah muncul** di stage 1–5 — mekanik mereka (mitigasi, evasion, burst, regen) butuh unlock lain dulu supaya tutorial tetap winnable.
 
-- Stage 1 — hanya Mage.
+- Stage 1 — hanya Elementalist.
 - Stage 2 — hanya Berserker.
-- Stage 3 — Mage + Berserker bergantian. **Clear → buka Poison Trap + Goblin Troop.**
+- Stage 3 — Elementalist + Berserker bergantian. **Clear → buka Poison Trap + Goblin Troop.**
 - Stage 4 — sama, tapi kombinasikan urutan ruang Spike vs Slime.
 - Stage 5 — ujian akhir tutorial. **Clear → buka Ruang ke-4.**
 
@@ -153,26 +156,27 @@ Warrior/Rogue/Paladin **tidak pernah muncul** di stage 1–5 — ketiganya terla
 
 | Stage | Unlock | Kenapa di sini |
 |---|---|---|
-| 3 | Poison Trap + Goblin Troop | Poison adalah satu-satunya penawar Warrior (×1.28) & Paladin (×1.22); Goblin Troop matchup terburuk Mage (×0.8) |
+| 3 | Poison Trap + Goblin Troop | Poison adalah DOT yang menembus mitigasi Paladin & menembus evasion Trickster begitu sekali kena |
 | 5 | Ruang ke-4 | Penutup tutorial, dungeon mulai lebih lega |
-| 8 | Net Trap | Dibuat khusus menjerat Rogue (×1.22), kelas paling evasive terhadap trap fisik lain |
+| 9 | Net Trap | Menjerat kelas evasive (Trickster) dan menunda RAGE Berserker |
 | 12 | Fire Trap | DOT bakar susulan — jawaban untuk hero yang bertahan lama |
-| 14 | Goblin Shaman | Ranged caster chip — Rogue paling efektif melawannya (×1.25, first-strike bonus) |
+| 14 | Goblin Shaman | Ranged caster chip — efektif menembus mitigasi tetap Paladin secara perlahan |
 | 17 | Frost Trap | Mengurangi DEF hero — combo starter untuk ruang monster sesudahnya |
-| 21 | Goblin Elite | Armored tank yang jadi matchup terburuk Rogue (×0.8), pelengkap Net Trap |
-| 26 | Orc | Endgame heavy hitter — hanya Paladin yang punya matchup unggul (×1.25) |
+| 21 | Goblin Elite | Armored tank yang membatalkan opening burst Assassin |
+| 26 | Orc | Endgame heavy hitter — mengancam kelas rapuh (Assassin, Elementalist) sebelum mereka sempat berkontribusi |
 | 32 | Ruang ke-5 | Perluasan dungeon terakhir, membuka layout 5-ruang penuh |
 
-Setiap stage unlock (3, 8, 12, 14, 17, 21, 26, 32) hanya membuka **kesempatan membeli** item itu di panel Upgrades (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.
+Setiap stage unlock di atas hanya membuka **kesempatan membeli** item itu di panel Upgrades (masih perlu Gold/Souls seperti biasa) — item baru disembunyikan total dari panel sampai stage-nya tercapai, supaya tidak ada janji counter yang belum bisa ditebus.
 
-### Roster hero: dari 2 kelas ke 5 kelas
+### Roster hero: dari 2 kelas ke 6 kelas
 
-- **Stage 1–5** — Mage, Berserker saja (lihat Tutorial di atas).
-- **Stage 6** — Warrior masuk, dibarengi Poison Trap yang baru terbuka sebagai penawarnya.
-- **Stage 8** — Paladin masuk (poison-vulnerable juga, ×1.22).
-- **Stage 9–34** — Rogue melengkapi roster (Net Trap baru terbuka sebagai penawar) → **5 kelas penuh** mulai stage 9, dan tetap penuh untuk sisa game.
-- **Stage 35–39** — lima "gauntlet" single-class berturut-turut (Berserker → Mage → Rogue → Warrior → Paladin), masing-masing menguji counter spesifik kelas itu satu per satu.
-- **Stage 40–50** — roster campuran lagi; kesulitan sepenuhnya dari komposisi/urutan/combo ruang (Frost→Fire, Net→Ogre, Poison→Shadow Wraith, dll.), bukan hero baru atau stat baru.
+- **Stage 1–5** — Elementalist, Berserker saja (lihat Tutorial di atas).
+- **Stage 6–7** — Paladin masuk.
+- **Stage 8** — Trickster masuk (Net Trap baru terbuka sebagai penawarnya).
+- **Stage 9** — Assassin masuk.
+- **Stage 10–34** — Druid melengkapi roster → **6 kelas penuh** mulai stage 10, dan tetap penuh untuk sisa game.
+- **Stage 35–40** — enam "gauntlet" single-class berturut-turut (Paladin → Berserker → Trickster → Assassin → Druid → Elementalist), masing-masing menguji counter mekanik spesifik kelas itu satu per satu.
+- **Stage 41–50** — roster campuran lagi; kesulitan sepenuhnya dari komposisi/urutan/combo ruang (Frost→Fire, Net→Goblin Elite, Poison→Orc, dll.), bukan hero baru atau stat baru.
 
 Detail lengkap 50 stage (`heroPool` + catatan desain per stage) ada di `src/data/stages.ts`.
 

@@ -32,9 +32,14 @@ export async function resolveKingFight(
   var goldReward = 0;
   var soulsReward = 0;
   var heroVictory = false;
+  var roundIndex = 0;
 
   while (kHp > 0 && hero.hp > 0) {
     await waitBeat('combatRound');
+
+    if (hero.regenPerRound) {
+      hero.hp = Math.min(hero.maxHp, hero.hp + Math.round(hero.maxHp * hero.regenPerRound));
+    }
 
     hero.status = hero.status.filter(function (s) {
       if (s.type === 'poison' && s.rounds > 0) {
@@ -53,7 +58,11 @@ export async function resolveKingFight(
       await waitBeat('actionGap');
     }
 
-    var hDmg = Math.max(1, hero.atk - kDef);
+    var timingMult = roundIndex === 0 ? (hero.burstMultiplier || 1) : 1;
+    if (hero.rampPerRound) {
+      timingMult *= 1 + Math.min(hero.rampCap || 0, hero.rampPerRound * roundIndex);
+    }
+    var hDmg = Math.max(1, Math.round((hero.atk - kDef) * timingMult));
     kHp -= hDmg;
 
     if (kHp <= 0) {
@@ -64,11 +73,15 @@ export async function resolveKingFight(
       break;
     }
 
-    var mDmg = Math.max(1, kAtk - hero.def);
-    hero.hp -= mDmg;
-    triggerPain(hero);
+    if (!(hero.evasion && Math.random() < hero.evasion)) {
+      var mDmg = Math.max(1, kAtk - hero.def);
+      if (hero.damageReduction) mDmg = Math.round(mDmg * (1 - hero.damageReduction));
+      hero.hp -= mDmg;
+      triggerPain(hero);
+    }
     updateBattleCard(hero);
     checkPanic(hero);
+    roundIndex++;
   }
 
   await waitBeat('resolve');

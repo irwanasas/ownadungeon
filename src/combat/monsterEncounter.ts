@@ -43,8 +43,13 @@ export async function resolveMonsterEncounter(
 
   var goldReward = 0;
   var mHp = monHp;
+  var roundIndex = 0;
   while (mHp > 0 && hero.hp > 0) {
     await waitBeat('combatRound');
+
+    if (hero.regenPerRound) {
+      hero.hp = Math.min(hero.maxHp, hero.hp + Math.round(hero.maxHp * hero.regenPerRound));
+    }
 
     hero.status = hero.status.filter(function (s) {
       if (s.type === 'poison' && s.rounds > 0) {
@@ -64,9 +69,13 @@ export async function resolveMonsterEncounter(
     }
 
     var mMult = heroMonsterMult(hero.classId, monCat.id);
+    var timingMult = roundIndex === 0 ? (hero.burstMultiplier || 1) : 1;
+    if (hero.rampPerRound) {
+      timingMult *= 1 + Math.min(hero.rampCap || 0, hero.rampPerRound * roundIndex);
+    }
     var raw = Math.max(1, hero.atk - monDef);
     if (hero.magicAtk) raw = Math.max(1, hero.atk - Math.floor(monDef * 0.4));
-    var hit = applySpecialOnMonsterHit(hero, monCat, Math.round(raw * mMult));
+    var hit = applySpecialOnMonsterHit(hero, monCat, Math.round(raw * mMult * timingMult));
     var hDmg = Math.max(1, hit.dmg);
     mHp -= hDmg;
 
@@ -76,11 +85,15 @@ export async function resolveMonsterEncounter(
       break;
     }
 
-    var mDmg = Math.max(1, monAtk - hero.def);
-    hero.hp -= mDmg;
-    triggerPain(hero);
+    if (!(hero.evasion && Math.random() < hero.evasion)) {
+      var mDmg = Math.max(1, monAtk - hero.def);
+      if (hero.damageReduction) mDmg = Math.round(mDmg * (1 - hero.damageReduction));
+      hero.hp -= mDmg;
+      triggerPain(hero);
+    }
     updateBattleCard(hero);
     checkPanic(hero);
+    roundIndex++;
   }
 
   await waitBeat('resolve');

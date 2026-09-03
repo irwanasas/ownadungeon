@@ -27,12 +27,12 @@ export async function resolveTrapEncounter(
   var tMult = heroTrapMult(hero.classId, trapCat.id);
   var dmg = Math.round(baseTrap * tMult);
 
-  if (hero.trapEvasion && Math.random() < hero.trapEvasion) {
+  if (hero.evasion && Math.random() < hero.evasion) {
     dmg = 0;
   }
 
   if (dmg > 0) {
-    var spec = applySpecialOnTrap(hero, trapCat.id, dmg);
+    var spec = applySpecialOnTrap(hero, trapCat.id, trapCat.tags, dmg);
     dmg = spec.dmg;
     hero.hp -= dmg;
     triggerPain(hero);

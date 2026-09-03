@@ -13,7 +13,7 @@ function kingUrl(path: string): string {
 const ENTITY_ICON_IDS = [
   'spike', 'poison', 'net', 'fire', 'frost',
   'slime', 'goblin_troop', 'goblin_shaman', 'goblin_elite', 'orc',
-  'warrior', 'rogue', 'berserker', 'mage', 'paladin',
+  'paladin', 'berserker', 'trickster', 'assassin', 'druid', 'elementalist',
   'treasure'
 ];
 
