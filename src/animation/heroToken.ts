@@ -23,7 +23,7 @@ export function showHeroToken(hero: Hero): void {
   if (!token || !runway) return;
 
   var face = token.querySelector('.hero-token-face');
-  if (face) face.textContent = getHeroIcon(hero);
+  if (face) face.innerHTML = getHeroIcon(hero);
 
   token.classList.add('is-visible');
   token.classList.remove('is-flee', 'is-dead', 'is-entering');
@@ -52,7 +52,7 @@ export function syncHeroTokenVisual(hero: Hero | null): void {
   if (hero.visualState === 'flee') token.classList.add('is-flee');
   if (hero.visualState === 'dead') token.classList.add('is-dead');
   var face = token.querySelector('.hero-token-face');
-  if (face) face.textContent = getHeroIcon(hero);
+  if (face) face.innerHTML = getHeroIcon(hero);
 }
 
 export function placeHeroAtEntrance(): void {

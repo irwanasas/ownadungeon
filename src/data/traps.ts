@@ -4,7 +4,7 @@ export const TRAPS: Record<string, TrapDef> = {
   spike: {
     id: 'spike',
     name: 'Spike Trap',
-    icon: '\uD83D\uDDE1',
+    icon: 'spike',
     kind: 'trap',
     tags: ['physical', 'instant'],
     desc: 'Damage fisik instan. Lemah vs armor tebal.',
@@ -15,7 +15,7 @@ export const TRAPS: Record<string, TrapDef> = {
   poison: {
     id: 'poison',
     name: 'Poison Trap',
-    icon: '\u2620',
+    icon: 'poison',
     kind: 'trap',
     tags: ['dot', 'nature'],
     desc: 'DOT tiap giliran. Menyiksa high-HP.',
@@ -27,7 +27,7 @@ export const TRAPS: Record<string, TrapDef> = {
   net: {
     id: 'net',
     name: 'Net Trap',
-    icon: '\uD83D\uDD78',
+    icon: 'net',
     kind: 'trap',
     tags: ['control'],
     desc: 'Turunkan ATK. Menunda RAGE Berserker.',
@@ -39,7 +39,7 @@ export const TRAPS: Record<string, TrapDef> = {
   fire: {
     id: 'fire',
     name: 'Fire Trap',
-    icon: '\uD83D\uDD25',
+    icon: 'fire',
     kind: 'trap',
     tags: ['fire', 'dot'],
     desc: 'Burn instan + sisa panas. Kuat vs slime.',
@@ -51,7 +51,7 @@ export const TRAPS: Record<string, TrapDef> = {
   frost: {
     id: 'frost',
     name: 'Frost Trap',
-    icon: '\u2744',
+    icon: 'frost',
     kind: 'trap',
     tags: ['control', 'cold'],
     desc: 'Kurangi DEF hero sementara. Soften tank.',

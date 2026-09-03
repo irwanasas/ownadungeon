@@ -1,5 +1,6 @@
 import { ENCOUNTER_X, EXIT_X, FLOOR_Y } from './laneLayout';
 import { MONSTER_SPRITE_MANIFEST } from '../data/monsterSprites';
+import { entityIconHtml } from '../ui/entityIcon';
 
 const ASSET_BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -34,7 +35,7 @@ export function showMonsterToken(icon: string, monsterId?: string): void {
     face.style.backgroundSize = (sprite.frameCount * 100) + '% 100%';
     face.classList.add('has-sprite');
   } else {
-    face.textContent = icon;
+    face.innerHTML = entityIconHtml(icon);
     face.style.backgroundImage = '';
     face.classList.remove('has-sprite');
   }

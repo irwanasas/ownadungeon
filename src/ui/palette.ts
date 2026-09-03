@@ -5,6 +5,7 @@ import { MONSTERS, TREASURE } from '../data/monsters';
 import { isUnlocked } from '../economy/economy';
 import { showToast } from './toast';
 import { closeAllOverlays } from './overlays';
+import { entityIconHtml } from './entityIcon';
 import type { CatalogItem } from '../types';
 
 export function renderPalette(): void {
@@ -67,7 +68,7 @@ function renderPaletteItem(item: CatalogItem, wrap: HTMLElement, alwaysUnlocked?
 
   div.innerHTML =
     '<span class="palette-icon">' +
-    item.icon +
+    entityIconHtml(item.icon) +
     '</span>' +
     '<div class="palette-info">' +
     '<div class="palette-item-name">' +

@@ -20,9 +20,7 @@ export default function GameApp() {
     <div className="app" style={uiAssetVars}>
       <header className="player-hud" aria-label="Player status">
         <div className="player-hud-left">
-          <div className="player-avatar" aria-hidden="true">
-            👑
-          </div>
+          <div className="player-avatar icon-king" aria-hidden="true"></div>
           <div className="player-meta">
             <div className="player-name">King</div>
             <div id="hud-king-level" className="player-level">
@@ -106,7 +104,7 @@ export default function GameApp() {
                 </div>
                 <div className="room-floor">
                   <div id="room-content" className="room-content">
-                    <span className="room-content-icon">🚪</span>
+                    <span className="room-content-icon icon-door"></span>
                     <span className="room-content-label">Dungeon Mouth</span>
                   </div>
                   <div id="hero-token" className="hero-token" aria-hidden="true">

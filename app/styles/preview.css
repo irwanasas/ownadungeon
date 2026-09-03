@@ -1,14 +1,14 @@
 .room-preview {
-  border: 1px solid rgba(59, 42, 23, 0.3);
-  border-radius: 8px;
-  background-color: #1b1610;
-  background-image: var(--img-panel-parchment);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--panel-raised);
+  background-image: var(--img-panel-stone);
+  background-size: 96px 96px;
+  background-repeat: repeat;
   image-rendering: pixelated;
 
   padding: 20px 12px 12px;
-  color: #3b2a17;
+  color: var(--bone);
 }
 
 .preview-header {
@@ -21,10 +21,10 @@
 
 .preview-title {
   font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #8a5a18;
+  color: var(--accent-blue-bright);
 }
 
 .preview-hero-blurb {
@@ -37,40 +37,49 @@
 .preview-tag {
   font-size: 9px;
   padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(59, 42, 23, 0.25);
-  color: #4a3520;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-bright);
+  color: var(--muted);
 }
 
 .preview-tag--good {
-  color: #4a6a28;
-  border-color: rgba(122, 149, 86, 0.45);
+  color: var(--poison-bright);
+  border-color: rgba(79, 157, 110, 0.45);
 }
 
 .preview-tag--bad {
-  color: #a33a22;
-  border-color: rgba(192, 71, 43, 0.4);
+  color: var(--ember-bright);
+  border-color: rgba(209, 72, 63, 0.4);
 }
 
 .preview-matchup {
   margin-top: 4px;
   font-size: 9px;
   text-align: center;
-  color: #6b5334;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.preview-matchup-icon {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
 }
 
 .preview-matchup--strong {
-  color: #4a6a28;
+  color: var(--poison-bright);
 }
 
 .preview-matchup--weak {
-  color: #a33a22;
+  color: var(--ember-bright);
 }
 
 .preview-hint {
   margin-top: 6px;
   font-size: 10px;
-  color: #6b5334;
+  color: var(--muted);
   line-height: 1.35;
 }
 
@@ -103,8 +112,8 @@
 }
 
 .hero-intro-icon {
-  font-size: 28px;
-  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
   flex-shrink: 0;
 }
 
@@ -115,19 +124,19 @@
 .hero-intro-name {
   font-weight: 700;
   font-size: 13px;
-  color: #3b2a17;
+  color: var(--bone);
 }
 
 .hero-intro-class {
   font-weight: 500;
-  color: #8a5a18;
+  color: var(--accent-blue-bright);
   font-size: 12px;
 }
 
 .hero-intro-stats {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #6b5334;
+  color: var(--muted);
   margin-top: 2px;
 }
 
@@ -141,21 +150,21 @@
 .hero-trait-chip {
   font-size: 9px;
   padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(59, 42, 23, 0.28);
-  color: #4a5a8a;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-bright);
+  color: var(--soul);
 }
 
 #room-preview.room-preview--intro {
-  border-color: rgba(138, 90, 42, 0.45);
+  border-color: var(--border-bright);
 }
 
 #room-preview.room-preview--battle {
   max-height: none;
   padding: 6px 8px;
   background-image: none;
-  background: rgba(12, 10, 8, 0.88);
-  border-color: rgba(138, 90, 42, 0.45);
+  background-color: rgba(5, 6, 10, 0.9);
+  border-color: var(--border-bright);
   color: var(--bone);
   image-rendering: auto;
 }
@@ -167,8 +176,8 @@
 }
 
 .battle-card-icon {
-  font-size: 20px;
-  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
 }
 
 .battle-card-name {
@@ -186,14 +195,14 @@
   color: var(--muted);
   padding: 1px 5px;
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius);
 }
 
 .battle-card-hp-bar {
   margin-top: 6px;
   height: 5px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.4);
   overflow: hidden;
 }
 
@@ -244,11 +253,11 @@
 }
 
 #room-preview.is-panic {
-  border-color: rgba(230, 122, 74, 0.5);
+  border-color: rgba(240, 106, 82, 0.5);
 }
 
 #room-preview.is-rage {
-  border-color: rgba(192, 71, 43, 0.55);
+  border-color: rgba(209, 72, 63, 0.55);
 }
 
 #room-preview.is-flee {

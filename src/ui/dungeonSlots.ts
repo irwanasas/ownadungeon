@@ -4,6 +4,7 @@ import { saveState } from '../state/gameState';
 import { catalogFor } from '../data/catalog';
 import { showToast } from './toast';
 import { renderAll } from './renderBus';
+import { entityIconHtml } from './entityIcon';
 
 export function renderDungeonSlots(): void {
   var wrap = document.getElementById('dungeon-slots');
@@ -43,7 +44,7 @@ export function renderDungeonSlots(): void {
       slotEl.innerHTML =
         indexTag +
         '<span class="slot-icon">' +
-        (cat ? cat.icon : '') +
+        (cat ? entityIconHtml(cat.icon) : '') +
         '</span><span class="slot-label">' +
         (cat ? cat.name : '') +
         '</span>';

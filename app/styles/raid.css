@@ -24,18 +24,18 @@
 }
 
 @keyframes slot-flash {
-  0% { background: rgba(230, 122, 74, 0.4); }
-  100% { background: var(--panel-raised); }
+  0% { background-color: rgba(240, 106, 82, 0.4); }
+  100% { background-color: var(--panel-raised); }
 }
 
 @keyframes slot-kill-flash {
-  0% { background: rgba(192, 71, 43, 0.5); box-shadow: 0 0 14px rgba(192, 71, 43, 0.4); }
-  100% { background: var(--panel-raised); box-shadow: none; }
+  0% { background-color: rgba(209, 72, 63, 0.5); box-shadow: 0 0 14px rgba(209, 72, 63, 0.4); }
+  100% { background-color: var(--panel-raised); box-shadow: none; }
 }
 
 @keyframes slot-clear-flash {
-  0% { background: rgba(122, 149, 86, 0.35); }
-  100% { background: var(--panel-raised); }
+  0% { background-color: rgba(76, 127, 219, 0.35); }
+  100% { background-color: var(--panel-raised); }
 }
 
 .dungeon-runway {
@@ -56,10 +56,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 2px solid var(--ember-bright);
+  border: 2px solid var(--accent-blue-bright);
   background: var(--panel-raised);
-  box-shadow: 0 0 12px rgba(230, 122, 74, 0.35);
+  box-shadow: 0 0 12px rgba(111, 160, 245, 0.35);
   font-size: 16px;
+  overflow: hidden;
 }
 
 .hero-token.is-panic .hero-token-face {
@@ -69,7 +70,7 @@
 
 .hero-token.is-rage .hero-token-face {
   border-color: var(--ember-bright);
-  box-shadow: 0 0 16px rgba(230, 122, 74, 0.55);
+  box-shadow: 0 0 16px rgba(240, 106, 82, 0.55);
   animation: token-rage-pulse 0.75s ease-in-out infinite;
 }
 
@@ -94,8 +95,8 @@
 }
 
 .dungeon-slot.throne-room {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 1px rgba(216, 170, 77, 0.35) inset;
+  border-color: var(--accent-purple-bright);
+  box-shadow: 0 0 0 1px rgba(143, 111, 199, 0.35) inset;
   min-width: 88px;
 }
 
@@ -134,24 +135,24 @@
   position: relative;
   flex: 1;
   min-height: 160px;
-  border: 1px solid rgba(80, 110, 140, 0.35);
-  border-radius: 10px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
 
-  background-color: #171310;
-  background-image: linear-gradient(180deg, rgba(40, 30, 22, 0.5) 0%, rgba(12, 9, 7, 0.85) 100%);
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, rgba(76, 127, 219, 0.1) 0%, rgba(5, 6, 10, 0.9) 100%);
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.5);
 }
 
 .room-chamber.is-throne {
-  border-color: rgba(216, 170, 77, 0.55);
+  border-color: var(--accent-purple-bright);
   box-shadow:
-    inset 0 0 36px rgba(216, 170, 77, 0.14),
-    inset 0 -24px 48px rgba(180, 40, 20, 0.18),
-    0 0 14px rgba(216, 170, 77, 0.22);
+    inset 0 0 36px rgba(107, 79, 160, 0.18),
+    inset 0 -24px 48px rgba(107, 79, 160, 0.14),
+    0 0 14px rgba(143, 111, 199, 0.25);
 }
 
 .room-content {
@@ -163,15 +164,18 @@
 }
 
 .room-content-icon {
-  font-size: 36px;
-  line-height: 1;
+  width: 36px;
+  height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  image-rendering: pixelated;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 .room-content-label {
-  font-family: var(--font-display);
-  font-size: 13px;
+  font-family: var(--font-body);
   font-weight: 700;
+  font-size: 13px;
   color: var(--bone);
   letter-spacing: 0.04em;
 }
@@ -208,7 +212,8 @@
 }
 
 .dungeon-runway.is-room-mode .dungeon-slot .slot-icon {
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .dungeon-runway.is-room-mode .slot-connector {
@@ -221,6 +226,7 @@
   }
 
   .room-content-icon {
-    font-size: 30px;
+    width: 30px;
+    height: 30px;
   }
 }

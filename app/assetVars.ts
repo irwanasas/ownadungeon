@@ -6,19 +6,38 @@ function assetUrl(path: string): string {
   return `url(${ASSET_BASE}/assets/ui/cropped/${path})`;
 }
 
-function uiBgUrl(path: string): string {
-  return `url(${ASSET_BASE}/assets/ui/bg/${path})`;
+function kingUrl(path: string): string {
+  return `url(${ASSET_BASE}/assets/king/${path})`;
+}
+
+const ENTITY_ICON_IDS = [
+  'spike', 'poison', 'net', 'fire', 'frost',
+  'slime', 'goblin_troop', 'goblin_shaman', 'goblin_elite', 'orc',
+  'warrior', 'rogue', 'berserker', 'mage', 'paladin',
+  'treasure'
+];
+
+const entityVars: Record<string, string> = {};
+for (const id of ENTITY_ICON_IDS) {
+  entityVars['--img-entity-' + id] = assetUrl('icon-entity-' + id + '.png');
 }
 
 export const uiAssetVars = {
-  '--img-panel-parchment': assetUrl('panel-parchment.png'),
-  '--img-pill-idle': assetUrl('pill-button.png'),
-  '--img-pill-hover': assetUrl('pill-button-hover.png'),
+  '--img-panel-stone': assetUrl('panel-stone.png'),
+  '--img-divider': assetUrl('divider-rune.png'),
+  '--img-pill-idle': assetUrl('pill-stone-idle.png'),
+  '--img-pill-hover': assetUrl('pill-stone-hover.png'),
+  '--img-pill-danger-idle': assetUrl('pill-danger-idle.png'),
+  '--img-pill-danger-hover': assetUrl('pill-danger-hover.png'),
   '--img-icon-gold': assetUrl('icon-gold.png'),
   '--img-icon-soul': assetUrl('icon-soul.png'),
   '--img-icon-armory': assetUrl('icon-armory.png'),
   '--img-icon-upgrade': assetUrl('icon-upgrade.png'),
   '--img-icon-settings': assetUrl('icon-settings.png'),
   '--img-icon-play': assetUrl('icon-play.png'),
-  '--img-room-bg': uiBgUrl('IMG_4394.jpeg')
+  '--img-icon-battle': assetUrl('icon-battle.png'),
+  '--img-icon-stats': assetUrl('icon-stats.png'),
+  '--img-icon-door': assetUrl('icon-door.png'),
+  '--img-icon-king': kingUrl('icon-king.png'),
+  ...entityVars
 } as CSSProperties;

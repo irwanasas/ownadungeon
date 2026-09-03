@@ -21,7 +21,7 @@ export function syncBattleCardVisual(hero: Hero | null): void {
   if (hero.visualState === 'dead') wrap.classList.add('is-dead');
 
   var icon = document.getElementById('battle-card-icon');
-  if (icon) icon.textContent = getHeroIcon(hero);
+  if (icon) icon.innerHTML = getHeroIcon(hero);
 
   syncHeroTokenVisual(hero);
 }

@@ -5,6 +5,7 @@ import { getKingStats } from '../data/king';
 import { placeHeroAtEntrance, walkHeroToEncounter } from './heroToken';
 import { showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './monsterToken';
 import { beatMs, type BeatKey } from './beatTiming';
+import { entityIconHtml } from '../ui/entityIcon';
 import type { DungeonSlotData } from '../types';
 
 interface StageEls {
@@ -78,7 +79,7 @@ export function presentEntrance(): void {
   }
   if (e.depth) e.depth.textContent = 'Entrance';
   e.content.innerHTML =
-    '<span class="room-content-icon">🚪</span>' +
+    '<span class="room-content-icon icon-door"></span>' +
     '<span class="room-content-label">Dungeon Mouth</span>';
   e.content.classList.remove('has-sprite');
   hideMonsterToken();
@@ -115,7 +116,7 @@ export function presentRoom(index: number, slot: DungeonSlotData | null): void {
   var isMonster = slot.kind === 'monster';
 
   e.content.innerHTML =
-    (isMonster ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? cat.icon : '·') + '</span>') +
+    (isMonster ? '' : '<span class="room-content-icon">' + (cat && cat.icon ? entityIconHtml(cat.icon) : '·') + '</span>') +
     '<span class="room-content-label">' + (cat && cat.name ? cat.name : 'Room') + '</span>' +
     '<span class="room-content-sub">Lv.' + level + '</span>';
   e.content.classList.toggle('has-sprite', isMonster);
@@ -141,7 +142,7 @@ export function presentThrone(): void {
   if (e.token) e.token.classList.remove('is-entering');
   placeHeroAtEntrance();
   e.content.innerHTML =
-    '<span class="room-content-icon">👑</span>' +
+    '<span class="room-content-icon icon-king"></span>' +
     '<span class="room-content-label">Throne</span>' +
     '<span class="room-content-sub">King Lv.' + kingLv + ' · HP ' + k.maxHp + '</span>';
   e.content.classList.remove('has-sprite');

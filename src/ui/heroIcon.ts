@@ -1,4 +1,5 @@
 import type { Hero } from '../types';
+import { entityIconHtml } from './entityIcon';
 
 export function getHeroIcon(hero: Hero | null): string {
   if (!hero) return '⚔';
@@ -6,5 +7,5 @@ export function getHeroIcon(hero: Hero | null): string {
   if (hero.visualState === 'flee') return '💨';
   if (hero.visualState === 'rage') return '🔥';
   if (hero.visualState === 'panic') return '😰';
-  return hero.icon || '⚔';
+  return hero.icon ? entityIconHtml(hero.icon) : '⚔';
 }

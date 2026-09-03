@@ -9,6 +9,7 @@ import {
   matchupLabel
 } from '../data/matchups';
 import { ensurePendingHero } from '../combat/hero';
+import { entityIconHtml } from './entityIcon';
 import type { Hero, ReactionKind } from '../types';
 
 function resetWrapModifiers(wrap: HTMLElement): void {
@@ -74,7 +75,7 @@ function layoutMatchupHints(hero: Hero): string {
       '<span class="preview-matchup preview-matchup--' +
         label +
         '">' +
-        cat.icon +
+        entityIconHtml(cat.icon, 'preview-matchup-icon') +
         ' R' +
         (i + 1) +
         ' ' +
@@ -93,7 +94,7 @@ function heroIntroHtml(hero: Hero, hint: string): string {
     '<div class="preview-header"><span class="preview-title">Enemy Detected</span></div>' +
     '<div class="hero-intro">' +
     '<span class="hero-intro-icon">' +
-    hero.icon +
+    entityIconHtml(hero.icon) +
     '</span>' +
     '<div class="hero-intro-main">' +
     '<div class="hero-intro-name">' +
@@ -202,7 +203,7 @@ export function updateBattleCard(hero: Hero): void {
       'HP ' + Math.max(0, Math.floor(hero.hp)) + '/' + hero.maxHp;
   }
   var icon = document.getElementById('battle-card-icon');
-  if (icon) icon.textContent = getHeroIcon(hero);
+  if (icon) icon.innerHTML = getHeroIcon(hero);
   syncBattleCardVisual(hero);
 }
 

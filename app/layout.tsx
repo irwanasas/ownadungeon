@@ -7,7 +7,6 @@ import './styles/raid.css';
 import './styles/battle.css';
 import './styles/preview.css';
 import './styles/sidescroll.css';
-import './styles/ui-skin.css';
 
 export const metadata: Metadata = {
   title: 'MVP - Own a Dungeon'
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
           rel="stylesheet"
         />
       </head>

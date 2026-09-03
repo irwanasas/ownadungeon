@@ -4,7 +4,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   slime: {
     id: 'slime',
     name: 'Slime',
-    icon: '🟢',
+    icon: 'slime',
     kind: 'monster',
     type: 'resist',
     tags: ['acid', 'resist'],
@@ -20,7 +20,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   goblin_troop: {
     id: 'goblin_troop',
     name: 'Goblin Troop',
-    icon: '👹',
+    icon: 'goblin_troop',
     kind: 'monster',
     type: 'brute',
     tags: ['physical', 'burst'],
@@ -35,7 +35,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   goblin_shaman: {
     id: 'goblin_shaman',
     name: 'Goblin Shaman',
-    icon: '🪄',
+    icon: 'goblin_shaman',
     kind: 'monster',
     type: 'ranged',
     tags: ['magic', 'ranged'],
@@ -50,7 +50,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   goblin_elite: {
     id: 'goblin_elite',
     name: 'Goblin Elite',
-    icon: '🛡️',
+    icon: 'goblin_elite',
     kind: 'monster',
     type: 'tank',
     tags: ['physical', 'tank', 'armored'],
@@ -65,7 +65,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   orc: {
     id: 'orc',
     name: 'Orc',
-    icon: '👺',
+    icon: 'orc',
     kind: 'monster',
     type: 'brute',
     tags: ['physical', 'brute', 'heavy'],
@@ -82,7 +82,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
 export const TREASURE: TreasureDef = {
   id: 'treasure',
   name: 'Treasure Vault',
-  icon: '💰',
+  icon: 'treasure',
   kind: 'treasure',
   desc: 'If the hero reaches this room alive, they steal some of your reward.'
 };
