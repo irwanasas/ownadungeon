@@ -98,6 +98,15 @@ export default function GameApp() {
                 Entrance
               </div>
               <div id="room-chamber" className="room-chamber">
+                <div className="room-torch" style={{ left: '28%', top: '47%' }} aria-hidden="true">
+                  <div className="room-torch-flame"></div>
+                </div>
+                <div className="room-torch" style={{ left: '54%', top: '47%' }} aria-hidden="true">
+                  <div className="room-torch-flame"></div>
+                </div>
+                <div className="room-torch" style={{ left: '83%', top: '47%' }} aria-hidden="true">
+                  <div className="room-torch-flame"></div>
+                </div>
                 <div id="room-door" className="room-door" aria-hidden="true">
                   <div className="room-door-panel"></div>
                   <div className="room-door-frame"></div>

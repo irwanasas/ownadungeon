@@ -10,6 +10,10 @@ function kingUrl(path: string): string {
   return `url(${ASSET_BASE}/assets/king/${path})`;
 }
 
+function roomUrl(path: string): string {
+  return `url(${ASSET_BASE}/assets/room/${path})`;
+}
+
 const ENTITY_ICON_IDS = [
   'spike', 'poison', 'net', 'fire', 'frost',
   'slime', 'goblin_troop', 'goblin_shaman', 'goblin_elite', 'orc',
@@ -39,5 +43,7 @@ export const uiAssetVars = {
   '--img-icon-stats': assetUrl('icon-stats.png'),
   '--img-icon-door': assetUrl('icon-door.png'),
   '--img-icon-king': kingUrl('icon-king.png'),
+  '--img-room-bg': roomUrl('room-bg.png'),
+  '--img-torch': roomUrl('TorchAnimation.png'),
   ...entityVars
 } as CSSProperties;
