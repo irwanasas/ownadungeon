@@ -23,6 +23,7 @@ import { resolveMonsterEncounter } from './monsterEncounter';
 import { resolveTreasureEncounter } from './treasureEncounter';
 import { resolveKingFight } from './kingFight';
 import { applyRaidOutcome } from './raidRewards';
+import { showRaidResultModal } from '../ui/raidResultModal';
 import type { DungeonSlotData, MonsterDef, TrapDef } from '../types';
 
 export async function runRaid(): Promise<void> {
@@ -31,7 +32,7 @@ export async function runRaid(): Promise<void> {
   renderAll();
 
   var status = document.getElementById('raid-status');
-  if (status) status.textContent = 'Raid berlangsung...';
+  if (status) status.textContent = 'Raid in progress...';
 
   var stageDiff = getRaidDiff();
 
@@ -139,9 +140,10 @@ export async function runRaid(): Promise<void> {
   exitRaidRoomMode();
   clearPendingHero();
 
-  applyRaidOutcome(hero, { dungeonWin, heroEscape, heroVictory }, goldReward, soulsReward, stageDiff);
+  var outcome = { dungeonWin, heroEscape, heroVictory };
+  var rewardTotals = applyRaidOutcome(hero, outcome, goldReward, soulsReward, stageDiff);
 
-  if (status) status.textContent = 'Raid selesai';
+  if (status) status.textContent = 'Raid finished';
 
   runtime.raidInProgress = false;
   saveState();
@@ -150,5 +152,6 @@ export async function runRaid(): Promise<void> {
   setTimeout(function () {
     hideHeroToken();
     hideMonsterToken();
+    showRaidResultModal(outcome, rewardTotals.gold, rewardTotals.souls);
   }, 1400);
 }

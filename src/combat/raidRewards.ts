@@ -8,13 +8,18 @@ export interface RaidOutcome {
   heroVictory: boolean;
 }
 
+export interface RaidRewardTotals {
+  gold: number;
+  souls: number;
+}
+
 export function applyRaidOutcome(
   hero: Hero,
   outcome: RaidOutcome,
   goldReward: number,
   soulsReward: number,
   stageDiff: RaidDifficulty
-): void {
+): RaidRewardTotals {
   var heroVictory = outcome.heroVictory;
   if (hero.hp > 0 && !outcome.heroEscape && !heroVictory) {
     heroVictory = true;
@@ -60,4 +65,6 @@ export function applyRaidOutcome(
   state.gold += goldReward;
   state.souls += soulsReward;
   state.stats.raidsTotal++;
+
+  return { gold: goldReward, souls: soulsReward };
 }

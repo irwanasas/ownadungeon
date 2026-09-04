@@ -252,6 +252,28 @@ export default function GameApp() {
         </div>
       </div>
 
+      <div id="raid-result-modal" className="modal-overlay modal-overlay--hidden">
+        <div className="modal">
+          <h2 id="raid-result-title" className="modal-title">Dungeon Held!</h2>
+          <div className="modal-body">
+            <p id="raid-result-desc"></p>
+            <div className="raid-result-rewards">
+              <span className="reward-pill">
+                <span className="currency-icon gold-icon" aria-hidden="true"></span>
+                +<span id="raid-result-gold">0</span>
+              </span>
+              <span className="reward-pill">
+                <span className="currency-icon soul-icon" aria-hidden="true"></span>
+                +<span id="raid-result-souls">0</span>
+              </span>
+            </div>
+          </div>
+          <div className="modal-actions">
+            <button id="btn-close-raid-result" className="btn btn-primary" type="button">Continue</button>
+          </div>
+        </div>
+      </div>
+
       <div id="reset-modal" className="modal-overlay modal-overlay--hidden">
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
           <h2 id="reset-modal-title" className="modal-title">Reset Game?</h2>

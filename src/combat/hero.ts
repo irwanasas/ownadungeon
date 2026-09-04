@@ -5,6 +5,7 @@ import { getStageDef } from '../data/stages';
 import { getRaidDiff } from './difficultyResolver';
 import { setBattleReaction, syncBattleCardVisual } from '../ui/battleReaction';
 import { isUnlocked } from '../economy/economy';
+import { playSfx } from '../audio/sfx';
 import type { Hero, ReactionKind } from '../types';
 
 function eligibleArchetypes() {
@@ -114,6 +115,7 @@ export function tryTriggerRage(hero: Hero): boolean {
     hero.hp + Math.round(hero.maxHp * hero.rageHealFraction)
   );
   setHeroReaction(hero, 'rage', 'RAGE');
+  playSfx('rage');
   return true;
 }
 
@@ -128,12 +130,14 @@ export function triggerDeath(hero: Hero): void {
   hero.hp = 0;
   hero.visualState = 'dead';
   setHeroReaction(hero, 'dead', '');
+  playSfx('death');
 }
 
 export function triggerPain(hero: Hero): void {
   if (!hero || hero.hp <= 0) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
   setBattleReaction('HURT!', 'pain');
+  playSfx('pain');
 }
 
 export function triggerSurprise(hero: Hero): void {

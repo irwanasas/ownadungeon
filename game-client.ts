@@ -37,7 +37,7 @@ export function startGame(): void {
 
   function openResetModal() {
     if (runtime.raidInProgress) {
-      showToast('Tunggu raid selesai dulu', 'warning');
+      showToast('Wait for the raid to finish first', 'warning');
       return;
     }
     if (resetModal) resetModal.classList.remove('modal-overlay--hidden');
@@ -66,6 +66,15 @@ export function startGame(): void {
     closeOffline.addEventListener('click', function () {
       document
         .getElementById('offline-modal')
+        ?.classList.add('modal-overlay--hidden');
+    });
+  }
+
+  var closeRaidResult = document.getElementById('btn-close-raid-result');
+  if (closeRaidResult) {
+    closeRaidResult.addEventListener('click', function () {
+      document
+        .getElementById('raid-result-modal')
         ?.classList.add('modal-overlay--hidden');
     });
   }

@@ -7,6 +7,7 @@ import { showMonsterToken, hideMonsterToken, playMonsterWalkFlourish } from './m
 import { beatMs, type BeatKey } from './beatTiming';
 import { resetWorldScroll } from './worldScroll';
 import { entityIconHtml } from '../ui/entityIcon';
+import { playSfx } from '../audio/sfx';
 import type { DungeonSlotData } from '../types';
 
 interface StageEls {
@@ -63,6 +64,7 @@ export function setDoorOpen(open: boolean): void {
   if (!e.door) return;
   if (open) {
     e.door.classList.add('is-opening');
+    playSfx('door');
     requestAnimationFrame(function () {
       if (e.door) e.door.classList.add('is-open');
     });
