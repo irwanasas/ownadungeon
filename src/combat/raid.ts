@@ -101,7 +101,6 @@ export async function runRaid(): Promise<void> {
     if (slot.kind === 'treasure') {
       var treasureResult = await resolveTreasureEncounter(hero, goldReward, waitBeat);
       goldReward = treasureResult.goldReward;
-      heroVictory = heroVictory || treasureResult.heroVictory;
     }
 
     if (slotEl) slotEl.classList.add('raid-cleared');
