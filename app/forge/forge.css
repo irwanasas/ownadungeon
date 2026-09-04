@@ -82,13 +82,25 @@
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
 }
 
-.dk-world {
+.dk-scroll {
   position: absolute;
-  top: 0; bottom: 0; left: 0;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.dk-scroll::-webkit-scrollbar { display: none; }
+.dk-scroll.locked { pointer-events: none; }
+
+.dk-world {
   display: flex;
   align-items: stretch;
-  will-change: transform;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  min-height: 100%;
+  width: max-content;
 }
 
 .dk-cell {
@@ -96,6 +108,7 @@
   flex: 0 0 128px;
   width: 128px;
   height: 100%;
+  scroll-snap-align: center;
   background-image: var(--tile-floor), var(--tile-wall);
   background-position: center bottom, center bottom 32px;
   background-size: 32px 32px, 32px 32px;

@@ -7,7 +7,7 @@ import { HEROES, heroById } from '../../engine/data/heroes';
 import { STAGES, STAGE_MAX, stageById } from '../../engine/data/stages';
 import { toDungeonConfig } from '../../engine/economy';
 import { simulateRaid } from '../../engine/simulate';
-import type { RaidResult } from '../../engine/types';
+import { EDITABLE_ROOMS, type RaidResult } from '../../engine/types';
 import DungeonStage, { type DungeonStageHandle } from './DungeonStage';
 import { BuildSheet, UpgradeSheet, ResultSheet } from './sheets';
 import { HERO_ICON, UI_ICON } from './assets';
@@ -17,16 +17,14 @@ import './forge.css';
 function syncUnlocks(state: GameState): GameState {
   const traps = new Set<string>(['spike']);
   const monsters = new Set<string>();
-  let slotCount = 1;
   for (const s of STAGES) {
     if (s.id > state.stage) break;
     s.unlockTrapIds.forEach((id) => traps.add(id));
     s.unlockMonsterIds.forEach((id) => monsters.add(id));
-    slotCount = s.slotCount;
   }
   const dungeon: GameState['dungeon'] = [];
-  for (let i = 0; i < slotCount; i++) dungeon.push(state.dungeon[i] || { kind: 'empty' });
-  return { ...state, unlockedTraps: [...traps], unlockedMonsters: [...monsters], slotCount, dungeon };
+  for (let i = 0; i < EDITABLE_ROOMS; i++) dungeon.push(state.dungeon[i] || { kind: 'empty' });
+  return { ...state, unlockedTraps: [...traps], unlockedMonsters: [...monsters], dungeon };
 }
 
 function pickHero(pool: string[]): string {

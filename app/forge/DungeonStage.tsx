@@ -3,7 +3,7 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import type { RaidResult, RaidEvent, StatusKind } from '../../engine/types';
 import type { DungeonSlot } from '../../engine/save';
-import { buildCells, CAMERA_ANCHOR_PX, type CellGeom } from './raidCells';
+import { buildCells, type CellGeom } from './raidCells';
 import { forgeVars, HERO_ICON, MONSTER_ICON, TRAP_ICON, UI_ICON } from './assets';
 import { playSfx, startAmbient, stopAmbient } from './audio';
 
@@ -65,8 +65,6 @@ const REACTION_TEXT: Record<string, string> = {
 
 const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage({ rooms, onCellTap }, ref) {
   const [raiding, setRaiding] = useState(false);
-  const [worldOffset, setWorldOffset] = useState(0);
-  const [instant, setInstant] = useState(false);
   const [doorOpenIndex, setDoorOpenIndex] = useState<number | null>(null);
   const [heroVisible, setHeroVisible] = useState(false);
   const [heroCls, setHeroCls] = useState('');
@@ -81,6 +79,7 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
   if (!raiding) cellsRef.current = buildCells(rooms);
   const cells = cellsRef.current;
   const currentCellIndexRef = useRef<number>(-1);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   function addNumber(text: string, cls: string) {
     const id = ++fxId;
@@ -100,11 +99,11 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
 
   function cameraTo(cellIndex: number, animate: boolean) {
     const cell = cellsRef.current.find((c) => c.index === cellIndex);
-    if (!cell) return;
+    const el = scrollRef.current;
+    if (!cell || !el) return;
     currentCellIndexRef.current = cellIndex;
-    setInstant(!animate);
-    setWorldOffset(CAMERA_ANCHOR_PX - cell.center);
-    if (!animate) requestAnimationFrame(() => setInstant(false));
+    const target = Math.max(0, cell.center - el.clientWidth / 2);
+    el.scrollTo({ left: target, behavior: animate ? 'smooth' : 'auto' });
   }
 
   useImperativeHandle(ref, () => ({
@@ -248,10 +247,8 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
 
   return (
     <div className="dk-stage-wrap" style={forgeVars}>
-      <div
-        className="dk-world"
-        style={{ transform: `translateX(${worldOffset}px)`, transitionDuration: instant ? '0ms' : undefined }}
-      >
+      <div className={'dk-scroll' + (raiding ? ' locked' : '')} ref={scrollRef}>
+      <div className="dk-world">
         {cells.map((cell) => {
           const icon = contentIcon(cell.content);
           const isBuildable = !raiding && cell.kind === 'room';
@@ -294,9 +291,10 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
           );
         })}
       </div>
+      </div>
 
       {heroVisible && (
-        <div className={'dk-hero ' + heroCls + (heroFlash ? ' hit' : '')} style={{ left: CAMERA_ANCHOR_PX }}>
+        <div className={'dk-hero ' + heroCls + (heroFlash ? ' hit' : '')} style={{ left: '50%' }}>
           <div className="dk-hero-face">
             <img src={heroIcon} alt="hero" />
           </div>
@@ -309,7 +307,7 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
       )}
 
       {numbers.map((n) => (
-        <span key={n.id} className={'dk-fx-num ' + n.cls} style={{ left: CAMERA_ANCHOR_PX + n.jitter, bottom: 78 }}>
+        <span key={n.id} className={'dk-fx-num ' + n.cls} style={{ left: `calc(50% + ${n.jitter}px)`, bottom: 78 }}>
           {n.text}
         </span>
       ))}

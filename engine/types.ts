@@ -86,12 +86,16 @@ export interface StageDef {
   id: number;
   title: string;
   heroPool: string[];
-  slotCount: number;
   unlockTrapIds: string[];
   unlockMonsterIds: string[];
   kingLevel: number;
   note: string;
 }
+
+// The dungeon is always a fixed 6-room strip: 5 editable rooms plus the
+// permanent Throne Room. Progression unlocks new trap/monster content, not
+// more room slots.
+export const EDITABLE_ROOMS = 5;
 
 // --- Runtime raid state -----------------------------------------------------
 

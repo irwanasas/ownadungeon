@@ -1,3 +1,5 @@
+import { EDITABLE_ROOMS } from './types';
+
 export type DungeonSlot = { kind: 'empty' } | { kind: 'trap'; trapId: string } | { kind: 'monster'; monsterId: string };
 
 export interface GameState {
@@ -9,7 +11,6 @@ export interface GameState {
   arcadeWave: number;
   arcadeBest: number;
   kingLevel: number;
-  slotCount: number;
   dungeon: DungeonSlot[];
   trapLevels: Record<string, number>;
   monsterLevels: Record<string, number>;
@@ -30,8 +31,7 @@ export function defaultState(): GameState {
     arcadeWave: 1,
     arcadeBest: 0,
     kingLevel: 1,
-    slotCount: 1,
-    dungeon: [{ kind: 'empty' }],
+    dungeon: Array.from({ length: EDITABLE_ROOMS }, () => ({ kind: 'empty' })),
     trapLevels: {},
     monsterLevels: {},
     unlockedTraps: ['spike'],
@@ -46,7 +46,11 @@ export function loadState(): GameState {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    return { ...defaultState(), ...parsed };
+    const merged: GameState = { ...defaultState(), ...parsed };
+    const dungeon = merged.dungeon.slice(0, EDITABLE_ROOMS);
+    while (dungeon.length < EDITABLE_ROOMS) dungeon.push({ kind: 'empty' });
+    merged.dungeon = dungeon;
+    return merged;
   } catch (e) {
     return defaultState();
   }

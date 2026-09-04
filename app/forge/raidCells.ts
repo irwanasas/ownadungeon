@@ -29,5 +29,3 @@ export function buildCells(rooms: DungeonSlot[]): CellGeom[] {
 
   return cells;
 }
-
-export const CAMERA_ANCHOR_PX = 108;
