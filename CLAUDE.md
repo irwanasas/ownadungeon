@@ -60,6 +60,12 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. No Comments, Short Summaries
+
+- Do not write code comments. Write plain code only.
+- After finishing a task, respond with a short summary — only the critical info, nothing else.
+- Commit and push directly to `main`. Do not create branches.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
