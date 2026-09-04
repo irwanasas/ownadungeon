@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic';
 
-const GameApp = dynamic(() => import('./GameApp'), { ssr: false });
+const ForgeApp = dynamic(() => import('./forge/ForgeApp'), { ssr: false });
 
 export default function Page() {
-  return <GameApp />;
+  return <ForgeApp />;
 }

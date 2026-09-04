@@ -1,0 +1,300 @@
+/* Dungeon Forge — new visual language: deep teal-black stone, moss-teal accent
+   instead of the old game's blue/purple, sharp pixel tiles for the dungeon
+   itself, rounded chrome only where it aids touch affordance. */
+
+:root {
+  --dk-bg: #0a1210;
+  --dk-panel: #12211f;
+  --dk-panel-raised: #1a2f2c;
+  --dk-border: #274240;
+  --dk-border-bright: #3c635f;
+  --dk-bone: #e8ecec;
+  --dk-muted: #7fa89e;
+  --dk-moss: #3fbf9e;
+  --dk-moss-bright: #6fe0c0;
+  --dk-violet: #9b6bd8;
+  --dk-ember: #e0503c;
+  --dk-ember-bright: #f5765c;
+  --dk-frost: #7fd8e8;
+  --dk-gold: #e8b94a;
+  --dk-radius-sm: 3px;
+  --dk-font: 'IBM Plex Sans', system-ui, sans-serif;
+  --dk-font-mono: 'JetBrains Mono', monospace;
+}
+
+.forge-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at 30% -10%, rgba(63, 191, 158, 0.08), transparent 55%), var(--dk-bg);
+  color: var(--dk-bone);
+  font-family: var(--dk-font);
+  overflow: hidden;
+}
+
+/* ---- top HUD ---- */
+.dk-hud {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: max(10px, env(safe-area-inset-top)) 14px 8px;
+  border-bottom: 1px solid var(--dk-border);
+  background: var(--dk-panel);
+}
+.dk-hud-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.dk-hud-title { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+.dk-hud-sub { font-size: 10px; color: var(--dk-muted); font-family: var(--dk-font-mono); }
+.dk-currencies { display: flex; gap: 10px; flex-shrink: 0; }
+.dk-currency {
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--dk-font-mono); font-size: 13px; font-weight: 700; color: var(--dk-gold);
+}
+.dk-currency.souls { color: var(--dk-frost); }
+.dk-currency img { width: 16px; height: 16px; image-rendering: pixelated; }
+
+/* ---- mode toggle ---- */
+.dk-mode-row { display: flex; gap: 6px; padding: 8px 14px 0; flex-shrink: 0; }
+.dk-mode-btn {
+  flex: 1; padding: 7px 0; text-align: center; font-size: 12px; font-weight: 700;
+  border-radius: var(--dk-radius-sm); border: 1px solid var(--dk-border);
+  background: var(--dk-panel); color: var(--dk-muted); cursor: pointer;
+}
+.dk-mode-btn.active { border-color: var(--dk-moss); color: var(--dk-moss-bright); background: rgba(63, 191, 158, 0.12); }
+
+/* ---- dungeon stage (the star of the screen) ---- */
+.dk-stage-wrap {
+  flex: 1;
+  min-height: 0;
+  margin: 10px 12px;
+  border-radius: var(--dk-radius-sm);
+  border: 1px solid var(--dk-border-bright);
+  overflow: hidden;
+  position: relative;
+  background: #060b0a;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.dk-world {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  display: flex;
+  align-items: stretch;
+  will-change: transform;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dk-cell {
+  position: relative;
+  flex: 0 0 128px;
+  width: 128px;
+  height: 100%;
+  background-image: var(--tile-floor), var(--tile-wall);
+  background-position: center bottom, center bottom 32px;
+  background-size: 32px 32px, 32px 32px;
+  background-repeat: repeat-x, repeat-x;
+  image-rendering: pixelated;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.35);
+}
+.dk-cell.entrance,
+.dk-cell.throne { flex-basis: 96px; width: 96px; }
+
+.dk-cell-content {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.9;
+}
+.dk-cell-icon { width: 34px; height: 34px; image-rendering: pixelated; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+.dk-cell-label { font-size: 8px; color: var(--dk-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.dk-torch { position: absolute; bottom: 46px; width: 48px; height: 48px; overflow: hidden; image-rendering: pixelated; }
+.dk-torch.left { left: 6px; }
+.dk-torch.right { right: 6px; }
+.dk-torch-flame {
+  width: 192px; height: 48px; background-image: var(--torch-sheet);
+  background-repeat: no-repeat; background-size: 192px 48px; image-rendering: pixelated;
+  animation: dk-torch-flicker 0.6s steps(1, end) infinite;
+}
+@keyframes dk-torch-flicker {
+  0% { background-position: 0 0; } 25% { background-position: -48px 0; }
+  50% { background-position: -96px 0; } 75% { background-position: -144px 0; }
+}
+
+.dk-door {
+  position: absolute; bottom: 30px; width: 26px; height: 40px;
+  background-image: var(--icon-door); background-size: contain; background-repeat: no-repeat;
+  image-rendering: pixelated; transition: opacity 0.2s ease;
+}
+.dk-door.is-open { background-image: var(--icon-door-open); }
+
+.dk-hero {
+  position: absolute;
+  bottom: 30px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  transform: translateX(-50%);
+  transition: bottom 0.15s ease;
+}
+.dk-hero-face {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--dk-panel-raised); border: 2px solid var(--dk-moss-bright);
+  box-shadow: 0 0 10px rgba(63, 191, 158, 0.4);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.dk-hero-face img { width: 26px; height: 26px; image-rendering: pixelated; }
+.dk-hero.walking { animation: dk-bob 0.35s ease-in-out infinite; }
+.dk-hero.hit .dk-hero-face { animation: dk-shake 0.3s ease-in-out; border-color: var(--dk-ember-bright); }
+.dk-hero.panic .dk-hero-face { animation: dk-shake 0.4s ease-in-out infinite; border-color: var(--dk-ember); }
+.dk-hero.dead .dk-hero-face { filter: grayscale(0.7); opacity: 0.6; animation: none; }
+.dk-hero.rage .dk-hero-face { border-color: var(--dk-ember-bright); box-shadow: 0 0 16px rgba(240, 100, 70, 0.6); animation: dk-pulse 0.6s ease-in-out infinite; }
+@keyframes dk-bob { 0%, 100% { bottom: 30px; } 50% { bottom: 34px; } }
+@keyframes dk-shake { 0%, 100% { transform: translateX(-50%); } 25% { transform: translate(calc(-50% - 3px), 0); } 75% { transform: translate(calc(-50% + 3px), 0); } }
+@keyframes dk-pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.12); } }
+
+.dk-monster {
+  position: absolute; bottom: 30px; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center; z-index: 5;
+  opacity: 0; transform: translateY(8px); transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.dk-monster.is-visible { opacity: 1; transform: translateY(0); }
+.dk-monster.is-dying { opacity: 0; transform: translateY(10px) scale(0.7); }
+.dk-monster img { width: 36px; height: 36px; image-rendering: pixelated; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+.dk-monster.hit img { animation: dk-shake 0.25s ease-in-out; }
+
+.dk-fx-num {
+  position: absolute; font-family: var(--dk-font-mono); font-weight: 700; font-size: 13px;
+  color: var(--dk-ember-bright); text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  animation: dk-float-up 0.9s ease-out forwards; pointer-events: none; z-index: 8;
+}
+.dk-fx-num.heal { color: var(--dk-moss-bright); }
+.dk-fx-num.evaded { color: var(--dk-frost); font-size: 11px; }
+@keyframes dk-float-up { 0% { opacity: 0; transform: translate(-50%, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -28px); } }
+
+.dk-status-badge {
+  position: absolute; bottom: 66px; width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 9px; z-index: 7;
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.dk-status-badge.poison { background: #3fbf9e; }
+.dk-status-badge.chill { background: var(--dk-frost); }
+.dk-status-badge.weaken { background: var(--dk-violet); }
+.dk-status-badge.burn { background: var(--dk-ember); }
+
+/* battle HUD overlay: hero name + hp bar, shown only during a raid */
+.dk-battle-hud {
+  position: absolute; top: 8px; left: 8px; right: 8px; z-index: 9;
+  background: rgba(6, 11, 10, 0.72); border: 1px solid var(--dk-border-bright); border-radius: var(--dk-radius-sm);
+  padding: 6px 10px; display: flex; flex-direction: column; gap: 4px;
+  opacity: 0; transform: translateY(-6px); transition: opacity 0.25s ease, transform 0.25s ease; pointer-events: none;
+}
+.dk-battle-hud.is-visible { opacity: 1; transform: translateY(0); }
+.dk-battle-hud-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; }
+.dk-battle-hud-name { font-weight: 700; }
+.dk-battle-hud-hp { height: 5px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.dk-battle-hud-hp-fill { height: 100%; background: var(--dk-moss); transition: width 0.3s ease; }
+.dk-battle-hud-hp-fill.low { background: var(--dk-ember); }
+.dk-battle-hud-reaction { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dk-muted); height: 12px; }
+.dk-battle-hud-reaction.pain, .dk-battle-hud-reaction.panic { color: var(--dk-ember-bright); }
+.dk-battle-hud-reaction.rage { color: var(--dk-ember); }
+
+/* room-slot tap targets, shown outside a raid */
+.dk-cell.buildable { cursor: pointer; }
+.dk-cell.buildable.empty .dk-cell-content { opacity: 0.35; }
+.dk-cell-plus { font-size: 20px; color: var(--dk-muted); }
+
+/* ---- bottom controls ---- */
+.dk-bottom {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  padding: 10px 20px max(14px, env(safe-area-inset-bottom));
+}
+.dk-side-btn {
+  width: 52px; height: 52px; border-radius: 12px;
+  border: 1px solid var(--dk-border-bright); background: var(--dk-panel-raised);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.dk-side-btn img { width: 26px; height: 26px; image-rendering: pixelated; }
+.dk-raid-btn {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--dk-moss-bright), var(--dk-moss) 70%);
+  border: 3px solid rgba(255,255,255,0.15);
+  box-shadow: 0 0 0 6px rgba(63, 191, 158, 0.12), 0 8px 24px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.dk-raid-btn img { width: 34px; height: 34px; image-rendering: pixelated; }
+.dk-raid-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ---- bottom sheets ---- */
+.dk-sheet-scrim {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.55); z-index: 40;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.dk-sheet-scrim.open { opacity: 1; pointer-events: auto; }
+.dk-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 41;
+  background: var(--dk-panel); border-top: 1px solid var(--dk-border-bright);
+  border-radius: 16px 16px 0 0; padding: 14px 14px max(14px, env(safe-area-inset-bottom));
+  transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  max-height: 68vh; overflow-y: auto;
+}
+.dk-sheet.open { transform: translateY(0); }
+.dk-sheet-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.dk-sheet-close { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--dk-border); background: rgba(0,0,0,0.2); color: var(--dk-muted); font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+.dk-item-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px; margin-bottom: 6px;
+  border: 1px solid var(--dk-border); border-radius: var(--dk-radius-sm); background: rgba(0,0,0,0.2); cursor: pointer;
+}
+.dk-item-row.selected { border-color: var(--dk-moss); background: rgba(63, 191, 158, 0.1); }
+.dk-item-row.locked { opacity: 0.4; cursor: not-allowed; }
+.dk-item-row img { width: 30px; height: 30px; image-rendering: pixelated; flex-shrink: 0; }
+.dk-item-info { flex: 1; min-width: 0; }
+.dk-item-name { font-size: 13px; font-weight: 700; }
+.dk-item-desc { font-size: 11px; color: var(--dk-muted); line-height: 1.35; }
+.dk-item-side { font-family: var(--dk-font-mono); font-size: 11px; color: var(--dk-gold); white-space: nowrap; }
+.dk-item-btn {
+  padding: 7px 12px; font-size: 12px; font-weight: 700; border-radius: var(--dk-radius-sm);
+  border: 1px solid var(--dk-moss); color: var(--dk-moss-bright); background: rgba(63,191,158,0.12); cursor: pointer;
+}
+.dk-item-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* ---- raid result sheet ---- */
+.dk-result {
+  position: absolute; left: 12px; right: 12px; top: 50%; transform: translateY(-50%);
+  z-index: 50; background: var(--dk-panel); border: 1px solid var(--dk-border-bright); border-radius: 10px;
+  padding: 18px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.dk-result.open { opacity: 1; pointer-events: auto; }
+.dk-result-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.dk-result-title.win { color: var(--dk-moss-bright); }
+.dk-result-title.escape { color: var(--dk-gold); }
+.dk-result-title.loss { color: var(--dk-ember-bright); }
+.dk-result-desc { font-size: 12px; color: var(--dk-muted); margin-bottom: 12px; }
+.dk-result-rewards { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; }
+.dk-reward-pill { display: flex; align-items: center; gap: 5px; padding: 6px 10px; background: rgba(0,0,0,0.25); border-radius: var(--dk-radius-sm); font-family: var(--dk-font-mono); font-weight: 700; font-size: 13px; color: var(--dk-gold); }
+.dk-reward-pill.souls { color: var(--dk-frost); }
+.dk-reward-pill img { width: 15px; height: 15px; image-rendering: pixelated; }
+.dk-result-btn { padding: 10px 24px; border-radius: var(--dk-radius-sm); border: 1px solid var(--dk-moss); background: rgba(63,191,158,0.16); color: var(--dk-moss-bright); font-weight: 700; font-size: 13px; cursor: pointer; }
+
+@media (max-width: 360px) {
+  .dk-raid-btn { width: 66px; height: 66px; }
+  .dk-side-btn { width: 46px; height: 46px; }
+}
