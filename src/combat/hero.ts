@@ -98,7 +98,7 @@ export function checkPanic(hero: Hero): void {
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
   if (hero.hp / hero.maxHp <= 0.35 && hero.visualState !== 'rage') {
     hero.visualState = 'panic';
-    setHeroReaction(hero, 'panic', 'PANIK');
+    setHeroReaction(hero, 'panic', 'PANIC');
   }
 }
 
@@ -120,7 +120,7 @@ export function tryTriggerRage(hero: Hero): boolean {
 export function triggerFlee(hero: Hero): void {
   if (!hero) return;
   hero.visualState = 'flee';
-  setHeroReaction(hero, 'flee', 'KABUR');
+  setHeroReaction(hero, 'flee', 'FLEE');
 }
 
 export function triggerDeath(hero: Hero): void {
@@ -133,17 +133,17 @@ export function triggerDeath(hero: Hero): void {
 export function triggerPain(hero: Hero): void {
   if (!hero || hero.hp <= 0) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
-  setBattleReaction('SAKIT!', 'pain');
+  setBattleReaction('HURT!', 'pain');
 }
 
 export function triggerSurprise(hero: Hero): void {
   if (!hero || hero.hp <= 0) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
-  setBattleReaction('TERKEJUT', 'surprise');
+  setBattleReaction('SURPRISED', 'surprise');
 }
 
 export function triggerFear(hero: Hero): void {
   if (!hero || hero.hp <= 0 || hero.fearImmune) return;
   if (hero.visualState === 'dead' || hero.visualState === 'flee') return;
-  setBattleReaction('TAKUT', 'fear');
+  setBattleReaction('AFRAID', 'fear');
 }

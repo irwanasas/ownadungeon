@@ -115,7 +115,7 @@ export default function GameApp() {
                     <span className="room-content-label">Dungeon Mouth</span>
                   </div>
                   <div id="hero-token" className="hero-token" aria-hidden="true">
-                    <span className="hero-token-face">⚔</span>
+                    <span className="hero-token-face"></span>
                   </div>
                   <div id="monster-token" className="monster-token" aria-hidden="true">
                     <span className="monster-token-face"></span>
@@ -152,11 +152,11 @@ export default function GameApp() {
           <span className="bottom-nav-label">Upgrade</span>
         </button>
         <button type="button" id="btn-nav-home" className="bottom-nav-item bottom-nav-item--center active" data-nav="home" aria-current="page">
-          <span className="bottom-nav-icon" aria-hidden="true">🏭</span>
+          <span className="bottom-nav-icon icon-battle" aria-hidden="true"></span>
           <span className="bottom-nav-label">Battle</span>
         </button>
         <button type="button" id="btn-open-stats" className="bottom-nav-item" aria-expanded="false" data-nav="stats">
-          <span className="bottom-nav-icon" aria-hidden="true">📊</span>
+          <span className="bottom-nav-icon icon-stats" aria-hidden="true"></span>
           <span className="bottom-nav-label">Stats</span>
         </button>
         <button type="button" id="btn-open-settings" className="bottom-nav-item" aria-expanded="false" data-nav="settings">

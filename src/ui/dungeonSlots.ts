@@ -14,7 +14,7 @@ export function renderDungeonSlots(): void {
   var entrance = document.createElement('div');
   entrance.className = 'dungeon-slot entrance';
   entrance.innerHTML =
-    '<span class="slot-icon">🚪</span><span class="slot-label">Entrance</span>';
+    '<span class="slot-icon" style="background-image:var(--img-icon-door);background-repeat:no-repeat;background-position:center;background-size:contain;image-rendering:pixelated"></span><span class="slot-label">Entrance</span>';
   wrap.appendChild(entrance);
 
   for (var i = 0; i < state.maxSlotCount; i++) {
@@ -90,7 +90,7 @@ export function renderDungeonSlots(): void {
   var kingLv = (state.king && state.king.level) || 1;
   throne.innerHTML =
     '<span class="slot-index">◆</span>' +
-    '<span class="slot-icon">👑</span>' +
+    '<span class="slot-icon" style="background-image:var(--img-icon-king);background-repeat:no-repeat;background-position:center;background-size:contain;image-rendering:pixelated"></span>' +
     '<span class="slot-label">Throne</span>' +
     '<span class="slot-sub">Chest · King Lv.' + kingLv + '</span>';
   wrap.appendChild(throne);
