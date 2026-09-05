@@ -116,6 +116,32 @@
 .dk-cell.entrance,
 .dk-cell.throne { flex-basis: 192px; width: 192px; }
 
+.dk-cell.entrance::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(255, 226, 168, 0.6) 0%, rgba(255, 206, 140, 0.28) 40%, transparent 78%);
+}
+
+.dk-cell.throne {
+  background-image: var(--throne-strip);
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: auto 480px;
+  background-color: #06090e;
+  image-rendering: pixelated;
+}
+.dk-cell.throne::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 55% at center 60%, rgba(232, 185, 74, 0.32), transparent 72%);
+}
+
 .dk-cell-content {
   position: absolute;
   bottom: 30px;

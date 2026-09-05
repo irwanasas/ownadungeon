@@ -104,4 +104,23 @@ door_closed.resize((door_closed.width * 2, door_closed.height * 2), Image.NEARES
 
 torch.resize((torch.width * 2, torch.height * 2), Image.NEAREST).save(os.path.join(OUT, 'torch-sheet.png'))
 
-print('unit', UNIT_W, UNIT_H, '-> strip', strip2x.size)
+CAP_W = 96
+
+throne = Image.new('RGBA', (CAP_W, UNIT_H), (6, 9, 14, 255))
+y = UNIT_H
+while y > 0:
+    y -= BRICK.height
+    x = 0
+    while x < CAP_W:
+        throne.paste(BRICK, (x, y), BRICK)
+        x += BRICK.width
+ceiling_crop = CEILING.crop(((CEILING.width - CAP_W) // 2, 0, (CEILING.width - CAP_W) // 2 + CAP_W, CEILING.height))
+throne.paste(ceiling_crop, (0, 0), ceiling_crop)
+paste_bottom(throne, PILLAR_STONE_A, 2)
+paste_bottom(throne, PILLAR_STONE_B, CAP_W - PILLAR_STONE_B.width - 2)
+paste_bottom(throne, URN_PALE, (CAP_W - URN_PALE.width) // 2)
+
+throne2x = throne.resize((throne.width * 2, throne.height * 2), Image.NEAREST)
+throne2x.save(os.path.join(OUT, 'throne-strip.png'))
+
+print('unit', UNIT_W, UNIT_H, '-> strip', strip2x.size, '-> throne', throne2x.size)

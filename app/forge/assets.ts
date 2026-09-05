@@ -12,6 +12,7 @@ export function forgeIcon(name: string): string {
 
 export const forgeVars: CSSProperties = {
   '--room-strip': url('room-strip.png'),
+  '--throne-strip': url('throne-strip.png'),
   '--torch-sheet': url('torch-sheet.png'),
   '--icon-door': url('icon-door.png'),
   '--icon-door-open': url('icon-door-open.png')
