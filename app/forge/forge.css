@@ -95,26 +95,26 @@
   min-height: 100%;
   width: max-content;
   padding-right: 220px;
+  background-image: var(--room-strip);
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: auto 480px;
+  image-rendering: pixelated;
 }
 
 .dk-cell {
   position: relative;
-  flex: 0 0 128px;
-  width: 128px;
+  flex: 0 0 256px;
+  width: 256px;
   height: 100%;
   scroll-snap-align: center;
-  background-image: var(--tile-floor), var(--tile-wall);
-  background-position: center bottom, center bottom 32px;
-  background-size: 32px 32px, 32px 32px;
-  background-repeat: repeat-x, repeat-x;
-  image-rendering: pixelated;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   border-right: 1px solid rgba(0, 0, 0, 0.35);
 }
 .dk-cell.entrance,
-.dk-cell.throne { flex-basis: 96px; width: 96px; }
+.dk-cell.throne { flex-basis: 192px; width: 192px; }
 
 .dk-cell-content {
   position: absolute;
@@ -128,21 +128,27 @@
 .dk-cell-icon { width: 34px; height: 34px; image-rendering: pixelated; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
 .dk-cell-label { font-size: 8px; color: var(--dk-muted); text-transform: uppercase; letter-spacing: 0.04em; }
 
-.dk-torch { position: absolute; bottom: 46px; width: 48px; height: 48px; overflow: hidden; image-rendering: pixelated; }
-.dk-torch.left { left: 6px; }
-.dk-torch.right { right: 6px; }
+.dk-torch { position: absolute; bottom: 90px; width: 64px; height: 96px; overflow: hidden; image-rendering: pixelated; }
+.dk-torch.left { left: 10px; }
+.dk-torch.right { right: 10px; }
 .dk-torch-flame {
-  width: 192px; height: 48px; background-image: var(--torch-sheet);
-  background-repeat: no-repeat; background-size: 192px 48px; image-rendering: pixelated;
-  animation: dk-torch-flicker 0.6s steps(1, end) infinite;
+  width: 256px; height: 256px; background-image: var(--torch-sheet);
+  background-repeat: no-repeat; background-size: 256px 256px; image-rendering: pixelated;
+  animation: dk-torch-flicker 0.8s steps(1, end) infinite;
 }
 @keyframes dk-torch-flicker {
-  0% { background-position: 0 0; } 25% { background-position: -48px 0; }
-  50% { background-position: -96px 0; } 75% { background-position: -144px 0; }
+  0%    { background-position: 0 0; }
+  12.5% { background-position: -64px 0; }
+  25%   { background-position: -128px 0; }
+  37.5% { background-position: -192px 0; }
+  50%   { background-position: 0 -128px; }
+  62.5% { background-position: -64px -128px; }
+  75%   { background-position: -128px -128px; }
+  87.5% { background-position: -192px -128px; }
 }
 
 .dk-door {
-  position: absolute; bottom: 30px; width: 26px; height: 40px;
+  position: absolute; bottom: 30px; width: 62px; height: 87px;
   background-image: var(--icon-door); background-size: contain; background-repeat: no-repeat;
   image-rendering: pixelated; transition: opacity 0.2s ease;
 }

@@ -69,18 +69,6 @@ def gen_icon_king():
     d.ellipse([10, 9, 14, 13], fill=VIOLET)
     save(im, 'icon-king.png')
 
-def gen_icon_door(open_=False):
-    im = canvas(24)
-    d = ImageDraw.Draw(im)
-    d.rectangle([3, 2, 21, 22], fill=STONE, outline=INK, width=1)
-    if open_:
-        d.rectangle([5, 4, 12, 20], fill=INK)
-        d.rectangle([13, 4, 19, 20], fill=(20, 26, 24, 255))
-    else:
-        d.rectangle([5, 4, 19, 20], fill=(60, 46, 34, 255), outline=INK)
-        d.ellipse([15, 11, 17, 13], fill=GOLD)
-    save(im, 'icon-door-open.png' if open_ else 'icon-door.png')
-
 def gen_hero(name, color, shape='round'):
     im = canvas(24)
     d = ImageDraw.Draw(im)
@@ -136,44 +124,6 @@ def gen_trap(name, color):
         d.ellipse([9, 9, 15, 15], fill=color, outline=INK)
     save(im, 'trap-' + name + '.png')
 
-def gen_tile_floor():
-    im = canvas(16)
-    d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, 15, 15], fill=STONE)
-    for (x, y) in [(2, 2), (9, 5), (5, 11), (12, 12)]:
-        d.point((x, y), fill=STONE_LIGHT)
-    d.line([0, 8, 15, 8], fill=(35, 48, 50, 255))
-    save(im, 'tile-floor.png', scale=3)
-
-def gen_tile_wall():
-    im = canvas(16)
-    d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, 15, 15], fill=(30, 41, 42, 255))
-    for y in [0, 8]:
-        for x in range(0, 16, 8):
-            d.rectangle([x, y, x + 7, y + 7], outline=(20, 28, 29, 255))
-    save(im, 'tile-wall.png', scale=3)
-
-def gen_torch_sheet():
-    frames = []
-    for i in range(4):
-        im = canvas(16)
-        d = ImageDraw.Draw(im)
-        d.rectangle([6, 10, 9, 15], fill=(70, 50, 34, 255))
-        flick = [
-            [(6, 9), (10, 9), (8, 2)],
-            [(5, 9), (9, 9), (7, 1), (11, 4)],
-            [(7, 9), (11, 9), (9, 2)],
-            [(6, 9), (10, 9), (8, 1), (5, 5)],
-        ][i]
-        d.polygon(flick, fill=EMBER_LIGHT if i % 2 == 0 else EMBER)
-        d.ellipse([6, 7, 9, 10], fill=GOLD)
-        frames.append(im)
-    sheet = Image.new('RGBA', (16 * 4, 16), CLEAR)
-    for i, f in enumerate(frames):
-        sheet.paste(f, (i * 16, 0))
-    save(sheet, 'torch-sheet.png', scale=3)
-
 def main():
     gen_icon_gold()
     gen_icon_soul()
@@ -181,8 +131,6 @@ def main():
     gen_icon_build()
     gen_icon_upgrade()
     gen_icon_king()
-    gen_icon_door(False)
-    gen_icon_door(True)
 
     gen_hero('paladin', MOSS, 'round')
     gen_hero('trickster', VIOLET, 'sharp')
@@ -196,9 +144,6 @@ def main():
     gen_trap('poison', (100, 170, 90, 255))
     gen_trap('frost', FROST)
 
-    gen_tile_floor()
-    gen_tile_wall()
-    gen_torch_sheet()
     print('done ->', OUT)
 
 if __name__ == '__main__':

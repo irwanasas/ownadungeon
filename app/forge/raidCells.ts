@@ -9,8 +9,8 @@ export interface CellGeom {
   center: number;
 }
 
-const ROOM_W = 128;
-const CAP_W = 96;
+const ROOM_W = 256;
+const CAP_W = 192;
 
 export function buildCells(rooms: DungeonSlot[]): CellGeom[] {
   const cells: CellGeom[] = [];
