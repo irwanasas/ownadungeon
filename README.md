@@ -3,8 +3,15 @@
 You are the dungeon owner. Place traps and monsters across a 6-room strip, press **Raid**, and watch an autonomous hero try to survive it.
 
 - **Stack:** Next.js App Router (TypeScript), static export
-- **Live:** https://irwanasas.github.io/ownadungeon/
+- **Live:** https://irwanasas.github.io/ownadungeon/ (auto-deployed from `main` via GitHub Actions)
 - **Persistence:** `localStorage`, client-side only
+
+## How to play
+
+1. Tap a room slot to open the build sheet and place a trap or monster (room 6, the Throne, is fixed).
+2. Swipe the dungeon strip to preview the layout.
+3. Press **Raid** and watch the hero fight through it.
+4. Spend gold/souls in the upgrade sheet to level up traps, monsters, and the King.
 
 ## Structure
 
@@ -23,7 +30,7 @@ You are the dungeon owner. Place traps and monsters across a 6-room strip, press
 ## Commands
 
 ```
-npm run dev          # local dev server
-npm run build         # static export to out/
-npm run type-check    # tsc --noEmit
+npm run dev         # local dev server
+npm run build       # static export to out/
+npm run type-check  # tsc --noEmit
 ```
