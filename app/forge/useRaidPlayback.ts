@@ -53,6 +53,7 @@ export function useRaidPlayback(rooms: DungeonSlot[]) {
   const [raiding, setRaiding] = useState(false);
   const [doorOpenIndex, setDoorOpenIndex] = useState<number | null>(null);
   const [heroVisible, setHeroVisible] = useState(false);
+  const [heroAnchor, setHeroAnchor] = useState(50);
   const [heroCls, setHeroCls] = useState('');
   const [heroFlash, setHeroFlash] = useState(false);
   const [heroIcon, setHeroIcon] = useState('');
@@ -100,6 +101,7 @@ export function useRaidPlayback(rooms: DungeonSlot[]) {
       case 'enterRoom': {
         const throneIdx = cellsRef.current[cellsRef.current.length - 1].index;
         const idx = ev.kind === 'throne' ? throneIdx : ev.roomIndex;
+        setHeroAnchor(50);
         setHeroCls('walking');
         cameraTo(idx, true);
         setDoorOpenIndex(null);
@@ -208,6 +210,7 @@ export function useRaidPlayback(rooms: DungeonSlot[]) {
     setRaiding(true);
     setHeroIcon(HERO_ICON[heroDefId] || '');
     setHeroVisible(true);
+    setHeroAnchor(20);
     setHeroCls('');
     setMonster(null);
     setNumbers([]);
@@ -234,6 +237,7 @@ export function useRaidPlayback(rooms: DungeonSlot[]) {
     raiding,
     doorOpenIndex,
     heroVisible,
+    heroAnchor,
     heroCls,
     heroFlash,
     heroIcon,

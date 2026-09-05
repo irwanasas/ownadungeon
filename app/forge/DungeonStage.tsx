@@ -26,6 +26,7 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
     raiding,
     doorOpenIndex,
     heroVisible,
+    heroAnchor,
     heroCls,
     heroFlash,
     heroIcon,
@@ -89,7 +90,7 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
       </div>
 
       {heroVisible && (
-        <div className={'dk-hero ' + heroCls + (heroFlash ? ' hit' : '')} style={{ left: '50%' }}>
+        <div className={'dk-hero ' + heroCls + (heroFlash ? ' hit' : '')} style={{ left: heroAnchor + '%' }}>
           <div className="dk-hero-face">
             <img src={heroIcon} alt="hero" />
           </div>
@@ -102,7 +103,7 @@ const DungeonStage = forwardRef<DungeonStageHandle, Props>(function DungeonStage
       )}
 
       {numbers.map((n) => (
-        <span key={n.id} className={'dk-fx-num ' + n.cls} style={{ left: `calc(50% + ${n.jitter}px)`, bottom: 78 }}>
+        <span key={n.id} className={'dk-fx-num ' + n.cls} style={{ left: `calc(${heroAnchor}% + ${n.jitter}px)`, bottom: 78 }}>
           {n.text}
         </span>
       ))}

@@ -94,6 +94,7 @@
   height: 100%;
   min-height: 100%;
   width: max-content;
+  padding-right: 220px;
 }
 
 .dk-cell {
@@ -157,7 +158,7 @@
   justify-content: center;
   z-index: 6;
   transform: translateX(-50%);
-  transition: bottom 0.15s ease;
+  transition: bottom 0.15s ease, left 0.6s ease;
 }
 .dk-hero-face {
   width: 34px; height: 34px; border-radius: 50%;
@@ -176,12 +177,13 @@
 @keyframes dk-pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.12); } }
 
 .dk-monster {
-  position: absolute; bottom: 30px; width: 40px; height: 40px;
+  position: absolute; left: 50%; bottom: 30px; width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center; z-index: 5;
-  opacity: 0; transform: translateY(8px); transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0; transform: translateX(calc(-50% + 24px)) translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
-.dk-monster.is-visible { opacity: 1; transform: translateY(0); }
-.dk-monster.is-dying { opacity: 0; transform: translateY(10px) scale(0.7); }
+.dk-monster.is-visible { opacity: 1; transform: translateX(calc(-50% + 24px)) translateY(0); }
+.dk-monster.is-dying { opacity: 0; transform: translateX(calc(-50% + 24px)) translateY(10px) scale(0.7); }
 .dk-monster img { width: 36px; height: 36px; image-rendering: pixelated; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
 .dk-monster.hit img { animation: dk-shake 0.25s ease-in-out; }
 
