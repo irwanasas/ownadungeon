@@ -47,8 +47,6 @@ function tagMultiplier(hero: HeroInstance, tag: string): number {
   return def.resist.includes(tag as never) ? 0.55 : 1;
 }
 
-// Ticks poison/burn (bypasses evasion and damage reduction) and counts down
-// every status's room timer. Returns total tick damage dealt this room.
 function tickStatusesForRoom(hero: HeroInstance, events: RaidEvent[]): number {
   let total = 0;
   for (const s of hero.status) {
@@ -163,7 +161,6 @@ function resolveMonsterRoom(
     }
   }
 
-  // Safety valve: an unresolved 12-round stalemate favors the hero moving on.
   return { monsterDied: false, heroDied: false, goldReward: 0 };
 }
 

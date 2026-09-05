@@ -1,7 +1,3 @@
-// Pure data/simulation types for the dungeon-raid engine. No DOM, no React —
-// this file and everything else in engine/ must stay renderer-agnostic so the
-// simulation can be tested and reasoned about independently of how it's drawn.
-
 export type DamageTag = 'physical' | 'fire' | 'poison' | 'frost' | 'arcane';
 export type StatusKind = 'poison' | 'burn' | 'chill' | 'weaken';
 
@@ -92,12 +88,7 @@ export interface StageDef {
   note: string;
 }
 
-// The dungeon is always a fixed 6-room strip: 5 editable rooms plus the
-// permanent Throne Room. Progression unlocks new trap/monster content, not
-// more room slots.
 export const EDITABLE_ROOMS = 5;
-
-// --- Runtime raid state -----------------------------------------------------
 
 export interface HeroInstance {
   defId: string;

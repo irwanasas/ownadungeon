@@ -1,8 +1,5 @@
 import type { HeroDef } from '../types';
 
-// Vertical slice ships 3 of the eventual 6-hero roster (one per family), each
-// with a mechanic no one else has, so matchups are decided by how the dungeon
-// is built, not by a bigger number winning.
 export const HEROES: HeroDef[] = [
   {
     id: 'paladin',

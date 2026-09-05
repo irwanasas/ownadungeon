@@ -1,7 +1,5 @@
 import type { StageDef } from '../types';
 
-// Vertical-slice progression: 6 handcrafted stages that each introduce one new
-// piece (a trap, a monster, a combo, the King) rather than just more HP.
 export const STAGES: StageDef[] = [
   {
     id: 1,

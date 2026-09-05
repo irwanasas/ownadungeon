@@ -1,16 +1,6 @@
-// A small procedural audio layer for the Dungeon Forge raid — tones for
-// musical beats, filtered noise bursts for physical impacts, and a very
-// quiet looping drone for dungeon atmosphere. No audio files: everything is
-// synthesized, so there is nothing to load and nothing that can 404.
-//
-// Every entry point swallows its own errors — a blocked/unavailable
-// AudioContext (autoplay policy, sandboxed preview) must never affect
-// gameplay, per the design brief's "remains playable without audio".
-
 export type SfxKind =
   | 'tap'
   | 'door'
-  | 'footstep'
   | 'trapTrigger'
   | 'monsterAppear'
   | 'heroAttack'
@@ -97,9 +87,6 @@ export function playSfx(kind: SfxKind): void {
         tone(audio, t, 130, 0.24, 'triangle', 0.08);
         noiseBurst(audio, t, 0.18, 0.03, 800);
         break;
-      case 'footstep':
-        noiseBurst(audio, t, 0.06, 0.05, 350);
-        break;
       case 'trapTrigger':
         noiseBurst(audio, t, 0.12, 0.09, 2200);
         tone(audio, t, 900, 0.06, 'square', 0.05);
@@ -145,13 +132,10 @@ export function playSfx(kind: SfxKind): void {
         break;
     }
   } catch (e) {
-    // audio is a non-essential enhancement
+    return;
   }
 }
 
-// A very quiet dungeon-atmosphere drone, meant to run for the duration of a
-// raid. Safe to call repeatedly — starting an already-running drone is a
-// no-op, and it can only be started from a user gesture (browser policy).
 export function startAmbient(): void {
   try {
     const audio = getCtx();
@@ -172,7 +156,7 @@ export function startAmbient(): void {
     gain.gain.linearRampToValueAtTime(0.02, audio.currentTime + 1.2);
     ambientNodes = { osc, osc2, gain };
   } catch (e) {
-    // non-essential
+    return;
   }
 }
 
@@ -186,6 +170,6 @@ export function stopAmbient(): void {
     osc2.stop(t + 0.6);
     ambientNodes = null;
   } catch (e) {
-    // non-essential
+    return;
   }
 }

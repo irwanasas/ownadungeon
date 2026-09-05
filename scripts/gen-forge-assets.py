@@ -1,22 +1,13 @@
-"""Generate original pixel-art assets for the Dungeon Forge vertical slice.
-
-Everything here is drawn procedurally at a small internal resolution and
-scaled up with nearest-neighbour, on a palette distinct from the previous
-Own a Dungeon implementation (teal/moss instead of blue/purple). None of this
-touches or reuses public/assets/** from the old game.
-"""
 from PIL import Image, ImageDraw
 import os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'public', 'forge')
 os.makedirs(OUT, exist_ok=True)
 
-# --- palette -----------------------------------------------------------
 INK = (10, 16, 15, 255)
 STONE = (43, 59, 61, 255)
 STONE_LIGHT = (61, 82, 84, 255)
 MOSS = (63, 191, 158, 255)
-MOSS_DIM = (40, 120, 100, 255)
 EMBER = (224, 80, 60, 255)
 EMBER_LIGHT = (250, 140, 90, 255)
 VIOLET = (155, 107, 216, 255)
@@ -25,21 +16,15 @@ FROST = (127, 216, 232, 255)
 BONE = (232, 236, 235, 255)
 CLEAR = (0, 0, 0, 0)
 
-
 def canvas(size=24):
     return Image.new('RGBA', (size, size), CLEAR)
-
 
 def save(img, name, scale=4):
     big = img.resize((img.width * scale, img.height * scale), Image.NEAREST)
     big.save(os.path.join(OUT, name))
 
-
 def px(d, x, y, color, w=1, h=1):
     d.rectangle([x, y, x + w - 1, y + h - 1], fill=color)
-
-
-# --- currency / UI icons -------------------------------------------------
 
 def gen_icon_gold():
     im = canvas(24)
@@ -48,7 +33,6 @@ def gen_icon_gold():
     d.ellipse([7, 7, 16, 16], outline=(180, 130, 40, 255), width=1)
     save(im, 'icon-gold.png')
 
-
 def gen_icon_soul():
     im = canvas(24)
     d = ImageDraw.Draw(im)
@@ -56,14 +40,12 @@ def gen_icon_soul():
     d.polygon([(12, 6), (16, 10), (14, 17), (10, 17), (8, 10)], outline=(90, 170, 190, 255))
     save(im, 'icon-soul.png')
 
-
 def gen_icon_play():
     im = canvas(24)
     d = ImageDraw.Draw(im)
     d.ellipse([1, 1, 22, 22], fill=MOSS, outline=INK, width=2)
     d.polygon([(9, 6), (18, 12), (9, 18)], fill=INK)
     save(im, 'icon-play.png')
-
 
 def gen_icon_build():
     im = canvas(24)
@@ -73,13 +55,11 @@ def gen_icon_build():
     d.rectangle([10, 8, 14, 11], fill=MOSS)
     save(im, 'icon-build.png')
 
-
 def gen_icon_upgrade():
     im = canvas(24)
     d = ImageDraw.Draw(im)
     d.polygon([(12, 3), (21, 13), (15, 13), (15, 21), (9, 21), (9, 13), (3, 13)], fill=MOSS, outline=INK)
     save(im, 'icon-upgrade.png')
-
 
 def gen_icon_king():
     im = canvas(24)
@@ -88,7 +68,6 @@ def gen_icon_king():
     d.rectangle([4, 18, 20, 20], fill=GOLD, outline=INK)
     d.ellipse([10, 9, 14, 13], fill=VIOLET)
     save(im, 'icon-king.png')
-
 
 def gen_icon_door(open_=False):
     im = canvas(24)
@@ -101,9 +80,6 @@ def gen_icon_door(open_=False):
         d.rectangle([5, 4, 19, 20], fill=(60, 46, 34, 255), outline=INK)
         d.ellipse([15, 11, 17, 13], fill=GOLD)
     save(im, 'icon-door-open.png' if open_ else 'icon-door.png')
-
-
-# --- heroes ---------------------------------------------------------------
 
 def gen_hero(name, color, shape='round'):
     im = canvas(24)
@@ -120,9 +96,6 @@ def gen_hero(name, color, shape='round'):
         d.ellipse([16, 2, 21, 7], fill=color, outline=INK)
         d.line([17, 8, 19, 20], fill=STONE_LIGHT, width=1)
     save(im, 'hero-' + name + '.png')
-
-
-# --- monsters ---------------------------------------------------------------
 
 def gen_monster(name, color):
     im = canvas(24)
@@ -141,9 +114,6 @@ def gen_monster(name, color):
         d.ellipse([9, 2, 15, 8], fill=VIOLET, outline=INK)
         d.line([12, 10, 12, 20], fill=GOLD, width=2)
     save(im, 'monster-' + name + '.png')
-
-
-# --- traps ---------------------------------------------------------------
 
 def gen_trap(name, color):
     im = canvas(24)
@@ -166,9 +136,6 @@ def gen_trap(name, color):
         d.ellipse([9, 9, 15, 15], fill=color, outline=INK)
     save(im, 'trap-' + name + '.png')
 
-
-# --- dungeon tiles + torch --------------------------------------------------
-
 def gen_tile_floor():
     im = canvas(16)
     d = ImageDraw.Draw(im)
@@ -178,7 +145,6 @@ def gen_tile_floor():
     d.line([0, 8, 15, 8], fill=(35, 48, 50, 255))
     save(im, 'tile-floor.png', scale=3)
 
-
 def gen_tile_wall():
     im = canvas(16)
     d = ImageDraw.Draw(im)
@@ -187,7 +153,6 @@ def gen_tile_wall():
         for x in range(0, 16, 8):
             d.rectangle([x, y, x + 7, y + 7], outline=(20, 28, 29, 255))
     save(im, 'tile-wall.png', scale=3)
-
 
 def gen_torch_sheet():
     frames = []
@@ -208,7 +173,6 @@ def gen_torch_sheet():
     for i, f in enumerate(frames):
         sheet.paste(f, (i * 16, 0))
     save(sheet, 'torch-sheet.png', scale=3)
-
 
 def main():
     gen_icon_gold()
@@ -236,7 +200,6 @@ def main():
     gen_tile_wall()
     gen_torch_sheet()
     print('done ->', OUT)
-
 
 if __name__ == '__main__':
     main()

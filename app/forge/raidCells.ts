@@ -1,7 +1,7 @@
 import type { DungeonSlot } from '../../engine/save';
 
 export interface CellGeom {
-  index: number; // -1 = entrance, rooms.length = throne
+  index: number;
   kind: 'entrance' | 'room' | 'throne';
   content: DungeonSlot | null;
   width: number;

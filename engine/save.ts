@@ -61,17 +61,6 @@ export function saveState(state: GameState): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
-    // storage can be unavailable (private mode, quota) — saving is best-effort
+    return;
   }
-}
-
-export function resetState(): GameState {
-  if (typeof window !== 'undefined') {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {
-      // ignore
-    }
-  }
-  return defaultState();
 }

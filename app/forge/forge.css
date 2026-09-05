@@ -1,7 +1,3 @@
-/* Dungeon Forge — new visual language: deep teal-black stone, moss-teal accent
-   instead of the old game's blue/purple, sharp pixel tiles for the dungeon
-   itself, rounded chrome only where it aids touch affordance. */
-
 :root {
   --dk-bg: #0a1210;
   --dk-panel: #12211f;
@@ -33,7 +29,6 @@
   overflow: hidden;
 }
 
-/* ---- top HUD ---- */
 .dk-hud {
   flex-shrink: 0;
   display: flex;
@@ -60,7 +55,6 @@
 .dk-currency.souls { color: var(--dk-frost); }
 .dk-currency img { width: 16px; height: 16px; image-rendering: pixelated; }
 
-/* ---- mode toggle ---- */
 .dk-mode-row { display: flex; gap: 6px; padding: 8px 14px 0; flex-shrink: 0; }
 .dk-mode-btn {
   flex: 1; padding: 7px 0; text-align: center; font-size: 12px; font-weight: 700;
@@ -69,7 +63,6 @@
 }
 .dk-mode-btn.active { border-color: var(--dk-moss); color: var(--dk-moss-bright); background: rgba(63, 191, 158, 0.12); }
 
-/* ---- dungeon stage (the star of the screen) ---- */
 .dk-stage-wrap {
   flex: 1;
   min-height: 0;
@@ -211,7 +204,6 @@
 .dk-status-badge.weaken { background: var(--dk-violet); }
 .dk-status-badge.burn { background: var(--dk-ember); }
 
-/* battle HUD overlay: hero name + hp bar, shown only during a raid */
 .dk-battle-hud {
   position: absolute; top: 8px; left: 8px; right: 8px; z-index: 9;
   background: rgba(6, 11, 10, 0.72); border: 1px solid var(--dk-border-bright); border-radius: var(--dk-radius-sm);
@@ -228,12 +220,10 @@
 .dk-battle-hud-reaction.pain, .dk-battle-hud-reaction.panic { color: var(--dk-ember-bright); }
 .dk-battle-hud-reaction.rage { color: var(--dk-ember); }
 
-/* room-slot tap targets, shown outside a raid */
 .dk-cell.buildable { cursor: pointer; }
 .dk-cell.buildable.empty .dk-cell-content { opacity: 0.35; }
 .dk-cell-plus { font-size: 20px; color: var(--dk-muted); }
 
-/* ---- bottom controls ---- */
 .dk-bottom {
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; gap: 22px;
@@ -255,7 +245,6 @@
 .dk-raid-btn img { width: 34px; height: 34px; image-rendering: pixelated; }
 .dk-raid-btn:disabled { opacity: 0.5; cursor: default; }
 
-/* ---- bottom sheets ---- */
 .dk-sheet-scrim {
   position: absolute; inset: 0; background: rgba(0,0,0,0.55); z-index: 40;
   opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
@@ -289,7 +278,6 @@
 }
 .dk-item-btn:disabled { opacity: 0.4; cursor: default; }
 
-/* ---- raid result sheet ---- */
 .dk-result {
   position: absolute; left: 12px; right: 12px; top: 50%; transform: translateY(-50%);
   z-index: 50; background: var(--dk-panel); border: 1px solid var(--dk-border-bright); border-radius: 10px;
