@@ -214,7 +214,7 @@ export function useRaidPlayback(rooms: DungeonSlot[]) {
     setBadges([]);
     cameraTo(-1, false);
     startAmbient();
-    await sleep(150);
+    await sleep(600);
 
     for (const ev of result.events) {
       await applyEvent(ev);
