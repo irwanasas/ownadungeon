@@ -1,17 +1,7 @@
-# Next.js
-/.next/
-/out/
-
-# TypeScript
+node_modules/
+.next/
+out/
 *.tsbuildinfo
-
-# dependencies
-/node_modules/
-
-# misc
+__pycache__/
+*.pyc
 .DS_Store
-*.log
-npm-debug.log*
-
-# env
-.env*.local

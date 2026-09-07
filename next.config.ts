@@ -14,6 +14,7 @@ if (isGithubActions && process.env.GITHUB_REPOSITORY) {
 const nextConfig: NextConfig = {
 
   agentRules: false,
+  devIndicators: false,
   output: 'export',
 
   trailingSlash: true,
