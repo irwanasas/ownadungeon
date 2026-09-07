@@ -246,8 +246,4 @@ export function worldEvent(id: string): WorldEvent | null {
   return WORLD_EVENTS.find((e) => e.id === id) || null;
 }
 
-export function isChainOnly(id: string): boolean {
-  return CHAINED.has(id);
-}
-
 export const ROLLABLE = WORLD_EVENTS.filter((e) => !CHAINED.has(e.id));

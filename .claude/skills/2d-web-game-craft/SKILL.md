@@ -1,13 +1,13 @@
 ---
 name: 2d-web-game-craft
 description: >-
-  Use when working on sprite/animation presentation, the isometric
-  battlefield, or browser-runtime concerns (asset loading, tab visibility,
-  performance of the render loop) in Own a Dungeon. Triggers on "sprite",
-  "animation", "isometric", "hero movement", "asset loading", "frame rate",
-  "juice". Adapted from davila7/claude-code-templates' web-games and
-  2d-games skills — trimmed to what applies to a DOM/CSS-rendered game
-  (this project has no canvas, no physics engine, no tilemap engine).
+  Use when working on sprite/animation presentation, the scrolling dungeon
+  view, or browser-runtime concerns (asset loading, tab visibility,
+  performance of the raid playback) in Own a Dungeon. Triggers on "sprite",
+  "animation", "hero movement", "asset loading", "frame rate", "juice".
+  Adapted from davila7/claude-code-templates' web-games and 2d-games skills —
+  trimmed to what applies to a DOM/CSS-rendered game (no canvas, no physics
+  engine, no tilemap engine).
 license: MIT
 ---
 
@@ -15,74 +15,50 @@ license: MIT
 
 Source: condensed from
 [davila7/claude-code-templates](https://github.com/davila7/claude-code-templates)'
-`creative-design/game-development/web-games` and `.../2d-games` skills.
-Those assume a canvas engine (Phaser/PixiJS), WebGPU, tilemap/atlas systems,
-and a physics engine — none of which exist or are wanted in this project.
-Own a Dungeon renders everything as styled DOM elements positioned on a CSS
-isometric grid (`src/animation/isoGrid.ts`), so this version keeps only the
-parts of those two skills that transfer: sprite/animation feel principles,
-top-down movement patterns, and real browser-runtime constraints.
+web-games and 2d-games skills, which assume a canvas engine, WebGPU and a
+physics engine — none of which exist or are wanted here. Own a Dungeon renders
+as styled DOM elements in one horizontally-scrolling strip, so this keeps only
+the parts that transfer.
 
-## Sprite & animation feel
+## Animation feel
 
-Applies to anything using the cropped sprites in `public/assets/ui/cropped/`
-or the hero/monster tokens in the battlefield:
+- **Timing is owned by one place.** `useRaidDirector` in `app/game/` holds
+  every beat duration and the playback-speed multiplier. Add new pacing there
+  rather than scattering `setTimeout` calls.
+- **Anticipation → action → follow-through.** A hero step, a hit reaction, a
+  door opening should each have a distinct start, impact and settle. The
+  keyframes in `styles/dungeon.css` (`lunge`, `shake`, `die`, `pop-in`) are
+  the established vocabulary.
+- **The camera and the actor move together.** Traversal is a CSS transform on
+  the hero plus a rAF tween of the scroll container over the same duration.
+  Change one and you must change the other or the hero drifts off centre.
+- **`image-rendering: pixelated`** everywhere, always.
+- **9-slice over stretching** for any resizable pixel-art surface.
 
-- **Timing reads as intent.** `src/animation/beatTiming.ts` (`beatMs()`) is
-  the single source of truth for pacing raid beats — reuse it rather than
-  hardcoding new `setTimeout` delays elsewhere.
-- **Anticipation → action → follow-through**, even in CSS transitions. A
-  hero step, a hit reaction, a door opening should each have a distinct
-  start/impact/settle rather than one linear tween — see how
-  `src/animation/heroToken.ts` and `.room-door` transitions in
-  `isometric.css` already stage movement.
-- **`image-rendering: pixelated`** on every pixel-art sprite reference
-  (already the convention in `layout.css`/`components.css` for the cropped
-  UI-pack sprites) — never let the browser smooth pixel art.
-- **9-slice (`border-image`) over stretching** for any new pixel-art button
-  or panel sprite that must resize — see `.btn` in `layout.css` for the
-  established pattern (`border-image-slice` + `border-image-repeat:
-  stretch`), rather than a plain `background-size: 100% 100%` which
-  distorts corners.
+## Movement
 
-## Top-down movement (applies directly — this is a top-down isometric game)
+The dungeon is one `overflow-x: auto` strip of seven fixed-width cells with
+`touch-action: pan-x`. Actors are absolutely positioned inside the track by
+world x, so cell index maps to position arithmetically. Two things to respect:
+the track is offset by a measured pad so the first and last cell can centre,
+and **cell index is not room index** — the entrance is cell 0, room *n* is
+cell *n+1*. Getting that wrong has already caused a real off-by-one where
+swiping selected the wrong room.
 
-- Own a Dungeon's hero token moves tile-to-tile on a discrete grid
-  (`isoGrid.ts` + `roomStage.ts`), not free-form physics movement — keep new
-  movement additions (a monster token, a projectile) on that same
-  coordinate system rather than inventing a second one.
-- Favor **readable** motion over "realistic" motion: a beat-paced step from
-  tile to tile that the player can follow beats free interpolation that
-  looks smooth but obscures what's happening — consistent with this being a
-  turn-resolved combat game, not an action game.
+## Browser-runtime constraints
 
-## Browser-runtime constraints that still apply (no canvas needed to hit these)
+- **Tab visibility.** `useGameState` treats time away as first class and runs
+  the offline batch on return. Any new timer-driven system must survive being
+  backgrounded mid-sequence.
+- **Asset loading.** Everything in `public/art/` ships in the static export;
+  there is no lazy loading. Keep new sprites small and purpose-generated.
+- **Mobile input.** Portrait, touch-first, 390×844 target with 360×640 as the
+  narrow case. Every interactive element needs a real tap target.
+- **Audio needs a gesture.** `app/game/audio.ts` creates the `AudioContext`
+  lazily and ambience starts on the RAID tap. Never try to start audio on load.
 
-- **Tab visibility.** `src/core/offlineProgress.ts` already treats
-  time-away as a first-class case (offline progress on return). Any new
-  timer-driven system (a raid animation, an idle tick) should be resilient
-  to the tab being backgrounded mid-sequence, not just assume it keeps
-  running at real-time cadence.
-- **Asset loading.** The UI-pack sprites are small cropped PNGs served from
-  `public/assets/ui/cropped/`, referenced via the `--img-*` CSS custom
-  properties (see `browser-game-dev` skill for why). Keep new sprite crops
-  small and purpose-cropped rather than shipping full multi-icon sheets to
-  the client — this project has no lazy-loading/streaming infrastructure,
-  so everything referenced ships in the initial static export.
-- **Mobile input.** This is a touch-first, single-screen mobile layout
-  (`~420px` viewport target). Any new interactive element needs a real tap
-  target size and must be checked at that viewport, not just desktop mouse
-  hover states.
-- **Audio (if ever added).** This project currently ships no audio. If
-  audio is added, note for whoever implements it: browsers require a user
-  gesture before `AudioContext` can play — wire it to an existing tap
-  (e.g. Raid button), don't try to autoplay on load.
+## Not applicable
 
-## Explicitly not applicable here — don't reach for these
-
-Sprite atlases/draw-call batching, WebGPU/WebGL feature detection, a
-physics engine, tilemap auto-tiling, screen-shake via camera transforms
-(there is no camera — the board is fixed), service-worker/PWA offline
-install. If a request seems to need one of these, it likely means the
-request wants a bigger architectural change than "add a 2D game feature" —
-flag that explicitly rather than quietly bolting on a canvas layer.
+Sprite atlases, draw-call batching, WebGPU, physics, tilemap auto-tiling,
+service workers. If a request seems to need one, it wants a bigger
+architectural change than "add a 2D feature" — flag that.

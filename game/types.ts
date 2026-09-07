@@ -306,4 +306,3 @@ export interface WorldModifiers {
 
 export const EDITABLE_ROOMS = 5;
 export const MAX_PER_ID = 2;
-export const THRONE_INDEX = EDITABLE_ROOMS;

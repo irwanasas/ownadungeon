@@ -25,7 +25,7 @@ const OUTCOME_COPY: Record<Outcome, { title: string; desc: string; cls: string }
   }
 };
 
-export function summarize(result: RaidResult): string[] {
+function summarize(result: RaidResult): string[] {
   const lines: string[] = [];
   const hero = heroDef(result.hero.defId);
   lines.push(`${result.hero.name} the ${hero.name} came in at level ${result.hero.level}.`);

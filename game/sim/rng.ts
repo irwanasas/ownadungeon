@@ -13,6 +13,3 @@ export function seeded(seed: number): Rng {
 
 export const systemRng: Rng = () => Math.random();
 
-export function pick<T>(list: T[], rng: Rng): T {
-  return list[Math.floor(rng() * list.length) % list.length];
-}

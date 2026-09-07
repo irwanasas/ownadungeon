@@ -37,15 +37,6 @@ function ac(): AudioContext | null {
   return ctx;
 }
 
-export function setMuted(next: boolean): void {
-  muted = next;
-  if (master) master.gain.value = next ? 0 : 0.5;
-}
-
-export function isMuted(): boolean {
-  return muted;
-}
-
 function tone(freq: number, dur: number, type: OscillatorType, vol: number, slideTo?: number, delay = 0): void {
   const a = ac();
   if (!a || !master) return;
@@ -182,15 +173,3 @@ export function startAmbient(): void {
   ambient = { osc, gain };
 }
 
-export function stopAmbient(): void {
-  if (!ambient) return;
-  ambient.osc.forEach((o) => {
-    try {
-      o.stop();
-    } catch {
-      return;
-    }
-  });
-  ambient.gain.disconnect();
-  ambient = null;
-}

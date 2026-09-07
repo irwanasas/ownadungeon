@@ -45,7 +45,7 @@ export function unlockedFor(stage: number): string[] {
   return [...ids];
 }
 
-export function emptyRooms(): RoomSlot[] {
+function emptyRooms(): RoomSlot[] {
   return Array.from({ length: EDITABLE_ROOMS }, () => ({ kind: 'empty' as const }));
 }
 
@@ -66,7 +66,7 @@ export function canPlace(rooms: RoomSlot[], targetIndex: number, id: string): bo
   return used < MAX_PER_ID;
 }
 
-export function enforceCaps(rooms: RoomSlot[]): RoomSlot[] {
+function enforceCaps(rooms: RoomSlot[]): RoomSlot[] {
   const used: Record<string, number> = {};
   return rooms.map((slot) => {
     if (slot.kind === 'empty') return slot;
@@ -99,7 +99,7 @@ export function defaultState(): GameState {
   };
 }
 
-export function normalize(input: (Partial<GameState> & { kingLevel?: number }) | null): GameState {
+function normalize(input: (Partial<GameState> & { kingLevel?: number }) | null): GameState {
   const base = defaultState();
   if (!input) return base;
   const { kingLevel, ...saved } = input;
@@ -141,6 +141,3 @@ export function saveState(state: GameState): void {
   }
 }
 
-export function levelOf(state: GameState, id: string): number {
-  return state.levels[id] || 1;
-}

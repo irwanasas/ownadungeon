@@ -1,11 +1,11 @@
-import type { HeroRecord, RaidResult, Tag } from '../types';
+import type { HeroRecord, RaidResult } from '../types';
 import { makeName, makeUid, SCAR_TITLE } from '../content/names';
 import type { Rng } from '../sim/rng';
 
 const ROSTER_CAP = 6;
 const LEVEL_CAP = 15;
 
-export function newHero(defId: string, level: number, rng: Rng): HeroRecord {
+function newHero(defId: string, level: number, rng: Rng): HeroRecord {
   const { name, title } = makeName(defId, rng);
   return { uid: makeUid(), defId, name, title, level: Math.max(1, level), raids: 0, deaths: 0, scars: [] };
 }
@@ -21,11 +21,6 @@ export function pickRaider(roster: HeroRecord[], pool: string[], level: number, 
   }
   const defId = draw[Math.floor(rng() * draw.length) % draw.length] || 'paladin';
   return newHero(defId, level, rng);
-}
-
-export function scarTitle(scars: Tag[]): string {
-  if (scars.length === 0) return '';
-  return SCAR_TITLE[scars[scars.length - 1]] || '';
 }
 
 export function absorbResult(roster: HeroRecord[], raider: HeroRecord, result: RaidResult): HeroRecord[] {
@@ -48,10 +43,6 @@ export function absorbResult(roster: HeroRecord[], raider: HeroRecord, result: R
   const rest = roster.filter((h) => h.uid !== next.uid);
   rest.unshift(next);
   return rest.slice(0, ROSTER_CAP);
-}
-
-export function heroFullName(record: { name: string; title: string }): string {
-  return record.title ? `${record.name} ${record.title}` : record.name;
 }
 
 export function returningNote(record: HeroRecord): string | null {

@@ -1,23 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { HeroRecord, RaidResult, RoomSlot, WorldEvent } from '../../game/types';
 import { EDITABLE_ROOMS } from '../../game/types';
-import { HEROES } from '../../game/content/heroes';
 import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
 import { LORD } from '../../game/content/monsters';
 import { toDungeon, unlockSoulCost } from '../../game/state/economy';
 import { effectCount, tickWorld, worldModifiers } from '../../game/state/world';
-import { canPlace, defaultState, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
-import { absorbResult, pickRaider, returningNote } from '../../game/state/roster';
+import { canPlace, unlockedFor, type GameState } from '../../game/state/save';
+import { absorbResult, returningNote } from '../../game/state/roster';
 import { simulateRaid } from '../../game/sim/raid';
-import { offlineReport, type OfflineReport } from '../../game/sim/offline';
 import { systemRng } from '../../game/sim/rng';
 import DungeonView from './DungeonView';
-import { BuildSheet, CodexSheet, SettingsSheet, UpgradeSheet, WorldSheet } from './panels';
+import { BuildSheet, CodexSheet, SettingsSheet, UpgradeSheet, WorldSheet } from './panels/index';
 import { Coach, HeroTeaser, OfflinePanel, ResultPanel, TUTORIAL } from './overlays';
 import { ICON, artVars, contentArt, heroArt } from './art';
 import { CELL, useRaidDirector } from './useRaidDirector';
+import { useGameState } from './useGameState';
 import { play as sfx, startAmbient } from './audio';
 
 const MIN_WORLD_STAGE = 3;
@@ -25,14 +24,12 @@ const MIN_WORLD_STAGE = 3;
 type SheetKind = 'build' | 'upgrade' | 'codex' | 'settings' | 'world' | null;
 
 export default function GameShell() {
-  const [state, setState] = useState<GameState | null>(null);
-  const [raider, setRaider] = useState<HeroRecord | null>(null);
+  const { state, raider, offline, setOffline, update, rollRaider, resetState } = useGameState();
   const [selected, setSelected] = useState(0);
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [result, setResult] = useState<RaidResult | null>(null);
   const [resultOpen, setResultOpen] = useState(false);
   const [stageCleared, setStageCleared] = useState(false);
-  const [offline, setOffline] = useState<OfflineReport | null>(null);
   const [justPlaced, setJustPlaced] = useState(-1);
   const [news, setNews] = useState<WorldEvent | null>(null);
 
@@ -40,76 +37,6 @@ export default function GameShell() {
   const { view, play, speed, setSpeed } = useRaidDirector(scrollRef);
   const busy = view.raiding;
 
-  const heroPool = useCallback((s: GameState) => {
-    return s.mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(s.stage).heroPool;
-  }, []);
-
-  const applyOffline = useCallback((s: GameState, report: OfflineReport | null): GameState => {
-    if (!report) return { ...s, lastSeenAt: Date.now() };
-    return {
-      ...s,
-      gold: s.gold + report.gold,
-      souls: s.souls + report.souls,
-      roster: report.roster,
-      lastSeenAt: Date.now(),
-      stats: {
-        ...s.stats,
-        raids: s.stats.raids + report.raids,
-        defeated: s.stats.defeated + report.defeated,
-        escaped: s.stats.escaped + report.escaped,
-        lost: s.stats.lost + report.breached,
-        goldEarned: s.stats.goldEarned + report.gold,
-        goldStolen: s.stats.goldStolen + report.goldStolen
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const loaded = loadState();
-    const report = offlineReport(loaded, Date.now());
-    const next = applyOffline(loaded, report);
-    if (report) setOffline(report);
-    setState(next);
-    saveState(next);
-    setRaider(pickRaider(next.roster, heroPool(next), stageDef(next.stage).heroLevel, systemRng, worldModifiers(next.world).heroBias));
-  }, [applyOffline, heroPool]);
-
-  useEffect(() => {
-    const hide = () => {
-      setState((s) => {
-        if (!s) return s;
-        const next = { ...s, lastSeenAt: Date.now() };
-        saveState(next);
-        return next;
-      });
-    };
-    const show = () => {
-      setState((s) => {
-        if (!s) return s;
-        const report = offlineReport(s, Date.now());
-        if (report) setOffline(report);
-        const next = applyOffline(s, report);
-        saveState(next);
-        return next;
-      });
-    };
-    const onVis = () => (document.visibilityState === 'hidden' ? hide() : show());
-    window.addEventListener('pagehide', hide);
-    document.addEventListener('visibilitychange', onVis);
-    return () => {
-      window.removeEventListener('pagehide', hide);
-      document.removeEventListener('visibilitychange', onVis);
-    };
-  }, [applyOffline]);
-
-  const update = useCallback((fn: (s: GameState) => GameState) => {
-    setState((prev) => {
-      if (!prev) return prev;
-      const next = fn(prev);
-      saveState(next);
-      return next;
-    });
-  }, []);
 
   const advanceTutorial = useCallback(
     (from: number) => {
@@ -182,8 +109,7 @@ export default function GameShell() {
   function setMode(mode: 'stage' | 'arcade') {
     if (busy || !state) return;
     update((s) => ({ ...s, mode }));
-    const nextPool = mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(state.stage).heroPool;
-    setRaider(pickRaider(state.roster, nextPool, stageDef(state.stage).heroLevel, systemRng, worldModifiers(state.world).heroBias));
+    rollRaider({ ...state, mode });
     sfx('tap');
   }
 
@@ -253,34 +179,19 @@ export default function GameShell() {
   }
 
   function closeResult() {
+    if (!state) return;
     setResultOpen(false);
     sfx('tap');
-    setState((s) => {
-      if (!s) return s;
-      if (s.tutorial === 3) advanceTutorial(3);
-      setRaider(
-        pickRaider(
-          s.roster,
-          s.mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(s.stage).heroPool,
-          stageDef(s.stage).heroLevel,
-          systemRng,
-          worldModifiers(s.world).heroBias
-        )
-      );
-      return s;
-    });
+    if (state.tutorial === 3) advanceTutorial(3);
+    rollRaider(state);
   }
 
   function resetGame() {
-    const fresh = defaultState();
-    setState(fresh);
-    saveState(fresh);
-    setRaider(pickRaider(fresh.roster, stageDef(fresh.stage).heroPool, stageDef(fresh.stage).heroLevel, systemRng));
+    resetState();
     setSelected(0);
     setSheet(null);
     setResult(null);
     setResultOpen(false);
-    setOffline(null);
     sfx('lose');
   }
 

@@ -7,10 +7,10 @@ import { absorbResult, pickRaider } from '../state/roster';
 import { simulateRaid } from './raid';
 import { seeded } from './rng';
 
-export const OFFLINE_RAID_MS = 10 * 60 * 1000;
-export const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
-export const OFFLINE_MAX_RAIDS = 30;
-export const OFFLINE_GOLD_RATE = 0.3;
+const OFFLINE_RAID_MS = 10 * 60 * 1000;
+const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
+const OFFLINE_MAX_RAIDS = 30;
+const OFFLINE_GOLD_RATE = 0.3;
 
 export interface OfflineReport {
   raids: number;

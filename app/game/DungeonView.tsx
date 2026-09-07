@@ -9,7 +9,7 @@ import { treasureDef } from '../../game/content/treasure';
 import { ICON, ROOM_VARIANT, contentArt } from './art';
 import { CELL, type DirectorView } from './useRaidDirector';
 
-export function slotLabel(slot: RoomSlot): string {
+function slotLabel(slot: RoomSlot): string {
   if (slot.kind === 'trap') return trapDef(slot.id).name;
   if (slot.kind === 'monster') return monsterDef(slot.id).name;
   if (slot.kind === 'treasure') return treasureDef(slot.id).name;

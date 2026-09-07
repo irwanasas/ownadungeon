@@ -13,7 +13,7 @@ function base(): Omit<StatusDef, 'kind' | 'name' | 'short' | 'desc'> {
   };
 }
 
-export const STATUSES: Record<StatusKind, StatusDef> = {
+const STATUSES: Record<StatusKind, StatusDef> = {
   poison: {
     ...base(),
     kind: 'poison',

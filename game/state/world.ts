@@ -3,11 +3,11 @@ import { ROLLABLE, worldEvent } from '../content/worldEvents';
 import { heroDef } from '../content/heroes';
 import type { Rng } from '../sim/rng';
 
-export const MAX_ACTIVE_EFFECTS = 2;
-export const CLAMP_LOW = 0.8;
-export const CLAMP_HIGH = 1.25;
-export const MIN_STAGE = 3;
-export const HISTORY_MAX = 12;
+const MAX_ACTIVE_EFFECTS = 2;
+const CLAMP_LOW = 0.8;
+const CLAMP_HIGH = 1.25;
+const MIN_STAGE = 3;
+const HISTORY_MAX = 12;
 const REPEAT_GUARD = 6;
 
 export function defaultWorld(): WorldState {
@@ -34,7 +34,7 @@ function mul<K extends string>(map: Partial<Record<K, number>>, key: K, value: n
   map[key] = (map[key] || 1) * value;
 }
 
-export function activeEvents(world: WorldState): WorldEvent[] {
+function activeEvents(world: WorldState): WorldEvent[] {
   return world.active.map((a) => worldEvent(a.id)).filter((e): e is WorldEvent => e !== null);
 }
 

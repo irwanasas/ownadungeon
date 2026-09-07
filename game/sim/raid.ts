@@ -275,7 +275,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
         }
       } else if (slot.kind === 'treasure') {
         const vd = treasureDef(slot.id);
-        const intent = decideLoot(hero, def, vd, rng);
+        const intent = decideLoot(def, vd, rng);
         events.push({ t: 'decision', intent, note: lootNote(hero, intent === 'loot', vd) });
         if (intent === 'loot') {
           const gold = Math.round(vd.gold + (built.level - 1) * vd.goldPerLevel);

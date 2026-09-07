@@ -1,15 +1,13 @@
 ---
 name: feature-brainstorm
 description: >-
-  Use when the user wants to explore ideas for new content or features in
-  Own a Dungeon without a settled direction yet — "what could we add",
-  "ideas for a new trap", "what should the next stage arc be". Triggers on
-  "brainstorm", "ideas for", "what should we add", "not sure what to build
-  next". Adapted from Donchitos/Claude-Code-Game-Studios' brainstorm
-  skill — the original is a from-zero "invent a new game" ideation process
-  (game concept, pillars, market fit); this version repurposes its
-  facilitation techniques for ideating new content/features within an
-  already-shipped game.
+  Use when the user wants to explore ideas for new content or features in Own
+  a Dungeon without a settled direction yet — "what could we add", "ideas for
+  a new trap", "what should the next stage arc be". Triggers on "brainstorm",
+  "ideas for", "what should we add", "not sure what to build next". Adapted
+  from Donchitos/Claude-Code-Game-Studios' brainstorm skill — the original is
+  a from-zero "invent a new game" process; this version points the same
+  facilitation at an already-shipped game.
 license: MIT
 ---
 
@@ -17,58 +15,39 @@ license: MIT
 
 Source: condensed from
 [Donchitos/Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios)'
-`brainstorm` skill. The original walks a designer from zero to a full new
-game concept (elevator pitch, genre mashups, market positioning) and writes
-`design/gdd/game-concept.md`. Own a Dungeon already has a settled concept
-(idle dungeon management, Hero × Monster × Trap puzzle, Stage/Arcade split
-— see `README.md`) — this version keeps the facilitation discipline
-(withhold judgment, build on ideas, use constraints as fuel) but points it
-at "what's the next thing to add to this game" instead of "what game should
-we build."
+`brainstorm`, which walks from zero to a new game concept. Own a Dungeon has
+a settled concept — build a dungeon, send in an autonomous hero, watch. This
+keeps the facilitation discipline and points it at what to add next.
 
-## Facilitation principles (kept from the original — still correct)
+## Principles
 
-- Withhold judgment during exploration — generate before filtering.
-- "Yes, and" over "but" — build on a half-formed idea rather than shutting
-  it down early.
-- Use this game's real constraints as creative fuel, not as blockers: no
-  server/backend, `localStorage`-only, single mobile screen with four
-  overlays, 5 hero classes × 5 monster types × 5 traps as the current
-  puzzle scope, no audio yet. A good idea for this game works *within*
-  those, or explicitly proposes changing one and says so.
-- Ask what emotional/mechanical gap the idea fills — don't generate ideas
-  in a vacuum. Anchor to: does this add a new *decision* to the Hero ×
-  Monster × Trap puzzle, or is it a new economy sink, a new progression
-  hook, or a new session-return reason?
+- Generate before filtering; "yes, and" over "but".
+- Use the real constraints as fuel: no server, `localStorage` only, one
+  portrait screen plus sheets, six rooms with a two-per-room cap, 6 heroes ×
+  5 monsters × 6 traps × 2 treasures, one interaction table, a world event
+  layer, Stage and Arcade. A good idea works inside those, or names the one
+  it wants to change.
+- Anchor every idea to a gap: does it add a **decision** to the room-order
+  puzzle, a **sink** for gold or souls, a **progression hook**, or a **reason
+  to come back**?
 
-## A useful ideation technique from the original, kept
+## Techniques worth keeping
 
-**Mashup method** — combine an existing system with a new angle and see
-if the tension produces a hook. Examples scoped to this game: "matchup
-puzzle + a limited-uses consumable trap" (scarcity forces harder
-placement decisions), "Arcade wave scaling + a temporary hero-only
-buff-of-the-run" (roguelike-lite twist without touching Stage), "King
-duel + a phase change partway through" (boss fight gets a second puzzle
-layer). Generate 2–3 concrete directions this way rather than one vague
-"more content" answer.
+**Mashup** — combine an existing system with a new angle and see if the
+tension produces a hook. Scoped to this game: "the interaction table + a
+consumable one-shot trap" (scarcity makes placement harder), "world events +
+a player choice about which rumour to encourage", "the persistent hero roster
++ a named rival who keeps coming back stronger", "the Throne fight + a second
+phase once Nekrokos drops below half".
 
-## Process
+**Push the existing systems before adding one.** Most good additions here are
+data, not code: a new status with a `blocksTraits`, a new interaction row, a
+new world event chain. Ask whether the idea can be expressed that way before
+proposing a new subsystem — it usually can, and it stays balanced for free.
 
-1. **Ask what gap this is meant to fill** if it isn't already stated —
-   more mid-game content? A new hook for returning players? Variety in the
-   puzzle space? Don't assume; a wrong guess wastes the round.
-2. **Generate 3 distinct directions**, each stated as: one-sentence pitch,
-   what new decision it adds to the existing puzzle (or what other loop it
-   serves — economy, progression, session-return), rough scope (a data-only
-   addition vs. needing a new UI surface vs. needing new game logic), and
-   the biggest open question about it.
-3. **Present all three together** and let the user pick, combine, or ask
-   for different directions — don't silently pick one yourself.
-4. **Hand off, don't implement from here.** Once a direction is chosen:
-   - If it's balance/mechanics detail work → `game-design-loop`
-   - If it's a specific Stage/trap/monster/hero → `dungeon-content-design`
-   - If it needs review before building → `design-review`
-   - If it's ready to build → `browser-game-dev`'s build-and-verify loop
+## Output
 
-This skill produces a shortlist of directions, not a shipped feature —
-resist the pull to start implementing mid-brainstorm.
+Two or three concrete directions, each with the gap it fills and roughly what
+it would touch. Then hand off: `dungeon-content-design` for the specifics,
+`design-review` before implementing, `game-design-loop` if it is really a
+balance question.

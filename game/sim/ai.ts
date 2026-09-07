@@ -19,7 +19,7 @@ export function fleeNote(hero: HeroInstance, def: HeroDef): string {
   return `${hero.name} is too badly hurt to go on.`;
 }
 
-export function decideLoot(hero: HeroInstance, def: HeroDef, treasure: TreasureDef, rng: Rng): Intent {
+export function decideLoot(def: HeroDef, treasure: TreasureDef, rng: Rng): Intent {
   const pull = Math.min(0.95, def.greed + treasure.lure);
   return rng() < pull ? 'loot' : 'ignoreLoot';
 }

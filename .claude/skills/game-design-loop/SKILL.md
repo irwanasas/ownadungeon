@@ -2,7 +2,7 @@
 name: game-design-loop
 description: >-
   Use when the user asks about game mechanics, core loop pacing, matchup
-  balance, the gold/soul economy, upgrade progression, or King/Stage/Arcade
+  balance, the gold/soul economy, upgrade progression, or Stage/Arcade/World
   design in Own a Dungeon. Triggers on "balance", "mechanic", "core loop",
   "progression", "economy", "matchup", "difficulty curve". Adapted from
   AlterLab-IEU/AlterLab_GameForge's game-designer agent — trimmed from a
@@ -15,63 +15,55 @@ license: MIT
 
 Source: condensed from
 [AlterLab-IEU/AlterLab_GameForge](https://github.com/AlterLab-IEU/AlterLab_GameForge)'s
-`game-designer` agent. The original is a persona-driven role meant to be
-spawned as a subagent inside a multi-role studio pipeline and references
-docs (`@docs/game-design-theory.md`) that don't exist in this repo. This
-version keeps the useful design frameworks and reapplies them directly to
-this game's actual mechanics — no persona, no subagent spawning, no
-external doc dependencies.
+`game-designer` agent. The original is a persona-driven role spawned inside a
+multi-role studio pipeline. This version keeps the useful frameworks and
+applies them to this game's real systems — no persona, no subagents.
 
-## This game's actual systems (ground every suggestion here)
+## This game's actual systems
 
-- **The puzzle is Hero × Monster × Trap**, not raw stat comparison — the
-  matchup matrix lives in `src/data/matchups.ts` (advantage ≈ ×1.25,
-  disadvantage ≈ ×0.8, plus special interactions: net blocks Berserker
-  RAGE, Frost affects DEF, Holy/Magic bonuses vs undead/shade). Any new
-  hero/monster/trap must be evaluated against this matrix for both new
-  advantages and unintended stacking — the project's own rule is that no
-  multiplier should stack to "broken."
-- **Progression has two tracks that must stay distinct:** Stage 1–50 is
-  hand-authored puzzle content (`src/data/stages.ts`) with per-stage
-  unlocks and a first-clear bonus; Arcade is unbounded wave scaling with
-  light stat growth and a random hero roster from already-unlocked
-  classes. Don't blur these — a Stage-only balance fix shouldn't leak stat
-  scaling into Arcade, and vice versa.
-- **Economy** is gold + souls (`src/economy/economy.ts`) feeding
-  `src/data/upgrades.ts` (item leveling, unlocks, King leveling). King is
-  a duel boss at the Throne room, not just a stat sheet — treat King
-  upgrades as both an economy sink and a difficulty lever.
+- **Depth comes from one interaction table, not a matchup matrix.** Every hit
+  carries a `Tag`; every status carries tags and may carry `blocksTraits`;
+  `game/content/interactions.ts` decides what happens when they meet. Oil then
+  Fire is ignition. A Net blocks the Berserker's rage because `bound` blocks
+  the `rage` trait — not because of a hero-specific branch. **There are no
+  per-hero special cases anywhere, and adding one is the wrong move.**
+- **Content:** 6 heroes (paladin, berserker, trickster, assassin, druid,
+  elementalist, in warrior/rogue/mage families), 5 monsters (goblin, archer,
+  slime, ogre, shadow), 6 traps (spike, poison, oil, fire, frost, net), 2
+  treasures (hoard, relic), and Nekrokos the Demon Lord in the Throne Room.
+- **The two-per-room cap** (`MAX_PER_ID`) means five rooms need at least three
+  different ideas. Any balance proposal has to work inside it.
+- **Two progression tracks stay distinct:** 20 hand-authored stages in
+  `game/content/stages.ts`, each teaching one thing; Arcade is unbounded wave
+  scaling with the full roster. A stage fix must not leak into Arcade scaling.
+- **Economy:** gold buys levels (`upgradeCost`, `base × 1.8 × 1.5^n`); souls
+  buy Lord levels and unlocks ahead of their stage gate, priced by how far
+  ahead you are reaching. Both live in `game/state/economy.ts`.
+- **The world layer** (`game/state/world.ts`) applies temporary modifiers via
+  one resolved object from `worldModifiers()`. Anything reading world state
+  reads that, never the active-event list.
 
-## Core-loop framing (from the original skill, kept because it's genuinely useful)
+## Core-loop framing
 
-Evaluate any new system or balance change at the timescale it actually
-lives at:
+- **Per room:** can the player tell *why* a room went the way it did from the
+  HP bars, floating numbers and reaction line alone? If not, that is a design
+  bug before it is a balance bug.
+- **Per raid (6 rooms):** does room order matter, or does one arrangement win
+  everywhere? Check the interaction table for a combination with no counter.
+- **Session:** do Stage and Arcade still both have a reason to exist?
+- **Long run:** does income outpace upgrade costs (inflation) or fall behind
+  (grind wall)? Current target is roughly 0.6 raids of income per upgrade
+  early, rising to ~3.5 late.
 
-- **Moment-to-moment (per room resolve):** is the trap/monster/hero
-  interaction legible in the compact battle card (HP bar + reaction text)
-  without needing a wiki? If a player can't tell *why* they won or lost a
-  room from the UI alone, that's a design bug before it's a balance bug.
-- **Per-raid (5–15 rooms):** does room-to-room variety keep the puzzle
-  interesting, or does one dominant trap/monster combo trivialize most
-  rooms? Check against the matchup matrix for a combo that wins
-  everywhere.
-- **Session (one sitting):** does the Stage/Arcade split still give a
-  reason to switch between them, or has one become strictly better?
-- **Long-run (across sessions):** does the upgrade curve in
-  `upgrades.ts` keep producing meaningful decisions, or does gold/soul
-  income outpace sink costs (inflation) or fall behind them (grind wall)?
-  Sanity-check new content against this before shipping it.
+## Before proposing a number
 
-## When proposing a change
+**Measure it.** This game's combat is discrete — integer damage, rounds-to-kill
+thresholds, flee thresholds, rage triggers. Small multipliers do not produce
+small outcome changes: +2% hero ATK and +10% both move some matchups by ~26
+percentage points, because either crosses a rounding boundary or neither does.
+Anything that touches combat stats has to be simulated across several dungeons
+and all six heroes with per-raid seeds before you can claim it is mild.
+Economy multipliers are the exception — they cannot touch combat at all.
 
-1. State which of the four timescales above it targets and why.
-2. Trace it through `matchups.ts` / `stages.ts` / `upgrades.ts` as
-   relevant — don't propose a new trap or hero without checking how it
-   slots into the existing 5×5×5 (hero × monster × trap) matrix.
-3. Flag anything that would require a new UI surface (new overlay, new
-   HUD element) separately — that's an implementation-scope question, not
-   a balance question, and belongs in a plan before code.
-4. For genuinely open-ended "what should we add" questions rather than
-   tuning an existing system, use the `feature-brainstorm` skill instead —
-   this skill is for reasoning about mechanics that already exist or are
-   already scoped.
+For open-ended "what should we add", use `feature-brainstorm` first, then
+`dungeon-content-design` for the specifics.

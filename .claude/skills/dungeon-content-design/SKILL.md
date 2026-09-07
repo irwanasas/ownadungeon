@@ -2,74 +2,58 @@
 name: dungeon-content-design
 description: >-
   Use when designing or tuning new dungeon content in Own a Dungeon — a new
-  Stage puzzle, a new hero/monster/trap, or Arcade scaling. Triggers on
-  "level design", "new stage", "design a puzzle", "new room". Adapted from
-  Donchitos/Claude-Code-Game-Studios' team-level workflow — the original
-  spawns a 6-agent studio team (narrative-director, world-builder,
-  level-designer, systems-designer, art-director, accessibility-specialist,
-  qa-tester) against a design/gdd/ + design/levels/ document tree that
-  don't exist in this project. This version is a single-session content
-  design pass scoped to this game's actual data files.
+  Stage puzzle, a new hero/monster/trap/treasure, a new world event, or
+  Arcade scaling. Triggers on "level design", "new stage", "design a puzzle",
+  "new room", "new event". Adapted from Donchitos/Claude-Code-Game-Studios'
+  team-level workflow — the original spawns a six-agent studio team against a
+  design/gdd/ document tree that does not exist here. This version is a
+  single-session content pass against this game's real data files.
 license: MIT
 ---
 
-# Own a Dungeon — Dungeon Content Design
+# Own a Dungeon — Content Design
 
 Source: condensed from
 [Donchitos/Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios)'
-`team-level` skill. "Level design" in that framework means spatial area
-layout with narrative beats, spawned across a multi-agent studio team. Own
-a Dungeon has no spatial levels or narrative — a "level" here is a Stage
-entry: a specific room-by-room puzzle of hero/monster/trap placements plus
-unlocks (`src/data/stages.ts`), or new content (`traps.ts`, `monsters.ts`,
-`heroes.ts`) that plugs into the matchup matrix. No subagent team — this is
-solo design work against real data files.
+`team-level` skill. There are no spatial levels here — a "level" is a Stage
+entry, and content is data in `game/content/`. Solo work, no subagent team.
 
-## Designing a new Stage entry
+## Designing a Stage entry
 
-1. **Read `src/data/stages.ts`** for the surrounding stages (a few before
-   and after the target stage number) to see the established difficulty
-   ramp and unlock cadence — a new stage should sit coherently in that
-   curve, not spike or trivialize it.
-2. **Pick the puzzle's teaching point.** Every stage should be testing or
-   teaching something specific about the Hero × Monster × Trap matchup
-   matrix (`src/data/matchups.ts`) — state it in one sentence (e.g. "tests
-   whether the player nets the Berserker before it RAGEs"). If you can't
-   state that sentence, the stage doesn't have a clear identity yet.
-3. **Check the matchup matrix for the intended solution** — verify the
-   hero/monster/trap combo you're designing around actually produces the
-   outcome you intend (advantage ≈ ×1.25 / disadvantage ≈ ×0.8 / special
-   interactions), and check there isn't a trivial off-path solution that
-   defeats the puzzle's point.
-4. **Set the unlock and first-clear bonus** consistent with neighboring
-   stages — don't gate content behind a stage whose difficulty doesn't
-   justify the gate.
-5. **Verify per `qa-verification`**: play the stage through in a real
-   browser pass, confirm the puzzle resolves as intended and the intended
-   "trap" solution (going in blind, or the wrong trap) actually fails
-   the way the design expects.
+1. **Read the neighbours** in `game/content/stages.ts` — a few before and
+   after — so the new stage sits in the existing ramp.
+2. **Name the teaching point in one sentence.** Every stage teaches exactly
+   one thing ("a Net binds, and bound heroes cannot rage"). If you cannot say
+   it, the stage has no identity yet.
+3. **Check it is winnable under the two-per-room cap.** With fewer than three
+   unlocked items the player cannot fill five rooms. This has already broken a
+   stage once: after the cap landed, stage 1 offered only Spike and its
+   best possible build won 0% of raids.
+4. **Simulate before shipping.** Sample legal builds against the stage's own
+   hero pool and Lord level; the best build should win comfortably and a
+   careless one should not.
+5. Set `unlockTraps` / `unlockMonsters` / `unlockTreasure` and `lordLevel`
+   consistently with the neighbours.
 
-## Designing new content (trap / monster / hero)
+## Designing new content
 
-1. **Where it lives:** `src/data/traps.ts`, `monsters.ts`, or `heroes.ts`
-   for the base stats/definition; `src/data/matchups.ts` for how it
-   interacts with everything already in the 5×5×5 matrix.
-2. **Justify the addition against what already exists** — a new trap/
-   monster/hero should create a new decision, not a strictly-better or
-   strictly-worse version of an existing one. Compare stats and special
-   interactions against the current five of each type.
-3. **Wire the full path**, not just the data: matchup entries, any new
-   matchup-hint text so the "Enemy Detected" panel can explain it, and — if
-   visually distinct — a sprite/icon (see `art-direction` skill).
-4. **Check Arcade too.** New heroes/monsters enter the Arcade random roster
-   automatically once unlocked — confirm the new content doesn't break
-   Arcade's light stat-scaling balance even though Arcade doesn't use
-   hand-authored puzzles.
+- **Where it lives:** `game/content/traps.ts`, `monsters.ts`, `heroes.ts`,
+  `treasure.ts` for the definition; `statuses.ts` and `interactions.ts` for
+  how it combines.
+- **Express it through the generic system.** A new trap that applies an
+  existing status, or a new status with `blocksTraits`, is right. A new
+  hardcoded branch in `game/sim/` is wrong — that is the design rule the whole
+  interaction table exists to protect.
+- **Justify it against what exists.** New content should create a decision,
+  not be a strictly better version of something already there.
+- **Wire the whole path:** definition, any interaction entry, a sprite in
+  `scripts/art/gen_entities.py`, and the Codex text if it needs explaining.
+- **Check Arcade**, where everything is unlocked and the full roster shows up.
 
-## Not applicable here
+## Designing a world event
 
-Spatial level layout, camera framing, narrative beats/dialogue per area,
-environmental storytelling, accessibility passes for 3D navigation — this
-game has none of those; "level design" is data-driven puzzle content, not
-a built space. For pure ideation on what new content to add, use
-`feature-brainstorm` first, then this skill to design the specifics.
+`game/content/worldEvents.ts`. An event with no `effect` is lore-only — that
+is the entire lore/gameplay split, there is no second type. Keep durations
+2–4 raids, and remember effects are clamped and capped at two active at once.
+Chains are `leadsTo` entries rolled when an event expires; an event only
+reachable through a chain is automatically kept out of the random pool.

@@ -104,16 +104,20 @@ Next.js App Router, static export, TypeScript, React. No game engine, no canvas 
 the dungeon is DOM and CSS, and it scrolls natively so touch feels right.
 
 ```
-game/          simulation and data — no DOM, no React
-  content/     heroes, monsters, traps, treasure, statuses, interactions, stages
-  state/       save, economy, persistent hero roster
-  sim/         hero instances, AI decisions, raid loop, offline batch sim
-app/game/      presentation
-  GameShell    state and orchestration
-  DungeonView  the scrolling six-room world
+game/            simulation and data — no DOM, no React
+  content/       heroes, monsters, traps, treasure, statuses, interactions,
+                 stages, world events, names
+  state/         save, economy, hero roster, world announcer
+  sim/           hero instances, AI decisions, raid loop, offline batch, rng
+app/game/        presentation
+  GameShell      composition and handlers
+  useGameState   load, save, offline report, visibility, reset
+  DungeonView    the scrolling six-room world
   useRaidDirector  turns the simulation's event log into timed animation
-  panels/overlays  build, upgrade, codex, result, offline, tutorial
-scripts/art/   regenerates every sprite and UI frame from assets-src/room/Room.png
+  panels/        Sheet primitive + build, upgrade, codex, world, settings
+  overlays.tsx   result, offline, tutorial coach, hero teaser
+  styles/        tokens, chrome, dungeon, panels — imported in that order
+scripts/art/     regenerates every sprite and UI frame from assets-src/room/
 ```
 
 `simulateRaid()` returns an ordered `RaidEvent[]` and nothing else. The

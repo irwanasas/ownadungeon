@@ -61,7 +61,7 @@ export function traitBlocked(hero: HeroInstance, trait: TraitId): boolean {
   return hero.status.some((s) => statusDef(s.kind).blocksTraits.includes(trait));
 }
 
-export function evasionOf(hero: HeroInstance, def: HeroDef): number {
+function evasionOf(hero: HeroInstance, def: HeroDef): number {
   if (traitBlocked(hero, 'dodge')) return 0;
   let e = def.evasion;
   for (const s of hero.status) e += statusDef(s.kind).evasionDelta;
@@ -114,7 +114,7 @@ export function applyStatus(
   out.push({ t: 'statusOn', kind });
 }
 
-export function clearStatus(hero: HeroInstance, kind: StatusKind, out: RaidEvent[]): void {
+function clearStatus(hero: HeroInstance, kind: StatusKind, out: RaidEvent[]): void {
   const before = hero.status.length;
   hero.status = hero.status.filter((s) => s.kind !== kind);
   if (hero.status.length !== before) out.push({ t: 'statusOff', kind });

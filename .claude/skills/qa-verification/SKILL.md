@@ -15,72 +15,63 @@ license: MIT
 
 Source: condensed from
 [AlterLab-IEU/AlterLab_GameForge](https://github.com/AlterLab-IEU/AlterLab_GameForge)'s
-`game-qa-lead` agent, written for formal test plans, acceptance-criteria
-sign-off, and a dedicated QA subagent. This project has no test suite and
-one maintainer, but it does already have a real, repeatedly-used
-verification habit (see the isometric-battlefield and UI-reskin work) —
-this skill writes that habit down so it's followed consistently instead of
-depending on memory.
+`game-qa-lead` agent, written for formal test plans and a dedicated QA
+subagent. This project has no committed test suite and one maintainer, but it
+does have a real, repeatedly-used verification habit — this writes it down.
 
 ## The standing bar for "done"
 
-Every code change to `src/`, `app/`, or `public/assets/` clears all of
-these before being called finished — this is not optional per-change,
-it's the project's baseline:
+1. **`npm run type-check`** — zero errors. Strict TypeScript throughout.
+   When a change renames a union member or a shared type, this is most of the
+   proof: the compiler enumerates every consumer for you.
+2. **`npx tsc --noEmit --noUnusedLocals --noUnusedParameters`** for cleanup
+   work — catches unused imports and dead parameters that the normal pass
+   allows.
+3. **`npm run build`** — the static export must succeed. It is also the only
+   way to catch basePath and asset-path problems, since `next dev` does not
+   apply the GitHub Pages `basePath`.
+4. **A real browser pass.** `npm run dev`, then drive the actual feature with
+   Playwright at `/opt/pw-browsers/chromium`, headless. Check **390×844 and
+   360×640** — this is a portrait mobile game and the narrow viewport has
+   caught real clipping the wide one hid.
+5. **Console must be clean.** A `pageerror`, a `console.error` or a 404 is a
+   failure even if the screenshot looks right.
 
-1. **`npm run type-check`** — zero errors. This project is strict
-   TypeScript throughout `src/`; a type error here is a real bug, not
-   noise.
-2. **`npm run build`** — the static export must succeed. This is also
-   the only way to catch basePath/asset-path issues (see
-   `tech-architecture` skill) since `next dev` doesn't apply the GitHub
-   Pages `basePath`.
-3. **A real browser pass**, not just "the code looks right":
-   - Serve the built `out/` directory locally (e.g.
-     `python3 -m http.server` from `out/`) or use `npm run dev` for
-     faster iteration on logic-only changes.
-   - Drive the actual changed feature — click the real buttons, open the
-     real overlay, trigger the real raid — via Playwright
-     (`/opt/pw-browsers/chromium`, headless) or manual check.
-   - Check the browser console for `pageerror`/`console.error` during the
-     pass. A clean screenshot with a silent thrown exception underneath
-     is still a fail.
-   - Screenshot at the mobile viewport this game targets
-     (`~420x860`) in addition to desktop, if the change touches layout —
-     this project has caught real mobile-only bugs this way before (the
-     `.side-panel` full-bleed-at-mobile-width case).
+## Measure, don't eyeball
 
-## Scoping the pass to the change
+The habits that have actually caught bugs in this repo:
 
-Don't re-verify the entire game on every change — verify the golden path
-through the feature that changed, plus anything it visibly touches:
+- **Assert on geometry, not on a screenshot.** `scrollWidth <= clientWidth`
+  for clipping, `getBoundingClientRect()` for overlap. A rendered name that
+  "looks fine" at 390 can clip at 360.
+- **Give every simulated raid its own seed.** Sharing one RNG stream across a
+  batch means any change to draw order diverges the whole run, and the numbers
+  become noise. This produced a completely wrong balance conclusion once —
+  weaker heroes appeared to produce *fewer* kills.
+- **Read state from `localStorage`, not from the DOM**, when checking that
+  something persisted.
+- **Select by `aria-label` or text, not `nth-child`.** Positional selectors
+  silently break when a tab is added to the row.
 
-- **Data/balance change** (`src/data/*.ts`) → play through a raid that
-  exercises the changed matchup/stage/upgrade, check the numbers land as
-  intended in the UI (HP bars, gold/soul totals, upgrade costs).
-- **New UI element** → open it, check both light interaction (hover/tap
-  states) and the close/dismiss path, at both viewports.
-- **Animation/timing change** (`beatTiming.ts`, `heroToken.ts`,
-  `roomStage.ts`) → watch a full raid sequence end-to-end, not just the
-  single beat that changed — timing bugs often only show up in the
-  handoff between beats.
-- **CSS-only visual change** → screenshot before/after comparison at both
-  viewports; check it didn't leak into other screens sharing the same
-  class (see `art-direction` skill's note on scoping overlay skins).
+## Scoping the pass
 
-## What "acceptance criteria" means here
+Verify the golden path through what changed, plus what it visibly touches:
 
-This project doesn't maintain a formal test-plan document. Instead, before
-starting a change, state in one sentence what "working" looks like for it
-(e.g. "the new trap reduces monster ATK by 20% and shows in the matchup
-hint") — that sentence is the acceptance criterion, and the verification
-pass above checks against it. If you can't state that sentence, the change
-isn't scoped enough to start yet.
+- **Content or balance** (`game/content/*`) → run the simulation directly in a
+  harness (compile `game/**` with `tsc --module commonjs` and drive
+  `simulateRaid`) over enough raids to be statistically meaningful, then one
+  browser pass to confirm the numbers reach the UI.
+- **A new sheet or overlay** → open it, exercise its controls, close it, at
+  both viewports.
+- **Raid presentation** (`useRaidDirector`) → watch a full raid end to end.
+  Timing bugs live in the handoff between beats, not in one beat.
+- **CSS** → confirm the change did not leak into another surface sharing the
+  class, and that `border-image` frames still render.
+- **A persisted field** → load a save written *before* the change and assert
+  the migration path, not just the fresh-save path.
 
 ## Reporting
 
-After the pass, say plainly what was checked and at what viewport(s) —
-don't just say "verified," name the specific commands run and what was
-visually confirmed. If something couldn't be checked (e.g. no way to
-trigger a rare state), say so explicitly rather than implying full
-coverage.
+Name the commands run, the viewports checked, and what was confirmed. If
+something could not be checked, say so rather than implying coverage. Do not
+call a change verified from reading the diff.
