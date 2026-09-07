@@ -48,6 +48,13 @@ export const STAGES: StageDef[] = SEEDS.map((s, i) => ({
 
 export const STAGE_MAX = STAGES.length;
 
+export function unlockStageOf(id: string): number {
+  for (const s of STAGES) {
+    if (s.unlockTraps.includes(id) || s.unlockMonsters.includes(id) || s.unlockTreasure.includes(id)) return s.id;
+  }
+  return 1;
+}
+
 export function stageDef(id: number): StageDef {
   return STAGES[Math.min(Math.max(1, id), STAGE_MAX) - 1];
 }

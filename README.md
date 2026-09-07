@@ -68,7 +68,9 @@ teaches them.
 - **Offline** — the dungeon keeps working while you are away, up to 8 hours,
   simulated deterministically on return.
 
-Gold levels up what you own. Souls unlock new content early and upgrade the King.
+Gold levels up what you own. Souls upgrade the King and buy content ahead of
+its stage gate — and the further ahead you reach, the dearer it gets, so
+impatience costs real souls rather than skipping the ladder for free.
 
 ## Running it
 

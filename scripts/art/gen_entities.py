@@ -308,6 +308,18 @@ def icon_clear(d, im):
     d.line([18, 5, 5, 18], fill=rgba('stone_lit'), width=3)
 
 
+def icon_settings(d, im):
+    import math
+    for i in range(8):
+        a = i * math.pi / 4
+        cx, cy = 12 + 9 * math.cos(a), 12 + 9 * math.sin(a)
+        d.rectangle([cx - 2.5, cy - 2.5, cx + 2.5, cy + 2.5], fill=rgba('stone_lit'))
+    d.ellipse([3, 3, 20, 20], fill=rgba('stone_lit'))
+    d.ellipse([5, 5, 18, 18], fill=rgba('stone'))
+    d.ellipse([8, 8, 15, 15], fill=rgba('ink'))
+    d.ellipse([9, 9, 14, 14], fill=rgba('gold'))
+
+
 def icon_lock(d, im):
     d.arc([6, 3, 17, 15], 180, 360, fill=rgba('stone_lit'), width=3)
     d.rectangle([4, 11, 19, 21], fill=rgba('stone'))
@@ -344,7 +356,8 @@ SPRITES = {
     'icon-codex': icon_codex,
     'icon-king': icon_king,
     'icon-clear': icon_clear,
-    'icon-lock': icon_lock
+    'icon-lock': icon_lock,
+    'icon-settings': icon_settings
 }
 
 

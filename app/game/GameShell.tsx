@@ -4,21 +4,21 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { HeroRecord, RaidResult, RoomSlot } from '../../game/types';
 import { EDITABLE_ROOMS } from '../../game/types';
 import { HEROES } from '../../game/content/heroes';
-import { STAGE_MAX, stageDef } from '../../game/content/stages';
-import { toDungeon } from '../../game/state/economy';
-import { canPlace, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
+import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
+import { toDungeon, unlockSoulCost } from '../../game/state/economy';
+import { canPlace, defaultState, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
 import { absorbResult, pickRaider, returningNote } from '../../game/state/roster';
 import { simulateRaid } from '../../game/sim/raid';
 import { offlineReport, type OfflineReport } from '../../game/sim/offline';
 import { systemRng } from '../../game/sim/rng';
 import DungeonView from './DungeonView';
-import { BuildSheet, CodexSheet, UpgradeSheet } from './panels';
+import { BuildSheet, CodexSheet, SettingsSheet, UpgradeSheet } from './panels';
 import { Coach, HeroTeaser, OfflinePanel, ResultPanel, TUTORIAL } from './overlays';
 import { ICON, artVars, contentArt, heroArt } from './art';
 import { CELL, useRaidDirector } from './useRaidDirector';
 import { play as sfx, startAmbient } from './audio';
 
-type SheetKind = 'build' | 'upgrade' | 'codex' | null;
+type SheetKind = 'build' | 'upgrade' | 'codex' | 'settings' | null;
 
 export default function GameShell() {
   const [state, setState] = useState<GameState | null>(null);
@@ -148,13 +148,15 @@ export default function GameShell() {
     else if (state && state.tutorial === 1 && filled + 1 >= 3) advanceTutorial(1);
   }
 
-  function buyUnlock(id: string, souls: number) {
+  function buyUnlock(id: string, goldCost: number) {
     update((s) => {
-      if (s.souls < souls || s.bought.includes(id)) return s;
+      if (s.bought.includes(id)) return s;
+      const price = unlockSoulCost(goldCost, unlockStageOf(id), s.stage);
+      if (s.souls < price) return s;
       const bought = [...s.bought, id];
       return {
         ...s,
-        souls: s.souls - souls,
+        souls: s.souls - price,
         bought,
         unlocked: [...new Set([...unlockedFor(Math.max(s.stage, s.maxStageCleared + 1)), ...bought])]
       };
@@ -249,6 +251,19 @@ export default function GameShell() {
     });
   }
 
+  function resetGame() {
+    const fresh = defaultState();
+    setState(fresh);
+    saveState(fresh);
+    setRaider(pickRaider(fresh.roster, stageDef(fresh.stage).heroPool, stageDef(fresh.stage).heroLevel, systemRng));
+    setSelected(0);
+    setSheet(null);
+    setResult(null);
+    setResultOpen(false);
+    setOffline(null);
+    sfx('lose');
+  }
+
   function closeSheet() {
     setSheet(null);
     sfx('tap');
@@ -290,6 +305,9 @@ export default function GameShell() {
         </button>
         <button className="tab tab-icon btn" onClick={() => openSheet('codex')} disabled={busy} aria-label="Codex">
           <img src={ICON.codex} alt="" />
+        </button>
+        <button className="tab tab-icon btn" onClick={() => openSheet('settings')} disabled={busy} aria-label="Settings">
+          <img src={ICON.settings} alt="" />
         </button>
       </nav>
 
@@ -388,6 +406,7 @@ export default function GameShell() {
       />
       <UpgradeSheet open={sheet === 'upgrade'} state={state} onClose={closeSheet} onUpgrade={upgrade} onKing={upgradeKing} />
       <CodexSheet open={sheet === 'codex'} state={state} onClose={closeSheet} />
+      <SettingsSheet open={sheet === 'settings'} state={state} onClose={closeSheet} onReset={resetGame} />
 
       <ResultPanel
         open={resultOpen}

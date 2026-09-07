@@ -1,13 +1,13 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { RoomSlot } from '../../game/types';
 import { TRAPS } from '../../game/content/traps';
 import { MONSTERS } from '../../game/content/monsters';
 import { TREASURES } from '../../game/content/treasure';
 import { HEROES } from '../../game/content/heroes';
 import { INTERACTIONS } from '../../game/content/interactions';
-import { STAGES } from '../../game/content/stages';
+import { STAGES, STAGE_MAX, unlockStageOf } from '../../game/content/stages';
 import { MAX_PER_ID } from '../../game/types';
 import { kingSoulCost, unlockSoulCost, upgradeCost } from '../../game/state/economy';
 import { idCounts, type GameState } from '../../game/state/save';
@@ -37,20 +37,13 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
   );
 }
 
-function unlockStage(id: string): number {
-  for (const s of STAGES) {
-    if (s.unlockTraps.includes(id) || s.unlockMonsters.includes(id) || s.unlockTreasure.includes(id)) return s.id;
-  }
-  return 1;
-}
-
 interface BuildProps {
   open: boolean;
   room: number;
   state: GameState;
   onClose: () => void;
   onPlace: (slot: RoomSlot) => void;
-  onBuy: (id: string, souls: number) => void;
+  onBuy: (id: string, goldCost: number) => void;
 }
 
 export function BuildSheet({ open, room, state, onClose, onPlace, onBuy }: BuildProps) {
@@ -80,7 +73,7 @@ export function BuildSheet({ open, room, state, onClose, onPlace, onBuy }: Build
           <div className="sheet-group">{g.label}</div>
           {g.items.map((item) => {
             const owned = state.unlocked.includes(item.id);
-            const souls = unlockSoulCost(item.goldCost);
+            const souls = unlockSoulCost(item.goldCost, unlockStageOf(item.id), state.stage);
             const lvl = state.levels[item.id] || 1;
             if (owned) {
               const used = elsewhere(item.id);
@@ -122,13 +115,13 @@ export function BuildSheet({ open, room, state, onClose, onPlace, onBuy }: Build
                 <img src={ICON.lock} alt="" />
                 <span className="row-body">
                   <span className="row-name">{item.name}</span>
-                  <span className="row-desc">Found on Stage {unlockStage(item.id)} — or buy it now with souls.</span>
+                  <span className="row-desc">Found on Stage {unlockStageOf(item.id)} — or buy it now with souls. The further ahead, the dearer.</span>
                 </span>
                 <span className={'row-cost' + (affordable ? '' : ' cant')}>
                   <img src={ICON.soul} alt="" />
                   {souls}
                 </span>
-                <button className="row-btn btn" disabled={!affordable} onClick={() => onBuy(item.id, souls)}>
+                <button className="row-btn btn" disabled={!affordable} onClick={() => onBuy(item.id, item.goldCost)}>
                   +
                 </button>
               </div>
@@ -205,15 +198,6 @@ export function UpgradeSheet({ open, state, onClose, onUpgrade, onKing }: Upgrad
         );
       })}
 
-      <div className="sheet-group">Record</div>
-      <div className="row inset">
-        <span className="row-body">
-          <span className="row-desc">
-            {state.stats.raids} raids &middot; {state.stats.defeated} heroes killed &middot; {state.stats.escaped} escaped &middot;{' '}
-            {state.stats.lost} breaches &middot; {state.stats.goldStolen}g stolen from you
-          </span>
-        </span>
-      </div>
     </Sheet>
   );
 }
@@ -300,6 +284,110 @@ export function CodexSheet({ open, state, onClose }: { open: boolean; state: Gam
           </span>
         </div>
       ))}
+    </Sheet>
+  );
+}
+
+interface SettingsProps {
+  open: boolean;
+  state: GameState;
+  onClose: () => void;
+  onReset: () => void;
+}
+
+const STATS: { label: string; value: (s: GameState) => string }[] = [
+  { label: 'Raids run', value: (s) => String(s.stats.raids) },
+  { label: 'Heroes killed', value: (s) => String(s.stats.defeated) },
+  { label: 'Heroes escaped', value: (s) => String(s.stats.escaped) },
+  { label: 'Dungeon breached', value: (s) => String(s.stats.lost) },
+  { label: 'Gold earned', value: (s) => `${s.stats.goldEarned}g` },
+  { label: 'Gold stolen from you', value: (s) => `${s.stats.goldStolen}g` },
+  { label: 'Stages cleared', value: (s) => `${s.maxStageCleared}/${STAGE_MAX}` },
+  { label: 'Best arcade wave', value: (s) => String(s.bestWave) },
+  { label: 'King level', value: (s) => `Lv${s.kingLevel}` },
+  { label: 'Veterans remembered', value: (s) => String(s.roster.length) }
+];
+
+export function SettingsSheet({ open, state, onClose, onReset }: SettingsProps) {
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    if (!open) setArmed(false);
+  }, [open]);
+
+  return (
+    <Sheet open={open} title="Settings" onClose={onClose}>
+      <div className="sheet-group">Records</div>
+      <div className="row inset stats">
+        <span className="row-body">
+          {STATS.map((s) => (
+            <span className="stat" key={s.label}>
+              <span className="stat-label">{s.label}</span>
+              <span className="stat-value">{s.value(state)}</span>
+            </span>
+          ))}
+        </span>
+      </div>
+
+      <div className="sheet-group">Language</div>
+      <div className="row inset">
+        <span className="row-body">
+          <span className="row-name">Language</span>
+          <span className="row-desc">More to come.</span>
+        </span>
+        <select className="picker btn" value="en" onChange={() => undefined} aria-label="Language">
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <div className="sheet-group">Danger</div>
+      <div className={'row ' + (armed ? 'danger' : 'inset')}>
+        <span className="row-body">
+          <span className="row-name">Reset Game</span>
+          <span className="row-desc">
+            {armed
+              ? 'Erases everything — dungeon, gold, souls, unlocks, stages, heroes. No undo.'
+              : 'Permanently deletes all player data and starts over.'}
+          </span>
+        </span>
+        {armed ? (
+          <>
+            <button className="row-btn btn" onClick={() => setArmed(false)}>
+              No
+            </button>
+            <button className="row-btn btn wipe" onClick={onReset}>
+              Erase
+            </button>
+          </>
+        ) : (
+          <button className="row-btn btn warn" onClick={() => setArmed(true)}>
+            Reset
+          </button>
+        )}
+      </div>
+
+      <div className="sheet-group">Credits</div>
+      <div className="row inset">
+        <span className="row-body">
+          <span className="row-name">Created by xanaksetan</span>
+          <span className="row-desc">Own a Dungeon — built as a mobile-first browser game.</span>
+        </span>
+      </div>
+      <a className="row inset link" href="https://www.instagram.com/xanaksetan" target="_blank" rel="noopener noreferrer">
+        <span className="row-body">
+          <span className="row-name">Instagram</span>
+          <span className="row-desc">@xanaksetan</span>
+        </span>
+        <span className="row-count">&#8599;</span>
+      </a>
+      <a className="row inset link" href="https://github.com/irwanasas" target="_blank" rel="noopener noreferrer">
+        <span className="row-body">
+          <span className="row-name">GitHub</span>
+          <span className="row-desc">github.com/irwanasas</span>
+        </span>
+        <span className="row-count">&#8599;</span>
+      </a>
+      <div className="copyright">All Rights Reserved 2026</div>
     </Sheet>
   );
 }

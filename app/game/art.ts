@@ -56,5 +56,6 @@ export const ICON = {
   codex: art('icon-codex.png'),
   king: art('icon-king.png'),
   clear: art('icon-clear.png'),
-  lock: art('icon-lock.png')
+  lock: art('icon-lock.png'),
+  settings: art('icon-settings.png')
 };
