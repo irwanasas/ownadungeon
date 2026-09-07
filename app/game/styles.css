@@ -930,12 +930,14 @@ img {
   font-size: 9px;
 }
 .row-desc {
+  display: block;
   font-size: 10.5px;
   color: var(--muted);
   line-height: 1.32;
   margin-top: 2px;
 }
 .row-hint {
+  display: block;
   font-size: 10px;
   color: var(--moss-lit);
   margin-top: 3px;
@@ -1048,6 +1050,68 @@ a.row.link {
   font-size: 9px;
   color: var(--muted);
   padding: 14px 0 6px;
+}
+
+.tone-tag {
+  font-family: var(--pixel);
+  font-size: 8px;
+  text-transform: uppercase;
+  padding: 2px 4px;
+  background: rgba(120, 150, 160, 0.16);
+  color: var(--stone-lit);
+  flex-shrink: 0;
+}
+.tone-tag.good {
+  color: var(--moss-lit);
+  background: rgba(86, 168, 118, 0.16);
+}
+.tone-tag.bad {
+  color: var(--ember-lit);
+  background: rgba(226, 96, 52, 0.16);
+}
+
+.row-name {
+  flex-wrap: wrap;
+}
+.row-hint.quiet {
+  color: var(--muted);
+}
+.row-count-sub {
+  display: block;
+  font-size: 7px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tab-icon {
+  position: relative;
+}
+.tab-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: var(--ember-lit);
+  box-shadow: 0 0 8px rgba(252, 166, 84, 0.9);
+}
+.tab-dot.live {
+  background: var(--gold-lit);
+  box-shadow: 0 0 8px rgba(246, 214, 122, 0.9);
+}
+
+.news {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--bone);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 7px 9px;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .modal {

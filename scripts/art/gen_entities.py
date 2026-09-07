@@ -308,6 +308,17 @@ def icon_clear(d, im):
     d.line([18, 5, 5, 18], fill=rgba('stone_lit'), width=3)
 
 
+def icon_world(d, im):
+    d.polygon([(3, 9), (17, 3), (17, 15), (3, 13)], fill=rgba('gold'))
+    d.polygon([(5, 9), (15, 5), (15, 13), (5, 12)], fill=rgba('gold_lit'))
+    d.ellipse([15, 2, 22, 16], fill=rgba('gold'))
+    d.ellipse([17, 5, 21, 13], fill=(30, 22, 10, 255))
+    d.rectangle([2, 8, 4, 14], fill=rgba('stone_lit'))
+    d.rectangle([2, 13, 4, 22], fill=rgba('wood'))
+    d.rectangle([6, 16, 8, 18], fill=rgba('ember_lit'))
+    d.rectangle([9, 18, 11, 20], fill=rgba('ember'))
+
+
 def icon_settings(d, im):
     import math
     for i in range(8):
@@ -357,7 +368,8 @@ SPRITES = {
     'icon-king': icon_king,
     'icon-clear': icon_clear,
     'icon-lock': icon_lock,
-    'icon-settings': icon_settings
+    'icon-settings': icon_settings,
+    'icon-world': icon_world
 }
 
 

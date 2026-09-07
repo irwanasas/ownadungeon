@@ -61,6 +61,21 @@ Heroes are named, persist between raids, gain levels, and come back scarred:
 die to poison once and Sir William returns poison-resistant. Your dungeon
 teaches them.
 
+## The world above
+
+Every few raids a herald brings news — rumours, wars, plagues, discoveries,
+festivals. Roughly half is pure flavour. The rest bends the rules for two to
+four raids: a war drills warriors harder, a drought makes fire bite deeper, a
+pilgrim season fattens the soul take. Some events lead to others, so a border
+skirmish can become a war and then an exhausted levy that sends mages instead.
+
+Effects are visible on the World tab before you press RAID, at most two run at
+once, and every multiplier is clamped. They are meant to change what the right
+dungeon looks like this week, not to be survived passively.
+
+Adding an event is a data change — one entry in `game/content/worldEvents.ts`.
+Everything else reads a single resolved object from `worldModifiers()`.
+
 ## Modes
 
 - **Stage** — 20 handcrafted stages, each introducing exactly one idea.

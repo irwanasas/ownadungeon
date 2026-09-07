@@ -10,13 +10,16 @@ export function newHero(defId: string, level: number, rng: Rng): HeroRecord {
   return { uid: makeUid(), defId, name, title, level: Math.max(1, level), raids: 0, deaths: 0, scars: [] };
 }
 
-export function pickRaider(roster: HeroRecord[], pool: string[], level: number, rng: Rng): HeroRecord {
-  const veterans = roster.filter((h) => pool.includes(h.defId));
+export function pickRaider(roster: HeroRecord[], pool: string[], level: number, rng: Rng, bias: string[] = []): HeroRecord {
+  const favoured = bias.filter((id) => pool.includes(id));
+  const draw = favoured.length > 0 && rng() < 0.6 ? favoured : pool;
+
+  const veterans = roster.filter((h) => draw.includes(h.defId));
   if (veterans.length > 0 && rng() < 0.55) {
     const chosen = veterans[Math.floor(rng() * veterans.length) % veterans.length];
     return { ...chosen, level: Math.max(chosen.level, level) };
   }
-  const defId = pool[Math.floor(rng() * pool.length) % pool.length] || 'paladin';
+  const defId = draw[Math.floor(rng() * draw.length) % draw.length] || 'paladin';
   return newHero(defId, level, rng);
 }
 

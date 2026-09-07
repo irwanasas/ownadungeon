@@ -1,24 +1,27 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { HeroRecord, RaidResult, RoomSlot } from '../../game/types';
+import type { HeroRecord, RaidResult, RoomSlot, WorldEvent } from '../../game/types';
 import { EDITABLE_ROOMS } from '../../game/types';
 import { HEROES } from '../../game/content/heroes';
 import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
 import { toDungeon, unlockSoulCost } from '../../game/state/economy';
+import { effectCount, tickWorld, worldModifiers } from '../../game/state/world';
 import { canPlace, defaultState, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
 import { absorbResult, pickRaider, returningNote } from '../../game/state/roster';
 import { simulateRaid } from '../../game/sim/raid';
 import { offlineReport, type OfflineReport } from '../../game/sim/offline';
 import { systemRng } from '../../game/sim/rng';
 import DungeonView from './DungeonView';
-import { BuildSheet, CodexSheet, SettingsSheet, UpgradeSheet } from './panels';
+import { BuildSheet, CodexSheet, SettingsSheet, UpgradeSheet, WorldSheet } from './panels';
 import { Coach, HeroTeaser, OfflinePanel, ResultPanel, TUTORIAL } from './overlays';
 import { ICON, artVars, contentArt, heroArt } from './art';
 import { CELL, useRaidDirector } from './useRaidDirector';
 import { play as sfx, startAmbient } from './audio';
 
-type SheetKind = 'build' | 'upgrade' | 'codex' | 'settings' | null;
+const MIN_WORLD_STAGE = 3;
+
+type SheetKind = 'build' | 'upgrade' | 'codex' | 'settings' | 'world' | null;
 
 export default function GameShell() {
   const [state, setState] = useState<GameState | null>(null);
@@ -30,6 +33,7 @@ export default function GameShell() {
   const [stageCleared, setStageCleared] = useState(false);
   const [offline, setOffline] = useState<OfflineReport | null>(null);
   const [justPlaced, setJustPlaced] = useState(-1);
+  const [news, setNews] = useState<WorldEvent | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const { view, play, speed, setSpeed } = useRaidDirector(scrollRef);
@@ -66,7 +70,7 @@ export default function GameShell() {
     if (report) setOffline(report);
     setState(next);
     saveState(next);
-    setRaider(pickRaider(next.roster, heroPool(next), stageDef(next.stage).heroLevel, systemRng));
+    setRaider(pickRaider(next.roster, heroPool(next), stageDef(next.stage).heroLevel, systemRng, worldModifiers(next.world).heroBias));
   }, [applyOffline, heroPool]);
 
   useEffect(() => {
@@ -178,7 +182,7 @@ export default function GameShell() {
     if (busy || !state) return;
     update((s) => ({ ...s, mode }));
     const nextPool = mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(state.stage).heroPool;
-    setRaider(pickRaider(state.roster, nextPool, stageDef(state.stage).heroLevel, systemRng));
+    setRaider(pickRaider(state.roster, nextPool, stageDef(state.stage).heroLevel, systemRng, worldModifiers(state.world).heroBias));
     sfx('tap');
   }
 
@@ -187,6 +191,7 @@ export default function GameShell() {
     setSheet(kind);
     sfx('tap');
     if (kind === 'upgrade' && state && state.tutorial === 4) advanceTutorial(4);
+    if (kind === 'world') update((s) => (s.world.unread === 0 ? s : { ...s, world: { ...s.world, unread: 0 } }));
   }
 
   async function startRaid() {
@@ -198,14 +203,20 @@ export default function GameShell() {
     const heroLevel = state.mode === 'arcade' ? 1 + Math.floor((state.wave - 1) / 2) : stage.heroLevel;
     const record: HeroRecord = { ...raider, level: Math.max(raider.level, heroLevel) };
     const kingLevel = state.mode === 'arcade' ? state.kingLevel + Math.floor(state.wave / 4) : Math.max(state.kingLevel, stage.kingLevel);
-    const raidResult = simulateRaid({ ...toDungeon(state), kingLevel }, record, tier);
+    const raidResult = simulateRaid({ ...toDungeon(state), kingLevel }, record, tier, {
+      world: worldModifiers(state.world)
+    });
 
     await play(raidResult, heroArt(record.defId));
 
-    let cleared = false;
+    const turned = tickWorld(state.world, state.mode === 'arcade' ? MIN_WORLD_STAGE : state.stage, systemRng);
+    const cleared =
+      state.mode === 'stage' && raidResult.outcome === 'dungeonWin' && state.stage > state.maxStageCleared;
+
     update((s) => {
       const next: GameState = {
         ...s,
+        world: turned.world,
         gold: s.gold + raidResult.gold,
         souls: s.souls + raidResult.souls,
         roster: absorbResult(s.roster, record, raidResult),
@@ -221,7 +232,6 @@ export default function GameShell() {
       };
       if (s.mode === 'stage') {
         if (raidResult.outcome === 'dungeonWin') {
-          cleared = s.stage > s.maxStageCleared;
           next.maxStageCleared = Math.max(s.maxStageCleared, s.stage);
           if (s.stage < STAGE_MAX) next.stage = s.stage + 1;
           next.unlocked = [...new Set([...unlockedFor(next.stage), ...next.bought])];
@@ -237,6 +247,7 @@ export default function GameShell() {
 
     setResult(raidResult);
     setStageCleared(cleared);
+    setNews(turned.fired);
     setResultOpen(true);
   }
 
@@ -246,7 +257,15 @@ export default function GameShell() {
     setState((s) => {
       if (!s) return s;
       if (s.tutorial === 3) advanceTutorial(3);
-      setRaider(pickRaider(s.roster, s.mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(s.stage).heroPool, stageDef(s.stage).heroLevel, systemRng));
+      setRaider(
+        pickRaider(
+          s.roster,
+          s.mode === 'arcade' ? HEROES.map((h) => h.id) : stageDef(s.stage).heroPool,
+          stageDef(s.stage).heroLevel,
+          systemRng,
+          worldModifiers(s.world).heroBias
+        )
+      );
       return s;
     });
   }
@@ -297,6 +316,12 @@ export default function GameShell() {
       </header>
 
       <nav className="tabs">
+        <button className="tab tab-icon btn" onClick={() => openSheet('world')} disabled={busy} aria-label="The World">
+          <img src={ICON.world} alt="" />
+          {(state.world.unread > 0 || effectCount(state.world) > 0) && (
+            <span className={'tab-dot' + (state.world.unread === 0 ? ' live' : '')} />
+          )}
+        </button>
         <button className={'tab btn' + (state.mode === 'stage' ? ' on' : '')} onClick={() => setMode('stage')} disabled={busy}>
           Stage
         </button>
@@ -406,6 +431,7 @@ export default function GameShell() {
       />
       <UpgradeSheet open={sheet === 'upgrade'} state={state} onClose={closeSheet} onUpgrade={upgrade} onKing={upgradeKing} />
       <CodexSheet open={sheet === 'codex'} state={state} onClose={closeSheet} />
+      <WorldSheet open={sheet === 'world'} state={state} onClose={closeSheet} />
       <SettingsSheet open={sheet === 'settings'} state={state} onClose={closeSheet} onReset={resetGame} />
 
       <ResultPanel
@@ -413,6 +439,7 @@ export default function GameShell() {
         result={result}
         stageCleared={stageCleared}
         nextBrief={stage.teaches}
+        news={news}
         onClose={closeResult}
       />
       <OfflinePanel report={offline} onClose={() => setOffline(null)} />

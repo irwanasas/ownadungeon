@@ -6,17 +6,20 @@ import type {
   RaidEvent,
   StatusKind,
   Tag,
-  TraitId
+  TraitId,
+  WorldModifiers
 } from '../types';
 import { heroDef } from '../content/heroes';
 import { statusDef } from '../content/statuses';
 import { findInteraction } from '../content/interactions';
 import type { Rng } from './rng';
 
-export function buildHero(record: HeroRecord): HeroInstance {
+export function buildHero(record: HeroRecord, world?: WorldModifiers): HeroInstance {
   const def = heroDef(record.defId);
   const lvl = Math.max(1, record.level);
-  const maxHp = Math.round(def.hp + (lvl - 1) * 9);
+  const hpMult = (world ? world.heroHp : 1) * (world && world.familyHp[def.family] ? (world.familyHp[def.family] as number) : 1);
+  const atkMult = (world ? world.heroAtk : 1) * (world && world.familyAtk[def.family] ? (world.familyAtk[def.family] as number) : 1);
+  const maxHp = Math.max(1, Math.round((def.hp + (lvl - 1) * 9) * hpMult));
   return {
     uid: record.uid,
     defId: def.id,
@@ -25,7 +28,7 @@ export function buildHero(record: HeroRecord): HeroInstance {
     level: lvl,
     hp: maxHp,
     maxHp,
-    atk: Math.round(def.atk + (lvl - 1) * 1.6),
+    atk: Math.max(1, Math.round((def.atk + (lvl - 1) * 1.6) * atkMult)),
     def: Math.round(def.def + (lvl - 1) * 0.5),
     scars: record.scars,
     status: [],

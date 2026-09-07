@@ -1,6 +1,7 @@
-import type { HeroRecord, RoomSlot } from '../types';
+import type { HeroRecord, RoomSlot, WorldState } from '../types';
 import { EDITABLE_ROOMS, MAX_PER_ID } from '../types';
 import { STAGES } from '../content/stages';
+import { defaultWorld, normalizeWorld } from './world';
 
 export interface GameStats {
   raids: number;
@@ -28,6 +29,7 @@ export interface GameState {
   roster: HeroRecord[];
   tutorial: number;
   lastSeenAt: number;
+  world: WorldState;
 }
 
 const KEY = 'own_a_dungeon_v1';
@@ -92,7 +94,8 @@ export function defaultState(): GameState {
     stats: { raids: 0, defeated: 0, escaped: 0, lost: 0, goldEarned: 0, goldStolen: 0 },
     roster: [],
     tutorial: 0,
-    lastSeenAt: Date.now()
+    lastSeenAt: Date.now(),
+    world: defaultWorld()
   };
 }
 
@@ -105,7 +108,8 @@ export function normalize(input: Partial<GameState> | null): GameState {
     stats: { ...base.stats, ...(input.stats || {}) },
     levels: { ...(input.levels || {}) },
     roster: Array.isArray(input.roster) ? input.roster : [],
-    bought: Array.isArray(input.bought) ? input.bought : []
+    bought: Array.isArray(input.bought) ? input.bought : [],
+    world: normalizeWorld(input.world)
   };
   const rooms = Array.isArray(input.rooms) ? input.rooms.slice(0, EDITABLE_ROOMS) : [];
   while (rooms.length < EDITABLE_ROOMS) rooms.push({ kind: 'empty' });

@@ -52,10 +52,12 @@ export interface HeroAbility {
   blurb: string;
 }
 
+export type HeroFamily = 'warrior' | 'rogue' | 'mage';
+
 export interface HeroDef {
   id: string;
   name: string;
-  family: 'warrior' | 'rogue' | 'mage';
+  family: HeroFamily;
   role: string;
   color: string;
   hp: number;
@@ -236,6 +238,70 @@ export interface RaidResult {
   hero: HeroSnapshot;
   killedByTag: Tag | null;
   survived: boolean;
+}
+
+export type EventCategory =
+  | 'rumor'
+  | 'news'
+  | 'politics'
+  | 'war'
+  | 'disaster'
+  | 'discovery'
+  | 'celebration';
+
+export type EventTone = 'good' | 'neutral' | 'bad';
+
+export interface WorldEffect {
+  heroAtk?: number;
+  heroHp?: number;
+  familyAtk?: Partial<Record<HeroFamily, number>>;
+  familyHp?: Partial<Record<HeroFamily, number>>;
+  monsterAtk?: number;
+  monsterHp?: number;
+  trapDamage?: number;
+  tagDamage?: Partial<Record<Tag, number>>;
+  gold?: number;
+  souls?: number;
+  heroBias?: string[];
+}
+
+export interface WorldEvent {
+  id: string;
+  headline: string;
+  body: string;
+  category: EventCategory;
+  tone: EventTone;
+  duration: number;
+  effect?: WorldEffect;
+  leadsTo?: { id: string; chance: number }[];
+  minStage?: number;
+}
+
+export interface ActiveEvent {
+  id: string;
+  raidsLeft: number;
+}
+
+export interface WorldState {
+  active: ActiveEvent[];
+  queued: string[];
+  history: string[];
+  nextIn: number;
+  unread: number;
+}
+
+export interface WorldModifiers {
+  heroAtk: number;
+  heroHp: number;
+  familyAtk: Partial<Record<HeroFamily, number>>;
+  familyHp: Partial<Record<HeroFamily, number>>;
+  monsterAtk: number;
+  monsterHp: number;
+  trapDamage: number;
+  tagDamage: Partial<Record<Tag, number>>;
+  gold: number;
+  souls: number;
+  heroBias: string[];
 }
 
 export const EDITABLE_ROOMS = 5;

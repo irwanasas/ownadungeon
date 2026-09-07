@@ -1,6 +1,6 @@
 'use client';
 
-import type { Outcome, RaidResult, RoomKind } from '../../game/types';
+import type { Outcome, RaidResult, RoomKind, WorldEvent } from '../../game/types';
 import { heroDef } from '../../game/content/heroes';
 import { monsterDef } from '../../game/content/monsters';
 import { trapDef } from '../../game/content/traps';
@@ -69,10 +69,11 @@ interface ResultProps {
   result: RaidResult | null;
   stageCleared: boolean;
   nextBrief: string | null;
+  news: WorldEvent | null;
   onClose: () => void;
 }
 
-export function ResultPanel({ open, result, stageCleared, nextBrief, onClose }: ResultProps) {
+export function ResultPanel({ open, result, stageCleared, nextBrief, news, onClose }: ResultProps) {
   const copy = result ? OUTCOME_COPY[result.outcome] : null;
   return (
     <>
@@ -87,6 +88,12 @@ export function ResultPanel({ open, result, stageCleared, nextBrief, onClose }: 
                 <li key={i}>{l}</li>
               ))}
             </ul>
+            {news && (
+              <div className="news">
+                <span className={'tone-tag ' + news.tone}>{news.category}</span>
+                <span>{news.headline}</span>
+              </div>
+            )}
             <div className="rewards">
               <span className="reward">
                 <img src={ICON.gold} alt="" />+{result.gold}

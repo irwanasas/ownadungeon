@@ -8,7 +8,8 @@ import type {
   RaidEvent,
   RaidResult,
   StatusKind,
-  Tag
+  Tag,
+  WorldModifiers
 } from '../types';
 import { EDITABLE_ROOMS } from '../types';
 import { heroDef } from '../content/heroes';
@@ -16,6 +17,7 @@ import { monsterDef, KING } from '../content/monsters';
 import { trapDef } from '../content/traps';
 import { treasureDef } from '../content/treasure';
 import { raidRewards } from '../state/economy';
+import { noWorld } from '../state/world';
 import {
   advanceStatuses,
   atkMultOf,
@@ -51,16 +53,16 @@ interface Enemy {
   source: 'monster' | 'king';
 }
 
-function monsterEnemy(def: MonsterDef, level: number): Enemy {
+function monsterEnemy(def: MonsterDef, level: number, world: WorldModifiers): Enemy {
   const lvl = Math.max(1, level);
-  const hp = Math.round(def.hp + (lvl - 1) * def.hpPerLevel);
+  const hp = Math.max(1, Math.round((def.hp + (lvl - 1) * def.hpPerLevel) * world.monsterHp));
   return {
     id: def.id,
     name: def.name,
     tag: def.tag,
     hp,
     maxHp: hp,
-    atk: Math.round(def.atk + (lvl - 1) * def.atkPerLevel),
+    atk: Math.max(1, Math.round((def.atk + (lvl - 1) * def.atkPerLevel) * world.monsterAtk)),
     def: def.def,
     hitsPerRound: def.hitsPerRound,
     cadence: def.cadence,
@@ -74,16 +76,16 @@ function monsterEnemy(def: MonsterDef, level: number): Enemy {
   };
 }
 
-function kingEnemy(level: number): Enemy {
+function kingEnemy(level: number, world: WorldModifiers): Enemy {
   const lvl = Math.max(1, level);
-  const hp = Math.round(KING.hp + (lvl - 1) * KING.hpPerLevel);
+  const hp = Math.max(1, Math.round((KING.hp + (lvl - 1) * KING.hpPerLevel) * world.monsterHp));
   return {
     id: 'king',
     name: 'The King',
     tag: 'physical',
     hp,
     maxHp: hp,
-    atk: Math.round(KING.atk + (lvl - 1) * KING.atkPerLevel),
+    atk: Math.max(1, Math.round((KING.atk + (lvl - 1) * KING.atkPerLevel) * world.monsterAtk)),
     def: Math.round(KING.def + (lvl - 1) * KING.defPerLevel),
     hitsPerRound: KING.hitsPerRound,
     cadence: 1,
@@ -103,13 +105,18 @@ interface Ctx {
   rng: Rng;
   out: RaidEvent[];
   killedByTag: Tag | null;
+  world: WorldModifiers;
+}
+
+function tagMult(world: WorldModifiers, tag: Tag): number {
+  return world.tagDamage[tag] || 1;
 }
 
 function enemyTurn(ctx: Ctx, enemy: Enemy): void {
   ctx.out.push({ t: 'enemyWindup', ranged: enemy.ranged });
   for (let hit = 0; hit < enemy.hitsPerRound; hit++) {
     const armour = ctx.hero.def * defMultOf(ctx.hero) * (1 - enemy.defPierce);
-    const raw = Math.max(1, enemy.atk - armour * 0.5);
+    const raw = Math.max(1, enemy.atk - armour * 0.5) * tagMult(ctx.world, enemy.tag);
     const res = resolveHit(
       ctx.hero,
       ctx.def,
@@ -188,15 +195,17 @@ function fight(ctx: Ctx, enemy: Enemy): { heroDied: boolean; enemyDied: boolean 
 export interface RaidOptions {
   rng?: Rng;
   collectEvents?: boolean;
+  world?: WorldModifiers;
 }
 
 export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number, options: RaidOptions = {}): RaidResult {
   const rng = options.rng || systemRng;
   const collect = options.collectEvents !== false;
-  const hero = buildHero(record);
+  const world = options.world || noWorld();
+  const hero = buildHero(record, world);
   const def = heroDef(record.defId);
   const events: RaidEvent[] = [];
-  const ctx: Ctx = { hero, def, rng, out: events, killedByTag: null };
+  const ctx: Ctx = { hero, def, rng, out: events, killedByTag: null, world };
 
   const start = snapshot(hero);
   events.push({ t: 'raidStart', hero: start });
@@ -225,7 +234,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
 
     if (slot.kind === 'monster') {
       const md = monsterDef(slot.id);
-      const enemy = monsterEnemy(md, built.level);
+      const enemy = monsterEnemy(md, built.level, world);
       events.push({ t: 'monsterAppear', monsterId: md.id, hp: enemy.hp, maxHp: enemy.maxHp });
       events.push({ t: 'reaction', kind: 'surprise' });
       const res = fight(ctx, enemy);
@@ -249,7 +258,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
           events.push({ t: 'reaction', kind: 'relief' });
         } else {
           events.push({ t: 'trapFire', trapId: td.id, disarmed: false });
-          const amount = td.damage + (built.level - 1) * td.dmgPerLevel;
+          const amount = (td.damage + (built.level - 1) * td.dmgPerLevel) * world.trapDamage * tagMult(world, td.tag);
           const res = resolveHit(
             hero,
             def,
@@ -311,7 +320,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
       outcome = 'heroEscape';
     } else {
       roomsEntered += 1;
-      const king = kingEnemy(dungeon.kingLevel);
+      const king = kingEnemy(dungeon.kingLevel, world);
       events.push({ t: 'enterRoom', room: EDITABLE_ROOMS, kind: 'throne', contentId: 'king' });
       events.push({ t: 'doorOpen', room: EDITABLE_ROOMS });
       events.push({ t: 'kingAppear', level: dungeon.kingLevel, hp: king.hp, maxHp: king.maxHp });
@@ -332,7 +341,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
   }
 
   const survived = outcome !== 'dungeonWin';
-  const base = raidRewards(outcome, roomsEntered, tier);
+  const base = raidRewards(outcome, roomsEntered, tier, world);
   const goldStolen = survived ? hero.looted : 0;
   const gold = Math.max(0, base.gold - goldStolen);
 
