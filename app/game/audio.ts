@@ -16,7 +16,7 @@ export type Cue =
   | 'win'
   | 'lose'
   | 'escape'
-  | 'king';
+  | 'lord';
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
@@ -151,7 +151,7 @@ export function play(cue: Cue): void {
     case 'escape':
       [523, 440, 392].forEach((f, i) => tone(f, 0.2, 'sine', 0.08, undefined, i * 0.1));
       break;
-    case 'king':
+    case 'lord':
       [131, 165, 196].forEach((f, i) => tone(f, 0.7, 'sawtooth', 0.1, undefined, i * 0.16));
       break;
   }

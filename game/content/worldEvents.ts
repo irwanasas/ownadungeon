@@ -28,7 +28,7 @@ export const WORLD_EVENTS: WorldEvent[] = [
   {
     id: 'king-cough',
     headline: 'The Old King Is Coughing',
-    body: 'Not your King. The other one, above ground, with the throne nobody has to fight for.',
+    body: 'Not yours. The other one, above ground, with the throne nobody has to fight for.',
     category: 'news',
     tone: 'neutral',
     duration: 3

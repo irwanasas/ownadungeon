@@ -141,7 +141,7 @@ export interface BuiltRoom {
 
 export interface Dungeon {
   rooms: BuiltRoom[];
-  kingLevel: number;
+  lordLevel: number;
 }
 
 export interface StageDef {
@@ -152,7 +152,7 @@ export interface StageDef {
   unlockTraps: string[];
   unlockMonsters: string[];
   unlockTreasure: string[];
-  kingLevel: number;
+  lordLevel: number;
   heroLevel: number;
 }
 
@@ -214,7 +214,7 @@ export type RaidEvent =
   | { t: 'enemyWindup'; ranged: boolean }
   | { t: 'ability'; id: string; name: string }
   | { t: 'interaction'; id: string; name: string; hint: string }
-  | { t: 'damage'; source: 'trap' | 'monster' | 'king'; tag: Tag; dmg: number; evaded: boolean; heroHp: number; heroMaxHp: number }
+  | { t: 'damage'; source: 'trap' | 'monster' | 'lord'; tag: Tag; dmg: number; evaded: boolean; heroHp: number; heroMaxHp: number }
   | { t: 'heal'; amount: number; heroHp: number }
   | { t: 'statusOn'; kind: StatusKind }
   | { t: 'statusOff'; kind: StatusKind }
@@ -222,7 +222,7 @@ export type RaidEvent =
   | { t: 'monsterDown'; monsterId: string }
   | { t: 'roomClear'; room: number }
   | { t: 'treasureTaken'; treasureId: string; gold: number }
-  | { t: 'kingAppear'; level: number; hp: number; maxHp: number }
+  | { t: 'lordAppear'; level: number; hp: number; maxHp: number }
   | { t: 'reaction'; kind: ReactionKind }
   | { t: 'heroDown' }
   | { t: 'heroFlee'; fromRoom: number }

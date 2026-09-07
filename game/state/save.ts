@@ -20,7 +20,7 @@ export interface GameState {
   maxStageCleared: number;
   wave: number;
   bestWave: number;
-  kingLevel: number;
+  lordLevel: number;
   rooms: RoomSlot[];
   levels: Record<string, number>;
   unlocked: string[];
@@ -86,7 +86,7 @@ export function defaultState(): GameState {
     maxStageCleared: 0,
     wave: 1,
     bestWave: 0,
-    kingLevel: 1,
+    lordLevel: 1,
     rooms: emptyRooms(),
     levels: {},
     unlocked: unlockedFor(1),
@@ -99,17 +99,20 @@ export function defaultState(): GameState {
   };
 }
 
-export function normalize(input: Partial<GameState> | null): GameState {
+export function normalize(input: (Partial<GameState> & { kingLevel?: number }) | null): GameState {
   const base = defaultState();
   if (!input) return base;
+  const { kingLevel, ...saved } = input;
   const merged: GameState = {
     ...base,
-    ...input,
+    ...saved,
     stats: { ...base.stats, ...(input.stats || {}) },
     levels: { ...(input.levels || {}) },
     roster: Array.isArray(input.roster) ? input.roster : [],
     bought: Array.isArray(input.bought) ? input.bought : [],
-    world: normalizeWorld(input.world)
+    world: normalizeWorld(input.world),
+    lordLevel:
+      typeof saved.lordLevel === 'number' ? saved.lordLevel : typeof kingLevel === 'number' ? kingLevel : base.lordLevel
   };
   const rooms = Array.isArray(input.rooms) ? input.rooms.slice(0, EDITABLE_ROOMS) : [];
   while (rooms.length < EDITABLE_ROOMS) rooms.push({ kind: 'empty' });

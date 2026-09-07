@@ -5,6 +5,7 @@ import type { HeroRecord, RaidResult, RoomSlot, WorldEvent } from '../../game/ty
 import { EDITABLE_ROOMS } from '../../game/types';
 import { HEROES } from '../../game/content/heroes';
 import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
+import { LORD } from '../../game/content/monsters';
 import { toDungeon, unlockSoulCost } from '../../game/state/economy';
 import { effectCount, tickWorld, worldModifiers } from '../../game/state/world';
 import { canPlace, defaultState, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
@@ -173,9 +174,9 @@ export default function GameShell() {
     sfx('place');
   }
 
-  function upgradeKing(souls: number) {
-    update((s) => (s.souls < souls ? s : { ...s, souls: s.souls - souls, kingLevel: s.kingLevel + 1 }));
-    sfx('king');
+  function upgradeLord(souls: number) {
+    update((s) => (s.souls < souls ? s : { ...s, souls: s.souls - souls, lordLevel: s.lordLevel + 1 }));
+    sfx('lord');
   }
 
   function setMode(mode: 'stage' | 'arcade') {
@@ -202,8 +203,8 @@ export default function GameShell() {
 
     const heroLevel = state.mode === 'arcade' ? 1 + Math.floor((state.wave - 1) / 2) : stage.heroLevel;
     const record: HeroRecord = { ...raider, level: Math.max(raider.level, heroLevel) };
-    const kingLevel = state.mode === 'arcade' ? state.kingLevel + Math.floor(state.wave / 4) : Math.max(state.kingLevel, stage.kingLevel);
-    const raidResult = simulateRaid({ ...toDungeon(state), kingLevel }, record, tier, {
+    const lordLevel = state.mode === 'arcade' ? state.lordLevel + Math.floor(state.wave / 4) : Math.max(state.lordLevel, stage.lordLevel);
+    const raidResult = simulateRaid({ ...toDungeon(state), lordLevel }, record, tier, {
       world: worldModifiers(state.world)
     });
 
@@ -378,7 +379,7 @@ export default function GameShell() {
           }}
           aria-label="Throne Room"
         >
-          <img src={ICON.king} alt="" />
+          <img src={ICON.lord} alt="" />
         </button>
       </div>
 
@@ -392,7 +393,7 @@ export default function GameShell() {
           view.litRoom < 0
             ? 'At the entrance.'
             : view.litRoom >= EDITABLE_ROOMS
-              ? 'Throne Room — facing the King.'
+              ? `Throne Room — facing ${LORD.short}.`
               : `Room ${view.litRoom + 1} of ${EDITABLE_ROOMS}.`
         }
       />
@@ -429,7 +430,7 @@ export default function GameShell() {
         onPlace={place}
         onBuy={buyUnlock}
       />
-      <UpgradeSheet open={sheet === 'upgrade'} state={state} onClose={closeSheet} onUpgrade={upgrade} onKing={upgradeKing} />
+      <UpgradeSheet open={sheet === 'upgrade'} state={state} onClose={closeSheet} onUpgrade={upgrade} onLord={upgradeLord} />
       <CodexSheet open={sheet === 'codex'} state={state} onClose={closeSheet} />
       <WorldSheet open={sheet === 'world'} state={state} onClose={closeSheet} />
       <SettingsSheet open={sheet === 'settings'} state={state} onClose={closeSheet} onReset={resetGame} />

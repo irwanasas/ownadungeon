@@ -2,7 +2,7 @@
 
 import type { Outcome, RaidResult, RoomKind, WorldEvent } from '../../game/types';
 import { heroDef } from '../../game/content/heroes';
-import { monsterDef } from '../../game/content/monsters';
+import { LORD, monsterDef } from '../../game/content/monsters';
 import { trapDef } from '../../game/content/traps';
 import type { OfflineReport } from '../../game/sim/offline';
 import { ICON, heroArt } from './art';
@@ -20,7 +20,7 @@ const OUTCOME_COPY: Record<Outcome, { title: string; desc: string; cls: string }
   },
   heroVictory: {
     title: 'DUNGEON BREACHED',
-    desc: 'They cut through everything and put the King down. Rebuild.',
+    desc: `They cut through everything and put ${LORD.short} down. Rebuild.`,
     cls: 'loss'
   }
 };
@@ -46,7 +46,7 @@ export function summarize(result: RaidResult): string[] {
       lines.push(`${e.name} triggered — ${e.hint}`);
     }
     if (e.t === 'trapFire' && e.disarmed) lines.push(`Disarmed your ${trapDef(e.trapId).name} in room ${lastRoom + 1}.`);
-    if (e.t === 'monsterDown' && e.monsterId !== 'king') lines.push(`Your ${monsterDef(e.monsterId).name} fell in room ${lastRoom + 1}.`);
+    if (e.t === 'monsterDown' && e.monsterId !== 'lord') lines.push(`Your ${monsterDef(e.monsterId).name} fell in room ${lastRoom + 1}.`);
     if (e.t === 'treasureTaken') lines.push(`Pocketed ${e.gold} gold and kept walking.`);
     if (e.t === 'ability' && e.id === 'rage') lines.push('Went into a rage instead of dying quietly.');
   }
@@ -144,7 +144,7 @@ export function OfflinePanel({ report, onClose }: { report: OfflineReport | null
             <ul className="log">
               <li>{report.defeated} heroes died in your rooms.</li>
               <li>{report.escaped} turned back and ran.</li>
-              <li>{report.breached} reached the throne and beat the King.</li>
+              <li>{report.breached} reached the throne and beat {LORD.short}.</li>
               {report.goldStolen > 0 && <li>{report.goldStolen} gold walked out with them.</li>}
             </ul>
             <div className="rewards">

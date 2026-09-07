@@ -149,7 +149,7 @@ export function advanceStatuses(hero: HeroInstance, out: RaidEvent[]): void {
 export interface IncomingHit {
   amount: number;
   tag: Tag;
-  source: 'trap' | 'monster' | 'king';
+  source: 'trap' | 'monster' | 'lord';
   applies: { kind: StatusKind; rooms: number } | null;
   ignoreEvasion?: boolean;
 }

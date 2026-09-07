@@ -123,7 +123,7 @@ export default function DungeonView({
                   )}
                   {!view.raiding && isThrone && (
                     <div className="slot">
-                      <img src={ICON.king} alt="Throne" />
+                      <img src={ICON.lord} alt="Throne" />
                       <span className="slot-label">Throne</span>
                     </div>
                   )}

@@ -170,7 +170,7 @@ def mon_shadow(d, im):
     d.ellipse([15, 9, 16, 11], fill=(255, 236, 255, 255))
 
 
-def mon_king(d, im):
+def mon_lord(d, im):
     d.polygon([(4, 23), (4, 12), (12, 7), (20, 12), (20, 23)], fill=(64, 48, 92, 255))
     d.polygon([(6, 13), (12, 10), (18, 13), (18, 23), (6, 23)], fill=(92, 68, 130, 255))
     d.ellipse([8, 4, 16, 12], fill=(214, 186, 158, 255))
@@ -295,7 +295,7 @@ def icon_codex(d, im):
         d.rectangle([14, y, 18, y], fill=(120, 108, 88, 255))
 
 
-def icon_king(d, im):
+def icon_lord(d, im):
     d.polygon([(3, 19), (3, 6), (8, 11), (12, 3), (16, 11), (21, 6), (21, 19)], fill=rgba('gold'))
     d.rectangle([3, 19, 21, 22], fill=rgba('gold_lit'))
     d.ellipse([10, 7, 14, 11], fill=rgba('ember'))
@@ -350,7 +350,7 @@ SPRITES = {
     'monster-slime': mon_slime,
     'monster-ogre': mon_ogre,
     'monster-shadow': mon_shadow,
-    'monster-king': mon_king,
+    'monster-lord': mon_lord,
     'trap-spike': trap_spike,
     'trap-poison': trap_poison,
     'trap-oil': trap_oil,
@@ -365,7 +365,7 @@ SPRITES = {
     'icon-build': icon_build,
     'icon-upgrade': icon_upgrade,
     'icon-codex': icon_codex,
-    'icon-king': icon_king,
+    'icon-lord': icon_lord,
     'icon-clear': icon_clear,
     'icon-lock': icon_lock,
     'icon-settings': icon_settings,

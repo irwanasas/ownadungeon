@@ -3,7 +3,7 @@
 A mobile-first browser game. You do not play the hero — you own the dungeon
 they walk into.
 
-Build five rooms, leave the Throne Room to the King, press RAID, and watch an
+Build five rooms, leave the Throne Room to Nekrokos, press RAID, and watch an
 autonomous hero try to get through. They decide what to fight, what to loot,
 and when to run. You only get to decide what is waiting for them.
 
@@ -79,11 +79,11 @@ Everything else reads a single resolved object from `worldModifiers()`.
 ## Modes
 
 - **Stage** — 20 handcrafted stages, each introducing exactly one idea.
-- **Arcade** — endless waves, escalating hero and King levels, best-wave tracking.
+- **Arcade** — endless waves, escalating hero and Dungeon Lord levels, best-wave tracking.
 - **Offline** — the dungeon keeps working while you are away, up to 8 hours,
   simulated deterministically on return.
 
-Gold levels up what you own. Souls upgrade the King and buy content ahead of
+Gold levels up what you own. Souls upgrade the Dungeon Lord and buy content ahead of
 its stage gate — and the further ahead you reach, the dearer it gets, so
 impatience costs real souls rather than skipping the ladder for free.
 

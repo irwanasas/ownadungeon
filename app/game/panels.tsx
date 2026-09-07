@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { RoomSlot } from '../../game/types';
 import { TRAPS } from '../../game/content/traps';
-import { MONSTERS } from '../../game/content/monsters';
+import { LORD, MONSTERS } from '../../game/content/monsters';
 import { TREASURES } from '../../game/content/treasure';
 import { HEROES } from '../../game/content/heroes';
 import { INTERACTIONS } from '../../game/content/interactions';
@@ -11,7 +11,7 @@ import { STAGES, STAGE_MAX, unlockStageOf } from '../../game/content/stages';
 import { worldEvent } from '../../game/content/worldEvents';
 import { describeEffect, effectCount } from '../../game/state/world';
 import { MAX_PER_ID } from '../../game/types';
-import { kingSoulCost, unlockSoulCost, upgradeCost } from '../../game/state/economy';
+import { lordSoulCost, unlockSoulCost, upgradeCost } from '../../game/state/economy';
 import { idCounts, type GameState } from '../../game/state/save';
 import { ICON, contentArt, heroArt } from './art';
 
@@ -140,11 +140,11 @@ interface UpgradeProps {
   state: GameState;
   onClose: () => void;
   onUpgrade: (id: string, cost: number) => void;
-  onKing: (souls: number) => void;
+  onLord: (souls: number) => void;
 }
 
-export function UpgradeSheet({ open, state, onClose, onUpgrade, onKing }: UpgradeProps) {
-  const kingCost = kingSoulCost(state.kingLevel);
+export function UpgradeSheet({ open, state, onClose, onUpgrade, onLord }: UpgradeProps) {
+  const lordCost = lordSoulCost(state.lordLevel);
   const all = [
     ...TRAPS.map((t) => ({ ...t, kind: 'trap' as const })),
     ...MONSTERS.map((m) => ({ ...m, kind: 'monster' as const })),
@@ -154,18 +154,18 @@ export function UpgradeSheet({ open, state, onClose, onUpgrade, onKing }: Upgrad
   return (
     <Sheet open={open} title="Upgrade" onClose={onClose}>
       <div className="row plate">
-        <img src={ICON.king} alt="" />
+        <img src={ICON.lord} alt="" />
         <span className="row-body">
           <span className="row-name">
-            The King<span className="row-lvl">Lv{state.kingLevel}</span>
+            {LORD.name}<span className="row-lvl">Lv{state.lordLevel}</span>
           </span>
           <span className="row-desc">Your last line. More health, more damage, more armour in the Throne Room.</span>
         </span>
-        <span className={'row-cost' + (state.souls >= kingCost ? '' : ' cant')}>
+        <span className={'row-cost' + (state.souls >= lordCost ? '' : ' cant')}>
           <img src={ICON.soul} alt="" />
-          {kingCost}
+          {lordCost}
         </span>
-        <button className="row-btn btn" disabled={state.souls < kingCost} onClick={() => onKing(kingCost)}>
+        <button className="row-btn btn" disabled={state.souls < lordCost} onClick={() => onLord(lordCost)}>
           +
         </button>
       </div>
@@ -306,7 +306,7 @@ const STATS: { label: string; value: (s: GameState) => string }[] = [
   { label: 'Gold stolen from you', value: (s) => `${s.stats.goldStolen}g` },
   { label: 'Stages cleared', value: (s) => `${s.maxStageCleared}/${STAGE_MAX}` },
   { label: 'Best arcade wave', value: (s) => String(s.bestWave) },
-  { label: 'King level', value: (s) => `Lv${s.kingLevel}` },
+  { label: 'Dungeon Lord level', value: (s) => `Lv${s.lordLevel}` },
   { label: 'Veterans remembered', value: (s) => String(s.roster.length) }
 ];
 

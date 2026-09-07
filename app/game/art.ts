@@ -54,7 +54,7 @@ export const ICON = {
   build: art('icon-build.png'),
   upgrade: art('icon-upgrade.png'),
   codex: art('icon-codex.png'),
-  king: art('icon-king.png'),
+  lord: art('icon-lord.png'),
   clear: art('icon-clear.png'),
   lock: art('icon-lock.png'),
   settings: art('icon-settings.png'),

@@ -118,7 +118,9 @@ export function monsterDef(id: string): MonsterDef {
   return m || MONSTERS[0];
 }
 
-export const KING = {
+export const LORD = {
+  name: 'Nekrokos the Demon Lord',
+  short: 'Nekrokos',
   hp: 46,
   atk: 9,
   def: 3,

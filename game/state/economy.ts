@@ -4,7 +4,7 @@ export function upgradeCost(baseCost: number, level: number): number {
   return Math.round(baseCost * 1.8 * Math.pow(1.5, level - 1));
 }
 
-export function kingSoulCost(level: number): number {
+export function lordSoulCost(level: number): number {
   return Math.round(3 * Math.pow(1.35, level - 1));
 }
 
@@ -35,13 +35,13 @@ export function raidRewards(
 export function toDungeon(state: {
   rooms: import('../types').RoomSlot[];
   levels: Record<string, number>;
-  kingLevel: number;
+  lordLevel: number;
 }): import('../types').Dungeon {
   return {
     rooms: state.rooms.map((slot) => ({
       slot,
       level: slot.kind === 'empty' ? 1 : state.levels[slot.id] || 1
     })),
-    kingLevel: state.kingLevel
+    lordLevel: state.lordLevel
   };
 }

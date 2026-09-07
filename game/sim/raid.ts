@@ -13,7 +13,7 @@ import type {
 } from '../types';
 import { EDITABLE_ROOMS } from '../types';
 import { heroDef } from '../content/heroes';
-import { monsterDef, KING } from '../content/monsters';
+import { monsterDef, LORD } from '../content/monsters';
 import { trapDef } from '../content/traps';
 import { treasureDef } from '../content/treasure';
 import { raidRewards } from '../state/economy';
@@ -50,7 +50,7 @@ interface Enemy {
   splitAt: number;
   ranged: boolean;
   applies: { kind: StatusKind; rooms: number } | null;
-  source: 'monster' | 'king';
+  source: 'monster' | 'lord';
 }
 
 function monsterEnemy(def: MonsterDef, level: number, world: WorldModifiers): Enemy {
@@ -76,18 +76,18 @@ function monsterEnemy(def: MonsterDef, level: number, world: WorldModifiers): En
   };
 }
 
-function kingEnemy(level: number, world: WorldModifiers): Enemy {
+function lordEnemy(level: number, world: WorldModifiers): Enemy {
   const lvl = Math.max(1, level);
-  const hp = Math.max(1, Math.round((KING.hp + (lvl - 1) * KING.hpPerLevel) * world.monsterHp));
+  const hp = Math.max(1, Math.round((LORD.hp + (lvl - 1) * LORD.hpPerLevel) * world.monsterHp));
   return {
-    id: 'king',
-    name: 'The King',
+    id: 'lord',
+    name: LORD.name,
     tag: 'physical',
     hp,
     maxHp: hp,
-    atk: Math.max(1, Math.round((KING.atk + (lvl - 1) * KING.atkPerLevel) * world.monsterAtk)),
-    def: Math.round(KING.def + (lvl - 1) * KING.defPerLevel),
-    hitsPerRound: KING.hitsPerRound,
+    atk: Math.max(1, Math.round((LORD.atk + (lvl - 1) * LORD.atkPerLevel) * world.monsterAtk)),
+    def: Math.round(LORD.def + (lvl - 1) * LORD.defPerLevel),
+    hitsPerRound: LORD.hitsPerRound,
     cadence: 1,
     strikesFirst: false,
     defPierce: 0.15,
@@ -95,7 +95,7 @@ function kingEnemy(level: number, world: WorldModifiers): Enemy {
     splitAt: 0,
     ranged: false,
     applies: null,
-    source: 'king'
+    source: 'lord'
   };
 }
 
@@ -320,13 +320,13 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
       outcome = 'heroEscape';
     } else {
       roomsEntered += 1;
-      const king = kingEnemy(dungeon.kingLevel, world);
-      events.push({ t: 'enterRoom', room: EDITABLE_ROOMS, kind: 'throne', contentId: 'king' });
+      const lord = lordEnemy(dungeon.lordLevel, world);
+      events.push({ t: 'enterRoom', room: EDITABLE_ROOMS, kind: 'throne', contentId: 'lord' });
       events.push({ t: 'doorOpen', room: EDITABLE_ROOMS });
-      events.push({ t: 'kingAppear', level: dungeon.kingLevel, hp: king.hp, maxHp: king.maxHp });
+      events.push({ t: 'lordAppear', level: dungeon.lordLevel, hp: lord.hp, maxHp: lord.maxHp });
       events.push({ t: 'reaction', kind: 'surprise' });
 
-      const res = fight(ctx, king);
+      const res = fight(ctx, lord);
       if (res.heroDied) {
         events.push({ t: 'reaction', kind: 'dead' });
         events.push({ t: 'heroDown' });

@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { RaidEvent, RaidResult, StatusKind, Tag } from '../../game/types';
 import { statusDef } from '../../game/content/statuses';
+import { LORD } from '../../game/content/monsters';
 import { monsterArt } from './art';
 import { play as sfx } from './audio';
 
@@ -200,7 +201,7 @@ export function useRaidDirector(scrollRef: React.RefObject<HTMLDivElement | null
             break;
 
           case 'monsterAppear':
-            foeName = e.monsterId === 'king' ? 'The King' : e.monsterId;
+            foeName = e.monsterId === 'lord' ? LORD.name : e.monsterId;
             foeHp = e.hp;
             foeMax = e.maxHp;
             patch({ foe: { art: monsterArt(e.monsterId), x: foeX, cls: 'pop' } });
@@ -218,19 +219,19 @@ export function useRaidDirector(scrollRef: React.RefObject<HTMLDivElement | null
             await wait(560);
             break;
 
-          case 'kingAppear':
-            foeName = 'The King';
+          case 'lordAppear':
+            foeName = LORD.name;
             foeHp = e.hp;
             foeMax = e.maxHp;
             foeX = xOf(room, FOE_FRAC);
             patch({
-              foe: { art: monsterArt('king'), x: foeX, cls: 'pop' },
-              callout: { key: ++keyId.current, text: `THE KING · LV.${e.level}`, danger: false }
+              foe: { art: monsterArt('lord'), x: foeX, cls: 'pop' },
+              callout: { key: ++keyId.current, text: `${LORD.short.toUpperCase()} · LV.${e.level}`, danger: false }
             });
             setFoeBar();
-            sfx('king');
+            sfx('lord');
             await wait(1150);
-            patch({ foe: { art: monsterArt('king'), x: foeX, cls: '' } });
+            patch({ foe: { art: monsterArt('lord'), x: foeX, cls: '' } });
             break;
 
           case 'heroAttack':
