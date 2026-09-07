@@ -12,9 +12,9 @@ interface Seed {
 }
 
 const SEEDS: Seed[] = [
-  { title: 'First Blood', teaches: 'Put something in a room. Press RAID. Watch.', heroes: ['paladin'], traps: ['spike'], king: 1, heroLevel: 1 },
-  { title: 'The Long Cough', teaches: 'Poison ticks for three rooms and ignores armour. Tanks rot in it.', heroes: ['paladin'], traps: ['poison'], king: 1, heroLevel: 1 },
-  { title: 'Something Alive', teaches: 'Monsters fight back over several rounds. Traps do not.', heroes: ['paladin', 'druid'], monsters: ['goblin'], king: 1, heroLevel: 2 },
+  { title: 'First Blood', teaches: 'A trap hits once. A monster fights back. Put both in, press RAID, and watch.', heroes: ['paladin'], traps: ['spike'], monsters: ['goblin'], king: 2, heroLevel: 1 },
+  { title: 'The Long Cough', teaches: 'Poison ticks for three rooms and ignores armour. Tanks rot in it.', heroes: ['paladin'], traps: ['poison'], king: 2, heroLevel: 1 },
+  { title: 'Only So Many', teaches: 'The same trap or monster fits in two rooms at most. Mix them, or leave a room empty.', heroes: ['paladin', 'druid'], king: 1, heroLevel: 2 },
   { title: 'The Green Mender', teaches: 'The Druid heals every round. Out-damage her or burst her down.', heroes: ['druid'], king: 2, heroLevel: 2 },
   { title: 'Slick', teaches: 'Oil does nothing alone.', heroes: ['paladin', 'druid'], traps: ['oil'], king: 2, heroLevel: 2 },
   { title: 'Ignition', teaches: 'Oil Slick, then Fire Jet. Order is the whole trick.', heroes: ['paladin', 'druid', 'berserker'], traps: ['fire'], king: 2, heroLevel: 3 },

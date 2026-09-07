@@ -61,7 +61,7 @@ export default function DungeonView({
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        onScrollRoom(Math.max(0, Math.min(EDITABLE_ROOMS, Math.round(el.scrollLeft / CELL))));
+        onScrollRoom(Math.max(-1, Math.min(EDITABLE_ROOMS, Math.round(el.scrollLeft / CELL) - 1)));
       });
     };
     el.addEventListener('scroll', onScroll, { passive: true });

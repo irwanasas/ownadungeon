@@ -28,6 +28,10 @@ every status carries tags and can block a hero trait, and one interaction
 table decides what happens when they meet. That is the whole depth system;
 there are no per-hero special cases.
 
+**The same thing fits in two rooms at most.** No spamming five Spike Pits —
+five rooms means at least three different ideas, so the combinations below are
+not optional.
+
 | Combination | Result |
 | --- | --- |
 | Oil Slick, then Fire Jet | **IGNITION** — 2.2x damage and the hero catches fire |

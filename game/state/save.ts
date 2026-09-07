@@ -1,5 +1,5 @@
 import type { HeroRecord, RoomSlot } from '../types';
-import { EDITABLE_ROOMS } from '../types';
+import { EDITABLE_ROOMS, MAX_PER_ID } from '../types';
 import { STAGES } from '../content/stages';
 
 export interface GameStats {
@@ -47,6 +47,34 @@ export function emptyRooms(): RoomSlot[] {
   return Array.from({ length: EDITABLE_ROOMS }, () => ({ kind: 'empty' as const }));
 }
 
+export function idCounts(rooms: RoomSlot[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const slot of rooms) {
+    if (slot.kind === 'empty') continue;
+    counts[slot.id] = (counts[slot.id] || 0) + 1;
+  }
+  return counts;
+}
+
+export function canPlace(rooms: RoomSlot[], targetIndex: number, id: string): boolean {
+  let used = 0;
+  rooms.forEach((slot, i) => {
+    if (i !== targetIndex && slot.kind !== 'empty' && slot.id === id) used += 1;
+  });
+  return used < MAX_PER_ID;
+}
+
+export function enforceCaps(rooms: RoomSlot[]): RoomSlot[] {
+  const used: Record<string, number> = {};
+  return rooms.map((slot) => {
+    if (slot.kind === 'empty') return slot;
+    const next = (used[slot.id] || 0) + 1;
+    if (next > MAX_PER_ID) return { kind: 'empty' as const };
+    used[slot.id] = next;
+    return slot;
+  });
+}
+
 export function defaultState(): GameState {
   return {
     gold: 30,
@@ -81,7 +109,7 @@ export function normalize(input: Partial<GameState> | null): GameState {
   };
   const rooms = Array.isArray(input.rooms) ? input.rooms.slice(0, EDITABLE_ROOMS) : [];
   while (rooms.length < EDITABLE_ROOMS) rooms.push({ kind: 'empty' });
-  merged.rooms = rooms;
+  merged.rooms = enforceCaps(rooms);
   merged.stage = Math.max(1, Math.min(STAGES.length, merged.stage));
   merged.unlocked = [...new Set([...unlockedFor(Math.max(merged.stage, merged.maxStageCleared + 1)), ...merged.bought])];
   return merged;

@@ -940,6 +940,24 @@ img {
   color: var(--moss-lit);
   margin-top: 3px;
 }
+.row-count {
+  flex-shrink: 0;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--gold-lit);
+  padding: 3px 5px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.row-count.full {
+  color: var(--ember-lit);
+}
+.sheet-rule {
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.4;
+  padding: 0 4px 8px;
+}
+
 .row-cost {
   display: flex;
   align-items: center;

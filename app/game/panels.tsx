@@ -8,8 +8,9 @@ import { TREASURES } from '../../game/content/treasure';
 import { HEROES } from '../../game/content/heroes';
 import { INTERACTIONS } from '../../game/content/interactions';
 import { STAGES } from '../../game/content/stages';
+import { MAX_PER_ID } from '../../game/types';
 import { kingSoulCost, unlockSoulCost, upgradeCost } from '../../game/state/economy';
-import type { GameState } from '../../game/state/save';
+import { idCounts, type GameState } from '../../game/state/save';
 import { ICON, contentArt, heroArt } from './art';
 
 interface SheetProps {
@@ -58,9 +59,14 @@ export function BuildSheet({ open, room, state, onClose, onPlace, onBuy }: Build
     { label: 'Monsters', kind: 'monster', items: MONSTERS },
     { label: 'Treasure', kind: 'treasure', items: TREASURES }
   ];
+  const counts = idCounts(state.rooms);
+  const here = state.rooms[room];
+  const elsewhere = (id: string) => (counts[id] || 0) - (here && here.kind !== 'empty' && here.id === id ? 1 : 0);
 
   return (
     <Sheet open={open} title={`Build — Room ${room + 1}`} onClose={onClose}>
+      <div className="sheet-rule">The same thing fits in {MAX_PER_ID} rooms at most. Mix, or leave a room empty.</div>
+
       <button className="row inset" onClick={() => onPlace({ kind: 'empty' })}>
         <img src={ICON.clear} alt="" />
         <span className="row-body">
@@ -77,16 +83,36 @@ export function BuildSheet({ open, room, state, onClose, onPlace, onBuy }: Build
             const souls = unlockSoulCost(item.goldCost);
             const lvl = state.levels[item.id] || 1;
             if (owned) {
-              return (
-                <button key={item.id} className="row inset" onClick={() => onPlace({ kind: g.kind, id: item.id } as RoomSlot)}>
+              const used = elsewhere(item.id);
+              const atCap = used >= MAX_PER_ID;
+              const chip = (
+                <span className={'row-count' + (atCap ? ' full' : '')}>
+                  {used}/{MAX_PER_ID}
+                </span>
+              );
+              const body = (
+                <>
                   <img src={contentArt(g.kind, item.id)} alt="" />
                   <span className="row-body">
                     <span className="row-name">
                       {item.name}
                       <span className="row-lvl">Lv{lvl}</span>
                     </span>
-                    <span className="row-desc">{item.desc}</span>
+                    <span className="row-desc">{atCap ? "Already in 2 rooms — that's the limit." : item.desc}</span>
                   </span>
+                  {chip}
+                </>
+              );
+              if (atCap) {
+                return (
+                  <div key={item.id} className="row inset locked">
+                    {body}
+                  </div>
+                );
+              }
+              return (
+                <button key={item.id} className="row inset" onClick={() => onPlace({ kind: g.kind, id: item.id } as RoomSlot)}>
+                  {body}
                 </button>
               );
             }

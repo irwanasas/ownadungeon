@@ -6,7 +6,7 @@ import { EDITABLE_ROOMS } from '../../game/types';
 import { HEROES } from '../../game/content/heroes';
 import { STAGE_MAX, stageDef } from '../../game/content/stages';
 import { toDungeon } from '../../game/state/economy';
-import { loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
+import { canPlace, loadState, saveState, unlockedFor, type GameState } from '../../game/state/save';
 import { absorbResult, pickRaider, returningNote } from '../../game/state/roster';
 import { simulateRaid } from '../../game/sim/raid';
 import { offlineReport, type OfflineReport } from '../../game/sim/offline';
@@ -135,6 +135,7 @@ export default function GameShell() {
     if (selected < 0 || selected >= EDITABLE_ROOMS) return;
     const target = selected;
     update((s) => {
+      if (slot.kind !== 'empty' && !canPlace(s.rooms, target, slot.id)) return s;
       const rooms = s.rooms.slice();
       rooms[target] = slot;
       return { ...s, rooms };
