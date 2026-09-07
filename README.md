@@ -9,128 +9,137 @@ and when to run. You only get to decide what is waiting for them.
 
 Play: <https://irwanasas.github.io/ownadungeon/>
 
-## The loop
+## What is this game?
+
+Own a Dungeon flips the usual roguelike around. Instead of controlling a hero
+who explores a dungeon, you are the dungeon owner. You place traps, monsters,
+and treasure ahead of time, then a hero walks in on their own and you watch
+what happens. Win by killing or breaking the hero before they reach your
+Throne Room; lose gold if they get through.
+
+## How to play
+
+1. **Build** — tap Build and fill your rooms with traps, monsters, and
+   treasure. Each raid tests the layout you leave behind.
+2. **Raid** — press RAID. A hero enters and moves through your rooms on
+   their own, room by room, making their own choices.
+3. **Watch** — the raid plays out automatically with full combat animation.
+   You cannot intervene once it starts.
+4. **Reward** — when the raid ends you collect gold and souls based on how
+   far the hero got and how it ended.
+5. **Upgrade** — spend gold and souls to level up your rooms, your content,
+   and the Dungeon Lord himself.
+6. **Redesign** — go back to Build and rethink the layout for the next raid.
+
+## Core gameplay loop
 
 ```
 BUILD -> RAID -> WATCH -> REWARD -> UPGRADE -> REDESIGN
 ```
 
-The dungeon is a fixed six-room corridor you swipe through horizontally:
-
-```
-ENTRANCE -> ROOM 1..5 (yours) -> THRONE ROOM (permanent)
-```
-
-## What makes a dungeon good
-
-Not bigger numbers — order. Every trap and monster carries a damage tag,
-every status carries tags and can block a hero trait, and one interaction
-table decides what happens when they meet. That is the whole depth system;
-there are no per-hero special cases.
-
-**The same thing fits in two rooms at most.** No spamming five Spike Pits —
-five rooms means at least three different ideas, so the combinations below are
-not optional.
+The depth of the game isn't bigger numbers, it's combinations. Every trap and
+monster carries a damage type, every status effect it applies can interact
+with another, and a hero's own traits (armour, dodge, rage, healing) decide
+how they respond. A few examples:
 
 | Combination | Result |
 | --- | --- |
-| Oil Slick, then Fire Jet | **IGNITION** — 2.2x damage and the hero catches fire |
-| Net, then anything physical | **PINNED** — no dodge, no rage, 1.5x damage |
-| Frost, then a multi-hit monster | **BRITTLE** — dodge collapses, armour thins |
+| Oil Slick, then Fire Jet | **Ignition** — heavy bonus damage and the hero catches fire |
+| Net, then anything physical | **Pinned** — no dodging, no raging, extra damage |
+| Frost, then a multi-hit monster | **Brittle** — dodge collapses, armour thins |
 | Fire on a Druid | Burning blocks all healing |
-| Frost on a burning hero | **DOUSED** — you just put your own fire out |
+| Frost on a burning hero | **Doused** — the fire goes out |
 | Treasure after a poison cloud | Greedy heroes stop to loot, and keep breathing it |
 
-A Cursed Relic is the sharpest tool in the box: a hero who takes it can no
-longer flee, so they die in your dungeon instead of walking out.
+A Cursed Relic is the sharpest tool available: a hero who loots it can no
+longer flee, so they have to die in your dungeon instead of walking out with
+your gold.
 
-## The heroes
+Each trap or monster can only be placed in **two rooms per raid**, so a good
+dungeon needs variety, not one trick repeated five times.
 
-Six archetypes, each with a real mechanical identity and a real counter.
+## Heroes and archetypes
+
+Heroes are autonomous — you never control them. Each one has a real identity
+and a real counter, so knowing who is coming (or building to handle any of
+them) is the whole strategic layer:
 
 | Hero | Identity | Counter |
 | --- | --- | --- |
-| Paladin | Mitigates every direct hit, immune to fear | Poison and burn tick past armour |
-| Berserker | Rages when wounded, never retreats | A Net blocks rage outright |
-| Trickster | Dodges ~45% of everything, disarms traps | Chill or Net strips the dodge |
-| Assassin | Devastating first strike, 36 HP | Anything that survives the opener |
-| Druid | Heals every round, shrugs off poison | Burning shuts the healing off |
-| Elementalist | Grows stronger every round of a fight | Kill fast, or Weaken/Net the ramp |
+| Paladin | Mitigates most direct hits, immune to fear | Poison and burn tick past his armour |
+| Berserker | Rages when badly wounded, never retreats | A Net stops him from raging |
+| Trickster | Dodges roughly half of everything, disarms traps | Chill or Net strips her dodge |
+| Assassin | Devastating opening strike, very fragile | Anything that survives the opener kills him |
+| Druid | Heals every round, shrugs off poison | Burning shuts her healing off |
+| Elementalist | Grows stronger every round of a fight | Kill him fast, or slow the ramp with a Net or a debuff |
 
-Heroes are named, persist between raids, gain levels, and come back scarred:
-die to poison once and Sir William returns poison-resistant. Your dungeon
-teaches them.
+Heroes are named and remembered. They persist between raids, gain levels over
+time, and come back scarred by what killed them — a hero who nearly died to
+poison once may return more resistant to it. Your dungeon shapes who they
+become.
 
-## The world above
+## Dungeon / room system
 
-Every few raids a herald brings news — rumours, wars, plagues, discoveries,
-festivals. Roughly half is pure flavour. The rest bends the rules for two to
-four raids: a war drills warriors harder, a drought makes fire bite deeper, a
-pilgrim season fattens the soul take. Some events lead to others, so a border
-skirmish can become a war and then an exhausted levy that sends mages instead.
-
-Effects are visible on the World tab before you press RAID, at most two run at
-once, and every multiplier is clamped. They are meant to change what the right
-dungeon looks like this week, not to be survived passively.
-
-Adding an event is a data change — one entry in `game/content/worldEvents.ts`.
-Everything else reads a single resolved object from `worldModifiers()`.
-
-## Modes
-
-- **Stage** — 20 handcrafted stages, each introducing exactly one idea.
-- **Arcade** — endless waves, escalating hero and Dungeon Lord levels, best-wave tracking.
-- **Offline** — the dungeon keeps working while you are away, up to 8 hours,
-  simulated deterministically on return.
-
-Gold levels up what you own. Souls upgrade the Dungeon Lord and buy content ahead of
-its stage gate — and the further ahead you reach, the dearer it gets, so
-impatience costs real souls rather than skipping the ladder for free.
-
-## Running it
-
-```bash
-npm install
-npm run dev        # http://localhost:3000
-npm run type-check
-npm run build      # static export to out/
-```
-
-Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy-pages.yml`.
-
-## How it is built
-
-Next.js App Router, static export, TypeScript, React. No game engine, no canvas —
-the dungeon is DOM and CSS, and it scrolls natively so touch feels right.
+Your dungeon is a fixed corridor you scroll through horizontally:
 
 ```
-game/            simulation and data — no DOM, no React
-  content/       heroes, monsters, traps, treasure, statuses, interactions,
-                 stages, world events, names
-  state/         save, economy, hero roster, world announcer
-  sim/           hero instances, AI decisions, raid loop, offline batch, rng
-app/game/        presentation
-  GameShell      composition and handlers
-  useGameState   load, save, offline report, visibility, reset
-  DungeonView    the scrolling six-room world
-  useRaidDirector  turns the simulation's event log into timed animation
-  panels/        Sheet primitive + build, upgrade, codex, world, settings
-  overlays.tsx   result, offline, tutorial coach, hero teaser
-  styles/        tokens, chrome, dungeon, panels — imported in that order
-scripts/art/     regenerates every sprite and UI frame from assets-src/room/
+ENTRANCE -> ROOM 1..5 (yours to design) -> THRONE ROOM (permanent)
 ```
 
-`simulateRaid()` returns an ordered `RaidEvent[]` and nothing else. The
-presentation layer is the only thing that knows what a pixel is, and it just
-plays that list back with timing and sound. The same function runs the offline
-simulation with events switched off.
+- The five rooms in the middle are yours: fill each with a trap, a monster,
+  treasure, or leave it empty.
+- The Throne Room can't be edited — it's always the final encounter, guarded
+  by **Nekrokos the Demon Lord**, who grows stronger as you upgrade him.
+- A hero enters at the Entrance and moves room by room toward the Throne
+  Room, reacting to whatever they find along the way.
 
-## Art
+## Progression and resources
 
-Every room backdrop, door, torch and UI frame is cut from the single tileset in
-`assets-src/room/`. Nothing is drawn by hand on top of it, and the UI chrome
-frames are sampled from the same stone as the walls. Regenerate with:
+- **Gold** is earned from raids and spent leveling up the traps, monsters,
+  and treasure you own.
+- **Souls** are the rarer currency, used to upgrade the Dungeon Lord and to
+  unlock content early, ahead of the stage that would normally grant it —
+  the further ahead you reach, the more it costs.
+- **Stage mode** — 20 handcrafted stages, each one built around teaching or
+  testing a specific idea, with unlocks tied to progress.
+- **Arcade mode** — endless waves with escalating difficulty and a random
+  hero each time, for testing your dungeon without a script. Your best wave
+  is tracked.
+- **Offline progress** — your dungeon keeps raiding while you're away, for up
+  to 8 hours, and reports what happened when you return.
 
-```bash
-cd scripts/art && python3 gen_rooms.py && python3 gen_entities.py && python3 gen_ui.py
-```
+## World Announcer / events
+
+Every few raids, a herald brings news from outside your dungeon: rumours,
+wars, plagues, discoveries, festivals, and other fantasy events. Some news is
+pure flavour. Other events temporarily change the rules for a handful of
+raids — a war might make warriors hit harder, a drought might make fire bite
+deeper, a pilgrim season might swell the souls you earn. Some events lead
+into later ones, so a small skirmish can escalate into a war and then fade
+into something else entirely.
+
+At most two effects are active at once, and every effect is temporary and
+capped, so the world nudges your strategy without ever locking you out of a
+raid. Open the World tab any time to see what's currently in effect and what
+has happened before.
+
+## Controls
+
+- **Build** (bottom left) — open the build panel to place or change what's in
+  your rooms.
+- **RAID** (bottom center) — start a raid with your current layout.
+- **Upgrade** (bottom right) — spend gold and souls on upgrades.
+- **The World** (top left icon) — see active world events and past ones.
+- **Stage / Arcade** (top tabs) — switch between the two modes.
+- **Codex** (top icon) — look up heroes, monsters, traps, and treasure.
+- **Settings** (top right icon) — records, language, reset game, and credits.
+- Swipe or scroll left and right to look through your dungeon's rooms.
+
+## Credits
+
+Created by **xanaksetan**.
+
+- Instagram: <https://www.instagram.com/xanaksetan>
+- GitHub: <https://github.com/irwanasas>
+
+All Rights Reserved 2026.
