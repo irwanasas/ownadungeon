@@ -68,6 +68,26 @@
   padding: 10px 4px 5px;
 }
 
+.subtabs {
+  display: flex;
+  gap: 5px;
+  padding: 4px 0 2px;
+}
+.subtab {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 2px;
+  font-family: var(--pixel);
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-width: 8px;
+}
+.subtab.on {
+  color: var(--gold-lit);
+}
+
 .row {
   display: flex;
   align-items: center;

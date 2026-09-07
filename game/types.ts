@@ -46,6 +46,20 @@ export interface Interaction {
   hint: string;
 }
 
+export interface ComboTrophy {
+  id: string;
+  name: string;
+  desc: string;
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  desc: string;
+  stageMin?: number;
+  soulReward: number;
+}
+
 export interface HeroAbility {
   id: string;
   name: string;

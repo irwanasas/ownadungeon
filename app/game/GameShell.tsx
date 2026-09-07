@@ -5,9 +5,11 @@ import type { HeroRecord, RaidResult, RoomSlot, WorldEvent } from '../../game/ty
 import { EDITABLE_ROOMS } from '../../game/types';
 import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
 import { LORD } from '../../game/content/monsters';
+import { legacyFrom, trophiesFrom } from '../../game/content/milestones';
+import { challengeSouls, challengesFrom } from '../../game/content/challenges';
 import { toDungeon, unlockSoulCost } from '../../game/state/economy';
 import { effectCount, tickWorld, worldModifiers } from '../../game/state/world';
-import { canPlace, unlockedFor, type GameState } from '../../game/state/save';
+import { FAME_MAX, canPlace, unlockedFor, type GameState } from '../../game/state/save';
 import { absorbResult, returningNote } from '../../game/state/roster';
 import { simulateRaid } from '../../game/sim/raid';
 import { systemRng } from '../../game/sim/rng';
@@ -130,7 +132,8 @@ export default function GameShell() {
     const heroLevel = state.mode === 'arcade' ? 1 + Math.floor((state.wave - 1) / 2) : stage.heroLevel;
     const record: HeroRecord = { ...raider, level: Math.max(raider.level, heroLevel) };
     const lordLevel = state.mode === 'arcade' ? state.lordLevel + Math.floor(state.wave / 4) : Math.max(state.lordLevel, stage.lordLevel);
-    const raidResult = simulateRaid({ ...toDungeon(state), lordLevel }, record, tier, {
+    const dungeon = { ...toDungeon(state), lordLevel };
+    const raidResult = simulateRaid(dungeon, record, tier, {
       world: worldModifiers(state.world)
     });
 
@@ -141,12 +144,29 @@ export default function GameShell() {
       state.mode === 'stage' && raidResult.outcome === 'dungeonWin' && state.stage > state.maxStageCleared;
 
     update((s) => {
+      const roster = absorbResult(s.roster, record, raidResult);
+      const earned = [
+        ...trophiesFrom(raidResult.events),
+        ...(s.mode === 'stage' ? challengesFrom(dungeon, s.stage, raidResult) : [])
+      ].filter((id) => !s.unlockedMilestones.includes(id));
+      const fame = legacyFrom(roster[0], raidResult)
+        .filter((id) => !s.hallOfFame.some((e) => e.uid === roster[0].uid && e.milestoneId === id))
+        .map((id) => ({
+          uid: roster[0].uid,
+          heroName: roster[0].name,
+          title: roster[0].title,
+          milestoneId: id,
+          achievedAt: Date.now()
+        }));
+
       const next: GameState = {
         ...s,
         world: turned.world,
         gold: s.gold + raidResult.gold,
-        souls: s.souls + raidResult.souls,
-        roster: absorbResult(s.roster, record, raidResult),
+        souls: s.souls + raidResult.souls + challengeSouls(earned),
+        roster,
+        unlockedMilestones: earned.length > 0 ? [...s.unlockedMilestones, ...earned] : s.unlockedMilestones,
+        hallOfFame: fame.length > 0 ? [...fame, ...s.hallOfFame].slice(0, FAME_MAX) : s.hallOfFame,
         stats: {
           ...s.stats,
           raids: s.stats.raids + 1,

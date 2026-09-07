@@ -12,6 +12,14 @@ export interface GameStats {
   goldStolen: number;
 }
 
+export interface LegacyEntry {
+  uid: string;
+  heroName: string;
+  title: string;
+  milestoneId: string;
+  achievedAt: number;
+}
+
 export interface GameState {
   gold: number;
   souls: number;
@@ -30,9 +38,12 @@ export interface GameState {
   tutorial: number;
   lastSeenAt: number;
   world: WorldState;
+  unlockedMilestones: string[];
+  hallOfFame: LegacyEntry[];
 }
 
 const KEY = 'own_a_dungeon_v1';
+export const FAME_MAX = 20;
 
 export function unlockedFor(stage: number): string[] {
   const ids = new Set<string>(['spike']);
@@ -95,7 +106,9 @@ export function defaultState(): GameState {
     roster: [],
     tutorial: 0,
     lastSeenAt: Date.now(),
-    world: defaultWorld()
+    world: defaultWorld(),
+    unlockedMilestones: [],
+    hallOfFame: []
   };
 }
 
@@ -111,6 +124,8 @@ function normalize(input: (Partial<GameState> & { kingLevel?: number }) | null):
     roster: Array.isArray(input.roster) ? input.roster : [],
     bought: Array.isArray(input.bought) ? input.bought : [],
     world: normalizeWorld(input.world),
+    unlockedMilestones: Array.isArray(saved.unlockedMilestones) ? saved.unlockedMilestones : [],
+    hallOfFame: Array.isArray(saved.hallOfFame) ? saved.hallOfFame.slice(0, FAME_MAX) : [],
     lordLevel:
       typeof saved.lordLevel === 'number' ? saved.lordLevel : typeof kingLevel === 'number' ? kingLevel : base.lordLevel
   };
