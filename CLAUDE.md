@@ -23,6 +23,8 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
+- Don't over-engineer. Stay lean: less code, less prose, less ceremony.
+- When two approaches both work, pick the more concise one - fewer files touched, fewer moving parts.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
@@ -59,6 +61,8 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+Once assumptions are stated (Section 1) and the plan is set, act on it with high confidence - don't re-ask or hedge on a decision you already made.
 
 ## 5. No Comments, Short Summaries
 
