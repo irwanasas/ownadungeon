@@ -107,6 +107,20 @@ export default function GameShell() {
     sfx('place');
   }
 
+  function buyLordWeapon(id: string, cost: number) {
+    update((s) =>
+      s.gold < cost || s.unlockedLordWeapons.includes(id)
+        ? s
+        : { ...s, gold: s.gold - cost, unlockedLordWeapons: [...s.unlockedLordWeapons, id] }
+    );
+    sfx('coin');
+  }
+
+  function equipLordWeapon(id: string) {
+    update((s) => (s.unlockedLordWeapons.includes(id) ? { ...s, equippedLordWeapon: id } : s));
+    sfx('lord');
+  }
+
   function upgradeLord(souls: number) {
     update((s) => (s.souls < souls ? s : { ...s, souls: s.souls - souls, lordLevel: s.lordLevel + 1 }));
     sfx('lord');
@@ -366,7 +380,15 @@ export default function GameShell() {
         onPlace={place}
         onBuy={buyUnlock}
       />
-      <UpgradeSheet open={sheet === 'upgrade'} state={state} onClose={closeSheet} onUpgrade={upgrade} onLord={upgradeLord} />
+      <UpgradeSheet
+        open={sheet === 'upgrade'}
+        state={state}
+        onClose={closeSheet}
+        onUpgrade={upgrade}
+        onLord={upgradeLord}
+        onBuyLordWeapon={buyLordWeapon}
+        onEquipLordWeapon={equipLordWeapon}
+      />
       <CodexSheet open={sheet === 'codex'} state={state} onClose={closeSheet} />
       <WorldSheet open={sheet === 'world'} state={state} onClose={closeSheet} />
       <SettingsSheet open={sheet === 'settings'} state={state} onClose={closeSheet} onReset={resetGame} />

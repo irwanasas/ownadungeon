@@ -156,6 +156,7 @@ export interface BuiltRoom {
 export interface Dungeon {
   rooms: BuiltRoom[];
   lordLevel: number;
+  lordWeaponId: string;
 }
 
 export interface StageDef {

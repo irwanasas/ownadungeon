@@ -36,12 +36,14 @@ export function toDungeon(state: {
   rooms: import('../types').RoomSlot[];
   levels: Record<string, number>;
   lordLevel: number;
+  equippedLordWeapon: string;
 }): import('../types').Dungeon {
   return {
     rooms: state.rooms.map((slot) => ({
       slot,
       level: slot.kind === 'empty' ? 1 : state.levels[slot.id] || 1
     })),
-    lordLevel: state.lordLevel
+    lordLevel: state.lordLevel,
+    lordWeaponId: state.equippedLordWeapon
   };
 }

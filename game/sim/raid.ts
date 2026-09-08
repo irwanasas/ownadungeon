@@ -14,6 +14,7 @@ import type {
 import { EDITABLE_ROOMS } from '../types';
 import { heroDef } from '../content/heroes';
 import { monsterDef, LORD } from '../content/monsters';
+import { lordWeapon, type LordWeapon } from '../content/lordWeapons';
 import { trapDef } from '../content/traps';
 import { treasureDef } from '../content/treasure';
 import { raidRewards } from '../state/economy';
@@ -76,13 +77,13 @@ function monsterEnemy(def: MonsterDef, level: number, world: WorldModifiers): En
   };
 }
 
-function lordEnemy(level: number, world: WorldModifiers): Enemy {
+function lordEnemy(weapon: LordWeapon, level: number, world: WorldModifiers): Enemy {
   const lvl = Math.max(1, level);
   const hp = Math.max(1, Math.round((LORD.hp + (lvl - 1) * LORD.hpPerLevel) * world.monsterHp));
   return {
     id: 'lord',
     name: LORD.name,
-    tag: 'physical',
+    tag: weapon.tag,
     hp,
     maxHp: hp,
     atk: Math.max(1, Math.round((LORD.atk + (lvl - 1) * LORD.atkPerLevel) * world.monsterAtk)),
@@ -320,7 +321,7 @@ export function simulateRaid(dungeon: Dungeon, record: HeroRecord, tier: number,
       outcome = 'heroEscape';
     } else {
       roomsEntered += 1;
-      const lord = lordEnemy(dungeon.lordLevel, world);
+      const lord = lordEnemy(lordWeapon(dungeon.lordWeaponId), dungeon.lordLevel, world);
       events.push({ t: 'enterRoom', room: EDITABLE_ROOMS, kind: 'throne', contentId: 'lord' });
       events.push({ t: 'doorOpen', room: EDITABLE_ROOMS });
       events.push({ t: 'lordAppear', level: dungeon.lordLevel, hp: lord.hp, maxHp: lord.maxHp });

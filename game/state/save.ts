@@ -40,10 +40,13 @@ export interface GameState {
   world: WorldState;
   unlockedMilestones: string[];
   hallOfFame: LegacyEntry[];
+  equippedLordWeapon: string;
+  unlockedLordWeapons: string[];
 }
 
 const KEY = 'own_a_dungeon_v1';
 export const FAME_MAX = 20;
+const DEFAULT_LORD_WEAPON = 'lord-physical';
 
 export function unlockedFor(stage: number): string[] {
   const ids = new Set<string>(['spike']);
@@ -108,7 +111,9 @@ export function defaultState(): GameState {
     lastSeenAt: Date.now(),
     world: defaultWorld(),
     unlockedMilestones: [],
-    hallOfFame: []
+    hallOfFame: [],
+    equippedLordWeapon: DEFAULT_LORD_WEAPON,
+    unlockedLordWeapons: [DEFAULT_LORD_WEAPON]
   };
 }
 
@@ -126,6 +131,8 @@ function normalize(input: (Partial<GameState> & { kingLevel?: number }) | null):
     world: normalizeWorld(input.world),
     unlockedMilestones: Array.isArray(saved.unlockedMilestones) ? saved.unlockedMilestones : [],
     hallOfFame: Array.isArray(saved.hallOfFame) ? saved.hallOfFame.slice(0, FAME_MAX) : [],
+    equippedLordWeapon: saved.equippedLordWeapon || DEFAULT_LORD_WEAPON,
+    unlockedLordWeapons: Array.isArray(saved.unlockedLordWeapons) ? saved.unlockedLordWeapons : [DEFAULT_LORD_WEAPON],
     lordLevel:
       typeof saved.lordLevel === 'number' ? saved.lordLevel : typeof kingLevel === 'number' ? kingLevel : base.lordLevel
   };
