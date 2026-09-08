@@ -149,16 +149,17 @@ export default function GameShell() {
 
     update((s) => {
       const roster = absorbResult(s.roster, record, raidResult);
+      const hero = roster[0];
       const earned = [
         ...trophiesFrom(raidResult.events),
         ...(s.mode === 'stage' ? challengesFrom(dungeon, s.stage, raidResult) : [])
       ].filter((id) => !s.unlockedMilestones.includes(id));
-      const fame = legacyFrom(roster[0], raidResult)
-        .filter((id) => !s.hallOfFame.some((e) => e.uid === roster[0].uid && e.milestoneId === id))
+      const fame = legacyFrom(hero, raidResult)
+        .filter((id) => !s.hallOfFame.some((e) => e.uid === hero.uid && e.milestoneId === id))
         .map((id) => ({
-          uid: roster[0].uid,
-          heroName: roster[0].name,
-          title: roster[0].title,
+          uid: hero.uid,
+          heroName: hero.name,
+          title: hero.title,
           milestoneId: id,
           achievedAt: Date.now()
         }));
@@ -169,8 +170,8 @@ export default function GameShell() {
         gold: s.gold + raidResult.gold,
         souls: s.souls + raidResult.souls + challengeSouls(earned),
         roster,
-        unlockedMilestones: earned.length > 0 ? [...s.unlockedMilestones, ...earned] : s.unlockedMilestones,
-        hallOfFame: fame.length > 0 ? [...fame, ...s.hallOfFame].slice(0, FAME_MAX) : s.hallOfFame,
+        unlockedMilestones: [...s.unlockedMilestones, ...earned],
+        hallOfFame: [...fame, ...s.hallOfFame].slice(0, FAME_MAX),
         stats: {
           ...s.stats,
           raids: s.stats.raids + 1,

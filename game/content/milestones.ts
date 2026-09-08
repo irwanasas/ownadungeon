@@ -1,7 +1,8 @@
 import type { ComboTrophy, HeroRecord, RaidEvent, RaidResult } from '../types';
 import { INTERACTIONS } from './interactions';
 
-const EXTRA_TROPHIES: ComboTrophy[] = [
+export const TROPHIES: ComboTrophy[] = [
+  ...INTERACTIONS.map((i) => ({ id: i.id, name: i.name, desc: i.hint })),
   {
     id: 'first-split',
     name: 'DIVIDED',
@@ -12,11 +13,6 @@ const EXTRA_TROPHIES: ComboTrophy[] = [
     name: 'PICKED CLEAN',
     desc: 'A hero spotted one of your traps and took it apart before it fired.'
   }
-];
-
-export const TROPHIES: ComboTrophy[] = [
-  ...INTERACTIONS.map((i) => ({ id: i.id, name: i.name, desc: i.hint })),
-  ...EXTRA_TROPHIES
 ];
 
 export function trophiesFrom(events: RaidEvent[]): string[] {
