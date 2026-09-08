@@ -38,18 +38,15 @@ BUILD -> RAID -> WATCH -> REWARD -> UPGRADE -> REDESIGN
 ```
 
 The depth of the game isn't bigger numbers, it's combinations. Every trap and
-monster carries a damage type, every status effect it applies can interact
-with another, and a hero's own traits (armour, dodge, rage, healing) decide
-how they respond. A few examples:
+monster carries a damage type, and most leave something behind — a hero can be
+slick with oil, chilled, bound, poisoned or burning when they walk into the next
+room. What's already on them changes what the next room does to them, and a
+hero's own traits (armour, dodge, rage, healing) decide the rest.
 
-| Combination | Result |
-| --- | --- |
-| Oil Slick, then Fire Jet | **Ignition** — heavy bonus damage and the hero catches fire |
-| Net, then anything physical | **Pinned** — no dodging, no raging, extra damage |
-| Frost, then a multi-hit monster | **Brittle** — dodge collapses, armour thins |
-| Fire on a Druid | Burning blocks all healing |
-| Frost on a burning hero | **Doused** — the fire goes out |
-| Treasure after a poison cloud | Greedy heroes stop to loot, and keep breathing it |
+The strongest of these pairings have names, and the game will announce one the
+moment you cause it. Working out what goes with what is the actual game — the
+Codex keeps a list, but every entry stays blank until you've pulled it off
+yourself.
 
 A Cursed Relic is the sharpest tool available: a hero who loots it can no
 longer flee, so they have to die in your dungeon instead of walking out with
@@ -99,7 +96,8 @@ ENTRANCE -> ROOM 1..5 (yours to design) -> THRONE ROOM (permanent)
   and treasure you own.
 - **Souls** are the rarer currency, used to upgrade the Dungeon Lord and to
   unlock content early, ahead of the stage that would normally grant it —
-  the further ahead you reach, the more it costs.
+  the further ahead you reach, the more it costs. Raids pay a few; mastery
+  challenges pay the rest.
 - **Stage mode** — 20 handcrafted stages, each one built around teaching or
   testing a specific idea, with unlocks tied to progress.
 - **Arcade mode** — endless waves with escalating difficulty and a random
@@ -107,6 +105,25 @@ ENTRANCE -> ROOM 1..5 (yours to design) -> THRONE ROOM (permanent)
   is tracked.
 - **Offline progress** — your dungeon keeps raiding while you're away, for up
   to 8 hours, and reports what happened when you return.
+
+## Trophies, records and challenges
+
+Three things are kept for you in the Codex, on top of the stage ladder.
+
+- **Trophies** — eight discoveries, one for each of the game's named
+  combinations plus a couple of other notable moments. Every trophy reads `???`
+  until you actually cause it, then reveals its name and what it was. They cost
+  nothing and grant nothing; they're a record of what you've figured out.
+- **Hall of Fame** — heroes who had a real career in your dungeon: one who
+  reached their peak without you ever killing them, one who walked out alive
+  carrying two scars, one who came back for a twentieth raid. Entries stay after
+  the hero dies or drops out of your active roster. It's a memorial, not a
+  roster.
+- **Mastery challenges** — six constraint puzzles, listed openly so you can aim
+  at them, each paying souls the first time you clear it. One asks you to win a
+  raid without a single trap in the dungeon; others want a specific dungeon
+  shape, or a hero who never touched your treasure. They're checked in Stage
+  mode, and a few only open up from a later stage.
 
 ## World Announcer / events
 
@@ -131,7 +148,9 @@ has happened before.
 - **Upgrade** (bottom right) — spend gold and souls on upgrades.
 - **The World** (top left icon) — see active world events and past ones.
 - **Stage / Arcade** (top tabs) — switch between the two modes.
-- **Codex** (top icon) — look up heroes, monsters, traps, and treasure.
+- **Codex** (top icon) — three tabs: Dungeon (this stage's brief and your
+  trophies), Heroes (the archetypes, your veterans, the Hall of Fame), and
+  Challenges.
 - **Settings** (top right icon) — records, language, reset game, and credits.
 - Swipe or scroll left and right to look through your dungeon's rooms.
 
