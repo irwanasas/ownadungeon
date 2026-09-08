@@ -1,6 +1,6 @@
 import type { WorldEvent } from '../types';
 
-export const WORLD_EVENTS: WorldEvent[] = [
+const WORLD_EVENTS: WorldEvent[] = [
   {
     id: 'two-moons',
     headline: 'Two Moons Over the Vale',

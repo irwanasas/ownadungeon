@@ -14,11 +14,11 @@ import { statusDef } from '../content/statuses';
 import { findInteraction } from '../content/interactions';
 import type { Rng } from './rng';
 
-export function buildHero(record: HeroRecord, world?: WorldModifiers): HeroInstance {
+export function buildHero(record: HeroRecord, world: WorldModifiers): HeroInstance {
   const def = heroDef(record.defId);
   const lvl = Math.max(1, record.level);
-  const hpMult = (world ? world.heroHp : 1) * (world && world.familyHp[def.family] ? (world.familyHp[def.family] as number) : 1);
-  const atkMult = (world ? world.heroAtk : 1) * (world && world.familyAtk[def.family] ? (world.familyAtk[def.family] as number) : 1);
+  const hpMult = world.heroHp * (world.familyHp[def.family] || 1);
+  const atkMult = world.heroAtk * (world.familyAtk[def.family] || 1);
   const maxHp = Math.max(1, Math.round((def.hp + (lvl - 1) * 9) * hpMult));
   return {
     uid: record.uid,

@@ -21,7 +21,6 @@ export type Cue =
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let ambient: { osc: OscillatorNode[]; gain: GainNode } | null = null;
-let muted = false;
 
 function ac(): AudioContext | null {
   if (typeof window === 'undefined') return null;
@@ -77,7 +76,6 @@ function noise(dur: number, vol: number, hp: number, delay = 0): void {
 }
 
 export function play(cue: Cue): void {
-  if (muted) return;
   switch (cue) {
     case 'tap':
       tone(520, 0.05, 'square', 0.06);

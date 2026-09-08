@@ -17,12 +17,12 @@ export function raidRewards(
   outcome: Outcome,
   roomsEntered: number,
   tier: number,
-  world?: WorldModifiers
+  world: WorldModifiers
 ): { gold: number; souls: number } {
   const scale = 1 + (tier - 1) * 0.11;
   const toll = roomsEntered * 4;
-  const g = world ? world.gold : 1;
-  const sl = world ? world.souls : 1;
+  const g = world.gold;
+  const sl = world.souls;
   if (outcome === 'dungeonWin') {
     return { gold: Math.round((30 + toll) * scale * g), souls: Math.round((1 + Math.floor(tier / 3)) * sl) };
   }
