@@ -1,4 +1,5 @@
 import type { Outcome, WorldModifiers } from '../types';
+import type { GameState } from './save';
 
 export function upgradeCost(baseCost: number, level: number): number {
   return Math.round(baseCost * 1.8 * Math.pow(1.5, level - 1));
@@ -30,6 +31,13 @@ export function raidRewards(
     return { gold: Math.round((11 + toll) * scale * g), souls: Math.round(1 * sl) };
   }
   return { gold: Math.round(5 * scale * g), souls: 0 };
+}
+
+export function dungeonPower(state: GameState): number {
+  return (
+    state.rooms.reduce((sum, slot) => (slot.kind === 'empty' ? sum : sum + (state.levels[slot.id] || 1)), 0) +
+    state.lordLevel
+  );
 }
 
 export function toDungeon(state: {

@@ -7,7 +7,7 @@ import { STAGE_MAX, stageDef, unlockStageOf } from '../../game/content/stages';
 import { LORD } from '../../game/content/monsters';
 import { legacyFrom, trophiesFrom } from '../../game/content/milestones';
 import { challengeSouls, challengesFrom } from '../../game/content/challenges';
-import { toDungeon, unlockSoulCost } from '../../game/state/economy';
+import { dungeonPower, toDungeon, unlockSoulCost } from '../../game/state/economy';
 import { effectCount, tickWorld, worldModifiers } from '../../game/state/world';
 import { FAME_MAX, canPlace, unlockedFor, type GameState } from '../../game/state/save';
 import { absorbResult, returningNote } from '../../game/state/roster';
@@ -252,6 +252,7 @@ export default function GameShell() {
             {state.mode === 'stage'
               ? `Stage ${state.stage}/${STAGE_MAX} · ${stage.title}`
               : `Wave ${state.wave} · Best ${state.bestWave}`}
+            {` · Power ${dungeonPower(state)}`}
           </div>
         </div>
         <div className="hud-right">
